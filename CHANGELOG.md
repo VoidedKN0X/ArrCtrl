@@ -4,6 +4,31 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.3.0 (2026-10-19)
+
+The Activity tab now works: your Radarr and Sonarr queue, your qBittorrent torrents and your download history, all in one place.
+
+### New
+
+- **Queue**: everything Radarr and Sonarr are downloading, from all your servers in one list. Each item shows the movie or episode, progress, size, time left, quality and status (downloading, queued, paused, waiting to import, import blocked, failed and more). Items with a problem are listed first, in red, with the reason from Radarr or Sonarr (for example "No files found are eligible for import")
+- **Queue details**: tap an item for the release name, client, indexer, protocol, path and every message about it
+- **Remove from the queue**, with the same choices as the web UI: also remove it from the download client, add the release to the blocklist, and (when blocklisting) don't search for a replacement
+- **Manual import** for downloads stuck on "import blocked" or "waiting to import": see the files found, what Radarr or Sonarr matched them to, and why any were rejected. Tap a file's match to choose a different movie, or a different series and episodes. Files that are matched and have no problems are selected for you; importing files with problems asks first
+- **Torrents**: every torrent from qBittorrent with progress, state, size, time left, download and upload speed, ratio, seeds and peers, category and tags. Filters for downloading, seeding, stopped and errored, with counts
+- **Torrent actions**: long-press a torrent (or use the menu on its page) to start or stop it, force start, recheck, change its category or tags, move it in the queue, set its own download and upload limits, or delete it with or without its files
+- **Torrent page**: tap a torrent for live progress and speeds, plus tabs for info (path, downloaded and uploaded, limits, times, pieces, hash), files (tap a file to set its priority, including "don't download"), trackers with their status and counts, and connected peers
+- **Speeds at the top** of the Activity tab: the total download and upload speed of your qBittorrent servers, with a button to turn the alternative speed limits on or off
+- **Add torrents** from a magnet link (or several at once) or a .torrent file, with a choice of category, which qBittorrent server (when you have more than one), and whether to add them stopped
+- **Open magnet links and .torrent files with ArrCtrl**, from your browser, file manager or the share sheet. ArrCtrl can be the default app for magnet links
+- **History**: grabbed, imported, failed, deleted, renamed and ignored events from all Radarr and Sonarr servers, newest first, with filters and "load more". Failed events show the reason
+- **Pull to refresh** on every list. The torrents update every 2 seconds and the queue every 5 while you're looking at them; nothing is checked in the background
+- **One server down doesn't stop the rest**: an unreachable server shows a red card with the reason at the top, and the other servers' items still show
+- Works with qBittorrent 4.x (pause and resume) and 5.x (stop and start)
+
+### Changed
+
+- The Activity tab shows what's there instead of a placeholder, and switches between Queue, Torrents and History when you have both Radarr or Sonarr and qBittorrent
+
 ## v0.2.0 (2026-10-19)
 
 You can now add your servers. Every service ArrCtrl supports can be set up and tested; the screens that use them arrive in the next updates, starting with Activity.

@@ -34,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +42,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vknxworks.arrctrl.container
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -60,7 +64,10 @@ import com.vknxworks.arrctrl.ui.servers.ImportScreen
 import com.vknxworks.arrctrl.ui.servers.ServerEditScreen
 import com.vknxworks.arrctrl.ui.settings.AccountScreen
 import com.vknxworks.arrctrl.ui.settings.SettingsScreen
-import com.vknxworks.arrctrl.ui.tabs.ActivityScreen
+import com.vknxworks.arrctrl.ui.activity.ActivityScreen
+import com.vknxworks.arrctrl.ui.activity.AddTorrentScreen
+import com.vknxworks.arrctrl.ui.activity.ManualImportScreen
+import com.vknxworks.arrctrl.ui.activity.TorrentScreen
 import com.vknxworks.arrctrl.ui.tabs.CalendarScreen
 import com.vknxworks.arrctrl.ui.tabs.MoreScreen
 import com.vknxworks.arrctrl.ui.tabs.MoviesScreen
@@ -101,6 +108,14 @@ private fun MainScaffold() {
             launchSingleTop = true
             restoreState = true
         }
+    }
+
+    val c = LocalContext.current.container
+    val incoming by c.pendingTorrent.collectAsStateWithLifecycle()
+    LaunchedEffect(incoming) {
+        val t = incoming ?: return@LaunchedEffect
+        c.pendingTorrent.value = null
+        navController.navigate(AddTorrentRoute(link = t.link, file = t.fileUri)) { launchSingleTop = true }
     }
 
     CompositionLocalProvider(LocalNavigator provides navigator) {
@@ -189,5 +204,17 @@ private fun AppNavHost(navController: NavHostController) {
             ServerEditScreen(r.id, r.type)
         }
         composable<ImportRoute> { ImportScreen() }
+        composable<TorrentRoute> {
+            val r = it.toRoute<TorrentRoute>()
+            TorrentScreen(r.serverId, r.hash)
+        }
+        composable<ManualImportRoute> {
+            val r = it.toRoute<ManualImportRoute>()
+            ManualImportScreen(r.serverId, r.downloadId, r.title)
+        }
+        composable<AddTorrentRoute> {
+            val r = it.toRoute<AddTorrentRoute>()
+            AddTorrentScreen(r.link, r.file)
+        }
     }
 }
