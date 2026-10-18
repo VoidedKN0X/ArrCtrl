@@ -15,7 +15,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Download
@@ -32,7 +34,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,13 +54,20 @@ import com.vknxworks.arrctrl.R
 import com.vknxworks.arrctrl.container
 import com.vknxworks.arrctrl.data.settings.AppSettings
 import com.vknxworks.arrctrl.data.settings.ThemeChoice
+import com.vknxworks.arrctrl.data.server.ServiceType
+import com.vknxworks.arrctrl.ui.components.ChoiceSheet
 import com.vknxworks.arrctrl.ui.components.Group
 import com.vknxworks.arrctrl.ui.components.GroupChoice
 import com.vknxworks.arrctrl.ui.components.GroupRow
 import com.vknxworks.arrctrl.ui.components.GroupSwitch
 import com.vknxworks.arrctrl.ui.components.ScreenTopBar
 import com.vknxworks.arrctrl.ui.nav.LocalNavigator
+import com.vknxworks.arrctrl.ui.nav.ImportRoute
+import com.vknxworks.arrctrl.ui.nav.ServerEditRoute
 import com.vknxworks.arrctrl.ui.nav.SettingsRoute
+import com.vknxworks.arrctrl.ui.servers.CheckIcon
+import com.vknxworks.arrctrl.ui.servers.checkText
+import com.vknxworks.arrctrl.ui.servers.icon
 import kotlinx.coroutines.launch
 
 private const val REPO_URL = "https://github.com/VoidedKN0X/ArrCtrl"
@@ -66,8 +79,6 @@ private const val SPONSORS_URL = "https://github.com/sponsors/VoidedKN0X"
 fun AccountScreen() {
     val nav = LocalNavigator.current
     val uri = LocalUriHandler.current
-    val notSetUp = stringResource(R.string.not_set_up)
-
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         containerColor = MaterialTheme.colorScheme.background,
@@ -85,15 +96,7 @@ fun AccountScreen() {
                 Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium)
             }
 
-            Group(stringResource(R.string.servers), footer = stringResource(R.string.servers_footer)) {
-                ServiceRow(R.string.service_radarr, R.string.service_radarr_role, Icons.Outlined.Movie, notSetUp)
-                ServiceRow(R.string.service_sonarr, R.string.service_sonarr_role, Icons.Outlined.Tv, notSetUp)
-                ServiceRow(R.string.service_qbittorrent, R.string.service_qbittorrent_role, Icons.Outlined.Download, notSetUp)
-                ServiceRow(R.string.service_prowlarr, R.string.service_prowlarr_role, Icons.Outlined.Search, notSetUp)
-                ServiceRow(R.string.service_bazarr, R.string.service_bazarr_role, Icons.Outlined.Subtitles, notSetUp)
-                ServiceRow(R.string.service_autobrr, R.string.service_autobrr_role, Icons.Outlined.RssFeed, notSetUp)
-                ServiceRow(R.string.service_cleanuparr, R.string.service_cleanuparr_role, Icons.Outlined.CleaningServices, notSetUp)
-            }
+            ServersSection()
 
             Group {
                 GroupRow(
@@ -122,9 +125,52 @@ fun AccountScreen() {
     }
 }
 
+/** Every saved server with its live connection status, plus add and import. */
 @Composable
-private fun ServiceRow(name: Int, role: Int, icon: androidx.compose.ui.graphics.vector.ImageVector, status: String) {
-    GroupRow(stringResource(name), "${stringResource(role)} · $status", icon, enabled = false)
+private fun ServersSection() {
+    val c = LocalContext.current.container
+    val nav = LocalNavigator.current
+    val servers by c.servers.servers.collectAsStateWithLifecycle()
+    val status by c.status.state.collectAsStateWithLifecycle()
+    var picking by remember { mutableStateOf(false) }
+
+    // Re-check whenever the list changes (a server was added, edited, removed or imported).
+    LaunchedEffect(servers) { c.status.refresh(servers) }
+
+    Group(
+        stringResource(R.string.servers),
+        footer = stringResource(if (servers.isEmpty()) R.string.servers_footer_empty else R.string.servers_footer),
+    ) {
+        servers.forEach { s ->
+            GroupRow(
+                s.name,
+                "${stringResource(s.type.label)} · ${checkText(status[s.id], s.type)}",
+                s.type.icon,
+                onClick = { nav.navigate(ServerEditRoute(id = s.id)) },
+                trailing = { CheckIcon(status[s.id]) },
+            )
+        }
+        GroupRow(stringResource(R.string.add_server), icon = Icons.Outlined.Add, showChevron = true, onClick = { picking = true })
+        GroupRow(
+            stringResource(R.string.import_title),
+            stringResource(R.string.import_subtitle),
+            Icons.Outlined.QrCodeScanner,
+            showChevron = true,
+            onClick = { nav.navigate(ImportRoute) },
+        )
+    }
+
+    if (picking) {
+        ChoiceSheet(
+            stringResource(R.string.add_server_pick),
+            ServiceType.entries.map { it to stringResource(it.label) },
+            selected = null,
+            onDismiss = { picking = false },
+        ) { type ->
+            picking = false
+            nav.navigate(ServerEditRoute(type = type.id))
+        }
+    }
 }
 
 @Composable

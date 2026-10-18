@@ -10,7 +10,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/VoidedKN0X/ArrCtrl"><img src=".github/assets/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a> <a href="https://voidedkn0x.github.io/CtrlF-Droid/"><img src=".github/assets/badge_ctrlf-droid.png" alt="Get it from our F-Droid repo" height="80"></a>
 
-> **Early development.** Version 0.1.0 is the app's frame: tabs, settings and theming. Server setup and the features below arrive over the next updates; see the [changelog](CHANGELOG.md).
+> **Early development.** You can add and test all your servers; the screens that use them (starting with Activity) arrive over the next updates. See the [changelog](CHANGELOG.md).
 
 ## Features
 
@@ -44,6 +44,48 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/VoidedKN0X/ArrCtrl"><img src=".github/assets/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a> <a href="https://voidedkn0x.github.io/CtrlF-Droid/"><img src=".github/assets/badge_ctrlf-droid.png" alt="Get it from our F-Droid repo" height="80"></a>
 
 If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X/ArrCtrl` in Obtainium by hand.
+
+## Getting started
+
+1. Tap the button at the top right of any tab, then **Add a server**.
+2. Pick the service and enter its address, e.g. `http://192.168.1.10:7878` or `https://radarr.example.com`. Add the path too if it runs under one behind a reverse proxy (`https://example.com/radarr`).
+3. Enter the API key (in the web UI under Settings → General → Security for Radarr, Sonarr, Prowlarr and Bazarr). For qBittorrent use your Web UI username and password, or an API key on recent versions.
+4. Tap **Test**, then **Save**. If the server uses a self-signed certificate, tap **Review certificate**, check the fingerprint and trust it. ArrCtrl then accepts that exact certificate from that server only.
+
+Every service is optional, and you can add more than one of each.
+
+### Import all servers at once
+
+Instead of typing seven API keys on your phone, put them in one JSON block and either paste it (**Import servers** → **Paste**) or turn it into a QR code and scan it (**Scan QR**).
+
+```json
+{
+  "arrctrl": 1,
+  "servers": [
+    { "type": "radarr",      "url": "http://192.168.1.10:7878", "apiKey": "…" },
+    { "type": "radarr",      "name": "Radarr 4K", "url": "http://192.168.1.10:7879", "apiKey": "…" },
+    { "type": "sonarr",      "url": "https://sonarr.example.com", "apiKey": "…" },
+    { "type": "prowlarr",    "url": "http://192.168.1.10:9696", "apiKey": "…" },
+    { "type": "bazarr",      "url": "http://192.168.1.10:6767", "apiKey": "…" },
+    { "type": "qbittorrent", "url": "http://192.168.1.10:8080", "username": "admin", "password": "…" },
+    { "type": "autobrr",     "url": "http://192.168.1.10:7474", "apiKey": "…" },
+    { "type": "cleanuparr",  "url": "https://cleanuparr.lan", "apiKey": "…", "certSha256": "AB:CD:…" }
+  ]
+}
+```
+
+| Field | Needed | What it is |
+| --- | --- | --- |
+| `type` | yes | `radarr`, `sonarr`, `prowlarr`, `bazarr`, `qbittorrent`, `autobrr` or `cleanuparr` |
+| `url` | yes | The server address. Without `http://` or `https://`, IP addresses and local names get `http://`, anything else `https://` |
+| `apiKey` | yes, except qBittorrent | The service's API key. For qBittorrent, an API key replaces username and password |
+| `username`, `password` | qBittorrent only | Your qBittorrent Web UI login, when not using an API key |
+| `name` | no | Shown in the app. Defaults to the service name, numbered when there's more than one |
+| `certSha256` | no | SHA-256 fingerprint of a self-signed certificate to trust, with or without colons |
+
+A plain list of servers (without the `"servers"` wrapper) works too. A server already saved with the same service and address is updated rather than added twice.
+
+To make a QR code on Linux, save the JSON as `arrctrl.json` and run `qrencode -t ansiutf8 < arrctrl.json` (or `-o arrctrl.png` for an image). **The JSON and the QR code contain your API keys and passwords.** Delete them once you've scanned them, and don't share screenshots of them.
 
 ## Build from source
 

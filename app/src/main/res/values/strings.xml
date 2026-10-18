@@ -35,19 +35,20 @@
 
     <!-- Empty tabs (before server setup) -->
     <string name="empty_movies_title">No Radarr server yet</string>
-    <string name="empty_movies_body">Your movie library will show here once a Radarr server is added. Server setup arrives in the next update.</string>
+    <string name="empty_movies_body">Add your Radarr server to see your movie library here.</string>
     <string name="empty_series_title">No Sonarr server yet</string>
-    <string name="empty_series_body">Your series will show here once a Sonarr server is added. Server setup arrives in the next update.</string>
+    <string name="empty_series_body">Add your Sonarr server to see your series here.</string>
     <string name="empty_calendar_title">Nothing to show yet</string>
-    <string name="empty_calendar_body">Upcoming movies and episodes from Radarr and Sonarr will show here once a server is added.</string>
+    <string name="empty_calendar_body">Add Radarr or Sonarr to see upcoming movies and episodes here.</string>
     <string name="empty_activity_title">No downloads to show</string>
-    <string name="empty_activity_body">The Radarr and Sonarr queues and your qBittorrent torrents will show here once a server is added.</string>
+    <string name="empty_activity_body">Add Radarr, Sonarr or qBittorrent to see your queue and torrents here.</string>
     <string name="more_tools">Tools</string>
-    <string name="more_footer">Each section appears once its server is set up.</string>
+    <string name="more_footer">Tap a tool to add its server. Their screens arrive in later updates.</string>
 
     <!-- Account and settings -->
     <string name="servers">Servers</string>
-    <string name="servers_footer">Adding servers arrives in the next update.</string>
+    <string name="servers_footer">Tap a server to edit it, test it again or remove it. Every service is optional, and you can add more than one of each.</string>
+    <string name="servers_footer_empty">Add the services you run. Every one is optional, and you can add more than one of each (a second Radarr for 4K, say).</string>
     <string name="settings">Settings</string>
     <string name="settings_subtitle">Theme and colours</string>
     <string name="about">About</string>
@@ -68,4 +69,108 @@
     <string name="theme_black">Pure black</string>
     <string name="dynamic_colour">Use wallpaper colours</string>
     <string name="dynamic_colour_subtitle">Replaces ArrCtrl\'s amber with colours from your wallpaper</string>
+
+    <!-- Buttons and common words -->
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="remove">Remove</string>
+    <string name="show">Show</string>
+    <string name="hide">Hide</string>
+
+    <!-- Tabs once a server is added (their content arrives in later updates) -->
+    <string name="tab_connected_title">Server added</string>
+    <string name="ready_movies_body">Your Radarr server is set up. The movie library arrives in an upcoming update.</string>
+    <string name="ready_series_body">Your Sonarr server is set up. Series and episodes arrive in an upcoming update.</string>
+    <string name="ready_calendar_body">Your servers are set up. The combined calendar arrives in an upcoming update.</string>
+    <string name="ready_activity_body">Your servers are set up. The queue and torrents arrive in the next update.</string>
+    <string name="more_connected">Added</string>
+
+    <!-- Servers -->
+    <string name="add_server">Add a server</string>
+    <string name="add_server_pick">Which service?</string>
+    <string name="add_service">Add %1$s</string>
+    <string name="server_not_found">This server no longer exists.</string>
+    <string name="remove_server">Remove server</string>
+    <string name="remove_server_title">Remove %1$s?</string>
+    <string name="remove_server_body">Its address and key are deleted from this phone. Nothing changes on the server.</string>
+    <string name="status_checking">Checking…</string>
+    <string name="status_connected">Connected</string>
+    <string name="status_problem">Problem</string>
+
+    <!-- Server form -->
+    <string name="field_name">Name</string>
+    <string name="field_address">Address</string>
+    <string name="field_address_hint">http://192.168.1.10:%1$d</string>
+    <string name="field_address_help">IP address, local name or domain, with a path if it runs behind a reverse proxy</string>
+    <string name="field_address_invalid">That isn\'t a valid web address</string>
+    <string name="field_api_key">API key</string>
+    <string name="field_username">Username</string>
+    <string name="field_password">Password</string>
+    <string name="field_required">Required</string>
+    <string name="http_warning">Not encrypted (HTTP). Fine on your home network, but use https if you connect over the internet.</string>
+    <string name="qbit_login">Username and password</string>
+    <string name="qbit_api_key">API key</string>
+    <string name="key_help_arr">In the web UI: Settings → General → Security → API Key</string>
+    <string name="key_help_bazarr">In the web UI: Settings → General → Security → API Key</string>
+    <string name="key_help_autobrr">In the web UI: Settings → API Keys → add a key</string>
+    <string name="key_help_cleanuparr">In the web UI: Settings → Account → API key</string>
+    <string name="key_help_qbittorrent">Only in recent qBittorrent versions (Web API 2.14.1 or newer). Create one in the Web UI options.</string>
+    <string name="key_help_qbittorrent_login">Your qBittorrent Web UI login</string>
+    <string name="test_connection">Test</string>
+    <string name="save_anyway_title">Save without a working connection?</string>
+    <string name="save_anyway_body">The test didn\'t succeed. You can save the server anyway and fix it later.</string>
+    <string name="save_anyway">Save anyway</string>
+
+    <!-- Connection test results -->
+    <string name="test_ok">Connected</string>
+    <string name="test_ok_version">Connected to %1$s %2$s</string>
+    <string name="test_wrong_service">Something answered, but it isn\'t %1$s. Check the address and port.</string>
+    <string name="test_wrong_service_found">That\'s %1$s, not %2$s. Check the address and port.</string>
+    <string name="test_bad_key">The API key was refused</string>
+    <string name="test_bad_login">Wrong username or password</string>
+    <string name="test_banned">qBittorrent has blocked this phone after too many failed sign-ins. Wait, or unban it in qBittorrent\'s settings.</string>
+    <string name="test_cert_untrusted">The server\'s certificate isn\'t trusted (self-signed or private CA)</string>
+    <string name="test_cert_changed">The server\'s certificate changed since you trusted it</string>
+    <string name="test_tls_failed">Secure connection failed. If the server only speaks http, use http:// in the address.</string>
+    <string name="test_host_not_found">Server not found. Check the address, and that you\'re on the right network.</string>
+    <string name="test_refused">Connection refused. Is the service running on that port?</string>
+    <string name="test_timeout">The server didn\'t answer in time</string>
+    <string name="test_unreachable">Can\'t reach the server</string>
+    <string name="test_http_error">The server answered with an error (HTTP %1$d)</string>
+
+    <!-- Certificates -->
+    <string name="cert_section">Certificate</string>
+    <string name="cert_pinned">Trusted self-signed certificate</string>
+    <string name="cert_forget">Forget</string>
+    <string name="cert_review">Review certificate</string>
+    <string name="cert_fetch_failed">Couldn\'t read the server\'s certificate.</string>
+    <string name="cert_trust">Trust</string>
+    <string name="cert_trust_title">Trust this certificate?</string>
+    <string name="cert_trust_body">%1$s uses a certificate your phone doesn\'t recognise. Check that this SHA-256 fingerprint matches your server\'s certificate. ArrCtrl will only accept this exact certificate from this server.</string>
+    <string name="cert_changed_title">Certificate changed</string>
+    <string name="cert_changed_body">%1$s now shows a different certificate than the one you trusted. If you didn\'t renew it yourself, someone may be intercepting the connection. Only trust it if the fingerprint matches your server\'s.</string>
+
+    <!-- Import -->
+    <string name="import_title">Import servers</string>
+    <string name="import_subtitle">Paste or scan all your servers at once</string>
+    <string name="import_intro">Add several servers at once from a JSON block, pasted or scanned from a QR code. The format is in the README on GitHub.</string>
+    <string name="import_scan">Scan QR</string>
+    <string name="import_paste">Paste</string>
+    <string name="import_scan_prompt">Point the camera at your ArrCtrl QR code</string>
+    <string name="import_field">Server settings (JSON)</string>
+    <string name="import_bad_format">Not valid ArrCtrl server settings</string>
+    <string name="import_preview">Found</string>
+    <string name="import_new">new</string>
+    <string name="import_updates">updates the saved server</string>
+    <string name="import_entry">Server %1$d</string>
+    <string name="import_problem_type">Unknown service \"%1$s\"</string>
+    <string name="import_problem_url">Not a valid address: %1$s</string>
+    <string name="import_problem_key">No API key</string>
+    <string name="import_problem_login">No API key, or username and password</string>
+    <string name="import_add_none">Nothing to add</string>
+    <string name="import_format_help">A server already saved with the same service and address is updated instead of added twice. Servers aren\'t tested during import; the Servers list checks them right after.</string>
+    <plurals name="import_add">
+        <item quantity="one">Add %1$d server</item>
+        <item quantity="other">Add %1$d servers</item>
+    </plurals>
 </resources>
