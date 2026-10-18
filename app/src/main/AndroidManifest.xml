@@ -8,6 +8,12 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
+    <!-- Package visibility for the "Play in JellyCtrl" and "Open in SeerrCtrl" buttons. -->
+    <queries>
+        <package android:name="com.vknxworks.jellyctrl" />
+        <package android:name="com.vknxworks.seerrctrl" />
+    </queries>
+
     <application
         android:name=".ArrCtrlApp"
         android:allowBackup="false"

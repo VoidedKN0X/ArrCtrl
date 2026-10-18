@@ -79,7 +79,6 @@
 
     <!-- Tabs once a server is added (their content arrives in later updates) -->
     <string name="tab_connected_title">Server added</string>
-    <string name="ready_movies_body">Your Radarr server is set up. The movie library arrives in an upcoming update.</string>
     <string name="ready_series_body">Your Sonarr server is set up. Series and episodes arrive in an upcoming update.</string>
     <string name="ready_calendar_body">Your servers are set up. The combined calendar arrives in an upcoming update.</string>
     <string name="more_connected">Added</string>
@@ -351,4 +350,146 @@
     <string name="history_other">Event</string>
     <string name="history_empty">No history yet</string>
     <string name="history_load_more">Load more</string>
+
+    <!-- Common (stage 4) -->
+    <string name="ok">OK</string>
+    <string name="retry">Retry</string>
+    <string name="clear">Clear</string>
+    <string name="none">None</string>
+    <string name="saved">Saved</string>
+    <string name="sort">Sort</string>
+    <string name="sort_ascending">↑</string>
+    <string name="sort_descending">↓</string>
+    <string name="view_grid">Show as grid</string>
+    <string name="view_list">Show as list</string>
+    <string name="minutes_short">%1$d min</string>
+    <string name="free_space">%1$s free</string>
+    <string name="tags_none">No tags yet. Create them in the web UI.</string>
+    <string name="selection_count">%1$d selected</string>
+    <string name="selection_clear">Clear selection</string>
+    <string name="selection_all">Select all</string>
+
+    <!-- Movies -->
+    <string name="movies_search_hint">Search your movies</string>
+    <string name="movies_none">No movies yet</string>
+    <string name="movies_none_body">Tap + to add one.</string>
+    <string name="movies_no_match">No movies match</string>
+    <string name="filter_monitored">Monitored</string>
+    <string name="filter_unmonitored">Unmonitored</string>
+    <string name="filter_missing">Missing</string>
+    <string name="filter_downloaded">Downloaded</string>
+    <string name="sort_title">Title</string>
+    <string name="sort_year">Year</string>
+    <string name="sort_added">Date added</string>
+    <string name="sort_release">Release date</string>
+    <string name="sort_size">Size on disk</string>
+    <string name="sort_rating">Rating</string>
+    <string name="badge_downloading">Downloading</string>
+    <string name="badge_downloaded">Downloaded</string>
+    <string name="badge_missing">Missing</string>
+    <string name="badge_in_cinemas">In cinemas</string>
+    <string name="badge_announced">Announced</string>
+    <string name="badge_unmonitored">Unmonitored</string>
+    <string name="bulk_monitor">Monitor</string>
+    <string name="bulk_unmonitor">Unmonitor</string>
+    <string name="bulk_profile">Change quality profile</string>
+    <string name="bulk_search">Search</string>
+    <string name="bulk_delete">Delete</string>
+    <string name="bulk_done">Done for %1$d</string>
+    <plurals name="bulk_confirm">
+        <item quantity="one">Apply to %1$d movie?</item>
+        <item quantity="other">Apply to %1$d movies?</item>
+    </plurals>
+    <plurals name="movies_delete_title">
+        <item quantity="one">Delete %1$d movie?</item>
+        <item quantity="other">Delete %1$d movies?</item>
+    </plurals>
+
+    <!-- Movie page -->
+    <string name="movie_gone">This movie is no longer in Radarr.</string>
+    <string name="movie_search">Search</string>
+    <string name="movie_search_started">Search started</string>
+    <string name="movie_interactive">Interactive</string>
+    <string name="movie_refresh">Refresh</string>
+    <string name="movie_refresh_started">Refresh started</string>
+    <string name="movie_rename">Rename</string>
+    <string name="movie_rename_nothing">The file already has the right name.</string>
+    <string name="movie_rename_started">Renaming</string>
+    <string name="movie_delete">Delete</string>
+    <string name="movie_delete_title">Delete %1$s?</string>
+    <string name="movie_delete_files">Also delete the movie\'s folder and files</string>
+    <string name="movie_add_exclusion">Don\'t add it again from import lists</string>
+    <string name="movie_deleted">Movie deleted</string>
+    <string name="movie_settings">Settings</string>
+    <string name="movie_monitored">Monitored</string>
+    <string name="movie_monitored_on">Radarr looks for this movie and upgrades it</string>
+    <string name="movie_monitored_off">Radarr leaves this movie alone</string>
+    <string name="movie_now_monitored">Monitored</string>
+    <string name="movie_now_unmonitored">Unmonitored</string>
+    <string name="movie_quality_profile">Quality profile</string>
+    <string name="movie_min_availability">Minimum availability</string>
+    <string name="movie_root_folder">Root folder</string>
+    <string name="movie_tags">Tags</string>
+    <string name="movie_move_title">Move files?</string>
+    <string name="movie_move_body">Move the movie\'s files to %1$s too, or only change where Radarr expects them?</string>
+    <string name="movie_move_files">Move files</string>
+    <string name="movie_move_no">Don\'t move</string>
+    <string name="movie_file">File</string>
+    <string name="movie_cutoff_unmet">upgrade wanted</string>
+    <string name="movie_delete_file">Delete file</string>
+    <string name="movie_delete_file_title">Delete this file?</string>
+    <string name="movie_file_deleted">File deleted</string>
+    <string name="movie_release_dates">Release dates</string>
+    <string name="movie_in_cinemas">In cinemas</string>
+    <string name="movie_digital">Digital</string>
+    <string name="movie_physical">Physical</string>
+    <string name="play_in_jellyctrl">Play in JellyCtrl</string>
+    <string name="open_in_seerrctrl">Open in SeerrCtrl</string>
+    <string name="availability_announced">Announced</string>
+    <string name="availability_in_cinemas">In cinemas</string>
+    <string name="availability_released">Released</string>
+    <string name="detail_size">Size</string>
+    <string name="detail_video">Video</string>
+    <string name="detail_audio">Audio</string>
+    <string name="detail_subtitles">Subtitles</string>
+    <string name="detail_release_group">Release group</string>
+    <string name="detail_edition">Edition</string>
+    <string name="detail_cf_score">Format score</string>
+
+    <!-- Add movie -->
+    <string name="movie_add">Add movie</string>
+    <string name="movie_add_hint">Title, IMDb or TMDB id</string>
+    <string name="movie_add_intro">Find a movie</string>
+    <string name="movie_add_intro_body">Search by title, or by id: imdb:tt0111161 or tmdb:278. Results don\'t have posters until the movie is in Radarr.</string>
+    <string name="movie_add_nothing">Nothing found</string>
+    <string name="movie_in_library">In your library</string>
+    <string name="movie_monitor">Monitor</string>
+    <string name="monitor_movie">Movie only</string>
+    <string name="monitor_movie_collection">Movie and its collection</string>
+    <string name="monitor_none">None</string>
+    <string name="movie_search_on_add">Start searching now</string>
+    <string name="movie_search_on_add_help">Look for the movie as soon as it\'s added</string>
+    <string name="movie_add_button">Add to Radarr</string>
+    <string name="movie_added">Added to Radarr</string>
+
+    <!-- Interactive search -->
+    <string name="release_title">Releases for %1$s</string>
+    <string name="release_searching">Asking your indexers. This can take a minute.</string>
+    <string name="release_none">No releases found</string>
+    <string name="release_none_body">None of your indexers had anything. Try again later, or check Prowlarr.</string>
+    <string name="release_sort_best">Best</string>
+    <string name="release_sort_seeders">Seeders</string>
+    <string name="release_sort_size">Size</string>
+    <string name="release_sort_age">Newest</string>
+    <string name="release_sort_score">Format score</string>
+    <string name="release_hide_rejected">Hide rejected</string>
+    <string name="release_peers">%1$d seeders · %2$d leechers</string>
+    <string name="release_sent">Sent to the download client</string>
+    <string name="release_sent_chip">Sent</string>
+    <string name="release_rejected_title">Grab a rejected release?</string>
+    <string name="release_grab_anyway">Grab anyway</string>
+    <plurals name="release_count">
+        <item quantity="one">%1$d release, %2$d allowed</item>
+        <item quantity="other">%1$d releases, %2$d allowed</item>
+    </plurals>
 </resources>

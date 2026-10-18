@@ -28,12 +28,20 @@ data class AppSettings(
     val theme: ThemeChoice = ThemeChoice.SYSTEM,
     /** Wallpaper (Material You) colours instead of ArrCtrl's amber. */
     val dynamicColor: Boolean = false,
+    /** Movies tab: posters in a grid (true) or a list. */
+    val moviesGrid: Boolean = true,
+    /** Movies tab sort, a MovieSort name. */
+    val moviesSort: String = "TITLE",
+    val moviesSortDescending: Boolean = false,
 )
 
 class SettingsRepository(private val context: Context, scope: CoroutineScope) {
     private object K {
         val theme = stringPreferencesKey("theme")
         val dynamic = booleanPreferencesKey("dynamic_color")
+        val moviesGrid = booleanPreferencesKey("movies_grid")
+        val moviesSort = stringPreferencesKey("movies_sort")
+        val moviesDesc = booleanPreferencesKey("movies_sort_desc")
     }
 
     val settings: StateFlow<AppSettings> = context.appDataStore.data
@@ -43,6 +51,9 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
     private fun Preferences.toSettings() = AppSettings(
         theme = enumOr(this[K.theme], ThemeChoice.SYSTEM),
         dynamicColor = this[K.dynamic] ?: false,
+        moviesGrid = this[K.moviesGrid] ?: true,
+        moviesSort = this[K.moviesSort] ?: "TITLE",
+        moviesSortDescending = this[K.moviesDesc] ?: false,
     )
 
     suspend fun update(transform: (AppSettings) -> AppSettings) {
@@ -50,6 +61,9 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             val s = transform(p.toSettings())
             p[K.theme] = s.theme.name
             p[K.dynamic] = s.dynamicColor
+            p[K.moviesGrid] = s.moviesGrid
+            p[K.moviesSort] = s.moviesSort
+            p[K.moviesDesc] = s.moviesSortDescending
         }
     }
 

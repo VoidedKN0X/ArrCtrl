@@ -21,3 +21,8 @@ import kotlinx.serialization.Serializable
 @Serializable data class TorrentRoute(val serverId: String, val hash: String)
 @Serializable data class ManualImportRoute(val serverId: String, val downloadId: String, val title: String)
 @Serializable data class AddTorrentRoute(val link: String? = null, val file: String? = null)
+
+// Movies
+@Serializable data class MovieRoute(val serverId: String, val movieId: Int)
+@Serializable data class MovieReleasesRoute(val serverId: String, val movieId: Int, val title: String)
+@Serializable data class AddMovieRoute(val serverId: String)

@@ -70,7 +70,10 @@ import com.vknxworks.arrctrl.ui.activity.ManualImportScreen
 import com.vknxworks.arrctrl.ui.activity.TorrentScreen
 import com.vknxworks.arrctrl.ui.tabs.CalendarScreen
 import com.vknxworks.arrctrl.ui.tabs.MoreScreen
-import com.vknxworks.arrctrl.ui.tabs.MoviesScreen
+import com.vknxworks.arrctrl.ui.movies.AddMovieScreen
+import com.vknxworks.arrctrl.ui.movies.MovieReleasesScreen
+import com.vknxworks.arrctrl.ui.movies.MovieScreen
+import com.vknxworks.arrctrl.ui.movies.MoviesScreen
 import com.vknxworks.arrctrl.ui.tabs.SeriesScreen
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
@@ -211,6 +214,18 @@ private fun AppNavHost(navController: NavHostController) {
         composable<ManualImportRoute> {
             val r = it.toRoute<ManualImportRoute>()
             ManualImportScreen(r.serverId, r.downloadId, r.title)
+        }
+        composable<MovieRoute> {
+            val r = it.toRoute<MovieRoute>()
+            MovieScreen(r.serverId, r.movieId)
+        }
+        composable<MovieReleasesRoute> {
+            val r = it.toRoute<MovieReleasesRoute>()
+            MovieReleasesScreen(r.serverId, r.movieId, r.title)
+        }
+        composable<AddMovieRoute> {
+            val r = it.toRoute<AddMovieRoute>()
+            AddMovieScreen(r.serverId)
         }
         composable<AddTorrentRoute> {
             val r = it.toRoute<AddTorrentRoute>()
