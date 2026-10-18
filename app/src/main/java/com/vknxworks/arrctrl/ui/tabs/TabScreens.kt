@@ -8,7 +8,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.HealthAndSafety
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Tv
@@ -103,16 +102,6 @@ fun CalendarScreen() = PendingTab(
     stringResource(R.string.empty_calendar_title),
     stringResource(R.string.empty_calendar_body),
     stringResource(R.string.ready_calendar_body),
-)
-
-@Composable
-fun ActivityScreen() = PendingTab(
-    stringResource(R.string.tab_activity),
-    Icons.Outlined.Download,
-    listOf(ServiceType.RADARR, ServiceType.SONARR, ServiceType.QBITTORRENT),
-    stringResource(R.string.empty_activity_title),
-    stringResource(R.string.empty_activity_body),
-    stringResource(R.string.ready_activity_body),
 )
 
 /** Prowlarr, Bazarr, autobrr, Cleanuparr and system health. Each opens in a later update. */

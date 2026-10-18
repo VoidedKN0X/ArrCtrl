@@ -82,7 +82,6 @@
     <string name="ready_movies_body">Your Radarr server is set up. The movie library arrives in an upcoming update.</string>
     <string name="ready_series_body">Your Sonarr server is set up. Series and episodes arrive in an upcoming update.</string>
     <string name="ready_calendar_body">Your servers are set up. The combined calendar arrives in an upcoming update.</string>
-    <string name="ready_activity_body">Your servers are set up. The queue and torrents arrive in the next update.</string>
     <string name="more_connected">Added</string>
 
     <!-- Servers -->
@@ -173,4 +172,183 @@
         <item quantity="one">Add %1$d server</item>
         <item quantity="other">Add %1$d servers</item>
     </plurals>
+
+    <!-- Common -->
+    <string name="search">Search</string>
+    <string name="load_failed">Couldn\'t load this</string>
+    <string name="more_actions">More actions</string>
+    <string name="eta_left">%1$s left</string>
+    <string name="download_speed">Download speed</string>
+    <string name="upload_speed">Upload speed</string>
+
+    <!-- Activity -->
+    <string name="activity_queue">Queue</string>
+    <string name="activity_torrents">Torrents</string>
+    <string name="activity_history">History</string>
+    <string name="alt_speed_active">Alternative limits on</string>
+    <string name="alt_speed_turn_on">Turn on alternative speed limits</string>
+    <string name="alt_speed_turn_off">Turn off alternative speed limits</string>
+    <string name="alt_speed_on">Alternative speed limits on</string>
+    <string name="alt_speed_off">Alternative speed limits off</string>
+
+    <!-- Queue -->
+    <string name="queue_empty_title">Nothing in the queue</string>
+    <string name="queue_empty_body">Downloads that Radarr and Sonarr are tracking show up here.</string>
+    <string name="queue_needs_attention">Needs attention</string>
+    <string name="queue_downloading">Downloading</string>
+    <string name="queue_queued">Queued</string>
+    <string name="queue_paused">Paused</string>
+    <string name="queue_delayed">Delayed</string>
+    <string name="queue_completed">Completed</string>
+    <string name="queue_failed">Failed</string>
+    <string name="queue_warning">Warning</string>
+    <string name="queue_import_blocked">Import blocked</string>
+    <string name="queue_import_pending">Waiting to import</string>
+    <string name="queue_importing">Importing</string>
+    <string name="queue_client_unavailable">Download client unavailable</string>
+    <string name="queue_remove">Remove from queue</string>
+    <string name="queue_remove_title">Remove %1$s?</string>
+    <string name="queue_remove_from_client">Also remove it from the download client</string>
+    <string name="queue_blocklist">Add the release to the blocklist</string>
+    <string name="queue_skip_search">Don\'t search for a replacement</string>
+    <string name="queue_removed">Removed from the queue</string>
+
+    <!-- Details -->
+    <string name="detail_status">Status</string>
+    <string name="detail_progress">Progress</string>
+    <string name="detail_eta">Time left</string>
+    <string name="detail_quality">Quality</string>
+    <string name="detail_client">Client</string>
+    <string name="detail_indexer">Indexer</string>
+    <string name="detail_protocol">Protocol</string>
+    <string name="detail_server">Server</string>
+    <string name="detail_path">Path</string>
+    <string name="detail_category">Category</string>
+    <string name="detail_tags">Tags</string>
+    <string name="detail_downloaded">Downloaded</string>
+    <string name="detail_uploaded">Uploaded</string>
+    <string name="detail_ratio">Ratio</string>
+    <string name="detail_limit_down">Download limit</string>
+    <string name="detail_limit_up">Upload limit</string>
+    <string name="detail_queue_position">Queue position</string>
+    <string name="detail_active">Active for</string>
+    <string name="detail_seeding_time">Seeding for</string>
+    <string name="detail_added">Added</string>
+    <string name="detail_completed">Completed</string>
+    <string name="detail_pieces">Pieces</string>
+    <string name="detail_comment">Comment</string>
+    <string name="detail_hash">Hash</string>
+
+    <!-- Manual import -->
+    <string name="manual_import">Manual import</string>
+    <string name="manual_import_none">No files to import</string>
+    <string name="manual_import_none_body">Nothing importable was found for this download. It may still be moving, or the files were already imported.</string>
+    <string name="manual_import_unmatched">Not matched. Tap to choose</string>
+    <string name="manual_import_change_series">Change series</string>
+    <string name="manual_import_use_episodes">Use these episodes</string>
+    <string name="manual_import_rejected_title">Import files with problems?</string>
+    <string name="manual_import_rejected_body">Some selected files were rejected (shown in red). They\'ll be imported anyway, which may replace better files.</string>
+    <string name="manual_import_anyway">Import anyway</string>
+    <string name="manual_import_started">Import started</string>
+    <plurals name="manual_import_files">
+        <item quantity="one">Import %1$d file</item>
+        <item quantity="other">Import %1$d files</item>
+    </plurals>
+
+    <!-- Torrents -->
+    <string name="torrents_empty_title">No torrents</string>
+    <string name="torrents_empty_body">Nothing matches this filter.</string>
+    <string name="filter_all">All</string>
+    <string name="filter_downloading">Downloading</string>
+    <string name="filter_seeding">Seeding</string>
+    <string name="filter_stopped">Stopped</string>
+    <string name="filter_error">Errored</string>
+    <string name="state_downloading">Downloading</string>
+    <string name="state_metadata">Getting metadata</string>
+    <string name="state_seeding">Seeding</string>
+    <string name="state_stopped">Stopped</string>
+    <string name="state_completed">Completed</string>
+    <string name="state_queued">Queued</string>
+    <string name="state_checking">Checking</string>
+    <string name="state_moving">Moving</string>
+    <string name="state_stalled">Stalled</string>
+    <string name="state_error">Error</string>
+    <string name="state_missing_files">Missing files</string>
+    <string name="state_unknown">Unknown</string>
+    <string name="state_forced">Forced</string>
+    <string name="torrent_ratio_peers">Ratio %1$s · Seeds %2$d (%3$d) · Peers %4$d (%5$d)</string>
+    <string name="torrent_gone">This torrent is no longer in qBittorrent.</string>
+    <string name="torrent_pause">Stop</string>
+    <string name="torrent_resume">Start</string>
+    <string name="torrent_force_start">Force start</string>
+    <string name="torrent_force_start_off">Stop forcing</string>
+    <string name="torrent_recheck">Recheck</string>
+    <string name="torrent_category">Category</string>
+    <string name="torrent_category_none">No category</string>
+    <string name="torrent_tags">Tags</string>
+    <string name="torrent_tags_field">Tags</string>
+    <string name="torrent_tags_help">Separate tags with commas</string>
+    <string name="torrent_queue_position">Queue position</string>
+    <string name="torrent_queue_top">Move to top</string>
+    <string name="torrent_queue_up">Move up</string>
+    <string name="torrent_queue_down">Move down</string>
+    <string name="torrent_queue_bottom">Move to bottom</string>
+    <string name="torrent_queue_help">Only works when queueing is turned on in qBittorrent.</string>
+    <string name="torrent_queueing_off">Queueing is turned off in qBittorrent</string>
+    <string name="torrent_speed_limits">Speed limits</string>
+    <string name="torrent_limit_down">Download limit (KB/s)</string>
+    <string name="torrent_limit_up">Upload limit (KB/s)</string>
+    <string name="torrent_limit_unlimited">Unlimited</string>
+    <string name="torrent_delete">Delete</string>
+    <string name="torrent_delete_title">Delete torrent?</string>
+    <string name="torrent_delete_files">Also delete the downloaded files</string>
+    <string name="torrent_tab_info">Info</string>
+    <string name="torrent_tab_files">Files</string>
+    <string name="torrent_tab_trackers">Trackers</string>
+    <string name="torrent_tab_peers">Peers</string>
+    <string name="file_priority">Priority</string>
+    <string name="file_priority_skip">Don\'t download</string>
+    <string name="file_priority_normal">Normal</string>
+    <string name="file_priority_high">High</string>
+    <string name="file_priority_max">Maximum</string>
+    <string name="tracker_disabled">Disabled</string>
+    <string name="tracker_not_contacted">Not contacted yet</string>
+    <string name="tracker_working">Working</string>
+    <string name="tracker_updating">Updating</string>
+    <string name="tracker_not_working">Not working</string>
+    <string name="tracker_counts">Seeds %1$d · Leeches %2$d · Peers %3$d</string>
+    <string name="peers_none">No connected peers</string>
+
+    <!-- Add torrent -->
+    <string name="torrent_add">Add torrent</string>
+    <string name="torrent_add_title">Add torrent</string>
+    <string name="torrent_add_link">Magnet link or URL</string>
+    <string name="torrent_add_link_help">Several links at once work too, one per line</string>
+    <string name="torrent_add_pick_file">Choose a .torrent file</string>
+    <string name="torrent_add_file">File</string>
+    <string name="torrent_file">Torrent file</string>
+    <string name="torrent_add_options">Options</string>
+    <string name="torrent_add_server">qBittorrent server</string>
+    <string name="torrent_add_stopped">Add stopped</string>
+    <string name="torrent_add_stopped_help">Don\'t start downloading straight away</string>
+    <string name="torrent_added">Added to qBittorrent</string>
+    <string name="torrent_add_no_qbit">No qBittorrent server</string>
+    <string name="torrent_add_no_qbit_body">Add your qBittorrent server to add torrents from ArrCtrl.</string>
+    <string name="torrent_file_too_big">That file is too big to be a .torrent file</string>
+    <string name="torrent_file_unreadable">Couldn\'t read the file</string>
+    <plurals name="torrent_add_n">
+        <item quantity="one">Add %1$d torrent</item>
+        <item quantity="other">Add %1$d torrents</item>
+    </plurals>
+
+    <!-- History -->
+    <string name="history_grabbed">Grabbed</string>
+    <string name="history_imported">Imported</string>
+    <string name="history_failed">Failed</string>
+    <string name="history_deleted">Deleted</string>
+    <string name="history_renamed">Renamed</string>
+    <string name="history_ignored">Ignored</string>
+    <string name="history_other">Event</string>
+    <string name="history_empty">No history yet</string>
+    <string name="history_load_more">Load more</string>
 </resources>

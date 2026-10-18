@@ -10,7 +10,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/VoidedKN0X/ArrCtrl"><img src=".github/assets/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a> <a href="https://voidedkn0x.github.io/CtrlF-Droid/"><img src=".github/assets/badge_ctrlf-droid.png" alt="Get it from our F-Droid repo" height="80"></a>
 
-> **Early development.** You can add and test all your servers; the screens that use them (starting with Activity) arrive over the next updates. See the [changelog](CHANGELOG.md).
+> **Early development.** Servers and the Activity tab (queue, torrents, history) work; Movies, Series, Calendar and the More tools arrive over the next updates. See the [changelog](CHANGELOG.md).
 
 ## Features
 
@@ -86,6 +86,10 @@ Instead of typing seven API keys on your phone, put them in one JSON block and e
 A plain list of servers (without the `"servers"` wrapper) works too. A server already saved with the same service and address is updated rather than added twice.
 
 To make a QR code on Linux, save the JSON as `arrctrl.json` and run `qrencode -t ansiutf8 < arrctrl.json` (or `-o arrctrl.png` for an image). **The JSON and the QR code contain your API keys and passwords.** Delete them once you've scanned them, and don't share screenshots of them.
+
+### Adding torrents
+
+Tap **Add torrent** on the Torrents tab and paste a magnet link (or several), or pick a `.torrent` file. ArrCtrl also shows up when you open a `magnet:` link or a `.torrent` file, and in the share sheet. To make it the default for magnet links, open one and pick **ArrCtrl** → **Always**, or set it in Android's Settings → Apps → Default apps → Opening links.
 
 ## Build from source
 

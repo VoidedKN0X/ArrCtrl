@@ -16,3 +16,8 @@ import kotlinx.serialization.Serializable
 /** Add ([type] set) or edit ([id] set) a server. */
 @Serializable data class ServerEditRoute(val id: String? = null, val type: String? = null)
 @Serializable data object ImportRoute
+
+// Activity
+@Serializable data class TorrentRoute(val serverId: String, val hash: String)
+@Serializable data class ManualImportRoute(val serverId: String, val downloadId: String, val title: String)
+@Serializable data class AddTorrentRoute(val link: String? = null, val file: String? = null)
