@@ -4,6 +4,28 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.4.0 (2026-10-19)
+
+The Movies tab: your whole Radarr library, with everything you need to manage it from your phone.
+
+### New
+
+- **Movie library** with posters in a grid, or a compact list with size and quality profile. The choice is remembered
+- **Status badges** on every movie: downloading, downloaded, missing, in cinemas or announced, plus a marker for unmonitored movies
+- **Search, filter and sort** the library: filter by monitored, unmonitored, missing, downloaded or downloading; sort by title, year, date added, release date, size on disk or rating, in either direction (remembered too)
+- **Several Radarr servers** (a 4K one, say): switch between them with the chips at the top
+- **Movie page** with the backdrop, poster, year, runtime, rating certificate, genres, IMDb, TMDB and Rotten Tomatoes scores, and the overview
+- **Change settings per movie**: monitored on or off, quality profile, minimum availability, root folder (choose whether the files move too) and tags
+- **File details**: quality (and whether an upgrade is still wanted), size, video and audio codecs, resolution and HDR, audio languages, subtitles, release group, edition and format score. Delete just the file if you want
+- **Release dates** (cinema, digital, physical) and the movie's own history (grabbed, imported, failed, deleted, renamed)
+- **Automatic search**, **refresh** and **rename** (see the new file name before applying it) from the movie page
+- **Interactive search**: every release your indexers find, with quality, format score and formats, indexer, size, age, seeders and leechers, languages and the reasons Radarr would reject it. Sort by best match, seeders, size, newest or format score, hide rejected releases, and tap one to send it to your download client. Grabbing a rejected release asks first
+- **Delete a movie**, optionally with its files and an import list exclusion so it doesn't come back
+- **Add movies**: search by title, `imdb:` id or `tmdb:` id, then pick the quality profile, root folder (with free space), what to monitor (the movie, the movie and its collection, or nothing), minimum availability and tags, and whether to start searching straight away. Movies already in your library are marked and open their page
+- **Select several movies** (long-press) to monitor or unmonitor them, change their quality profile, search for them or delete them in one go
+- **Play in JellyCtrl** for downloaded movies and **Open in SeerrCtrl**, shown when those apps are installed. For now they open the app; they'll jump straight to the movie once JellyCtrl and SeerrCtrl support ArrCtrl's links
+- **Posters and backdrops come from your Radarr server** (its own resized copies), not from TMDB, and use the same connection as everything else, including a trusted self-signed certificate. Movies found in Add movie have no poster until they're in Radarr
+
 ## v0.3.0 (2026-10-19)
 
 The Activity tab now works: your Radarr and Sonarr queue, your qBittorrent torrents and your download history, all in one place.

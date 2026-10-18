@@ -12,6 +12,7 @@ serialization = "1.9.0"
 coroutines = "1.10.2"
 haze = "1.6.10"
 okhttp = "4.12.0"
+coil = "3.2.0"
 zxingEmbedded = "4.3.0"
 zxingCore = "3.5.3"
 
@@ -33,6 +34,8 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 zxing-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingEmbedded" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "zxingCore" }
 

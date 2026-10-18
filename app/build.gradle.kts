@@ -22,8 +22,8 @@ android {
         minSdk = 33
         targetSdk = 36
         // Bump both to publish a new release (see CHANGELOG.md).
-        versionCode = 3
-        versionName = "0.3.0"
+        versionCode = 4
+        versionName = "0.4.0"
     }
 
     signingConfigs {
@@ -117,6 +117,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.haze)
     implementation(libs.okhttp)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
 
     // QR import of server settings. Pure zxing, no Google Play Services (F-Droid safe).
     implementation(libs.zxing.embedded)

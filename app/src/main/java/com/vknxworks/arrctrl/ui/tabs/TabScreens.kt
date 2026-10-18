@@ -9,7 +9,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.HealthAndSafety
-import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Tv
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -73,16 +72,6 @@ private fun PendingTab(
         }
     }
 }
-
-@Composable
-fun MoviesScreen() = PendingTab(
-    stringResource(R.string.tab_movies),
-    Icons.Outlined.Movie,
-    listOf(ServiceType.RADARR),
-    stringResource(R.string.empty_movies_title),
-    stringResource(R.string.empty_movies_body),
-    stringResource(R.string.ready_movies_body),
-)
 
 @Composable
 fun SeriesScreen() = PendingTab(
