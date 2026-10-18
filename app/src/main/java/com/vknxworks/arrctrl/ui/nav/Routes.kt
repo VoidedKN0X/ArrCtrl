@@ -12,3 +12,7 @@ import kotlinx.serialization.Serializable
 // Pushed screens
 @Serializable data object AccountRoute
 @Serializable data object SettingsRoute
+
+/** Add ([type] set) or edit ([id] set) a server. */
+@Serializable data class ServerEditRoute(val id: String? = null, val type: String? = null)
+@Serializable data object ImportRoute

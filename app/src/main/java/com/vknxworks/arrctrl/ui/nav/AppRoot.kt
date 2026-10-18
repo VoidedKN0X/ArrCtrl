@@ -52,9 +52,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.vknxworks.arrctrl.R
 import com.vknxworks.arrctrl.ui.components.LocalBottomClearance
 import com.vknxworks.arrctrl.ui.components.LocalHazeState
+import com.vknxworks.arrctrl.ui.servers.ImportScreen
+import com.vknxworks.arrctrl.ui.servers.ServerEditScreen
 import com.vknxworks.arrctrl.ui.settings.AccountScreen
 import com.vknxworks.arrctrl.ui.settings.SettingsScreen
 import com.vknxworks.arrctrl.ui.tabs.ActivityScreen
@@ -181,5 +184,10 @@ private fun AppNavHost(navController: NavHostController) {
 
         composable<AccountRoute> { AccountScreen() }
         composable<SettingsRoute> { SettingsScreen() }
+        composable<ServerEditRoute> {
+            val r = it.toRoute<ServerEditRoute>()
+            ServerEditScreen(r.id, r.type)
+        }
+        composable<ImportRoute> { ImportScreen() }
     }
 }
