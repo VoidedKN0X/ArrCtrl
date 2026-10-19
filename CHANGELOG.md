@@ -4,6 +4,12 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.0.2 (2026-10-19)
+
+### Changed
+
+- **Support ArrCtrl** under About on the Account and settings page (tap your profile picture) opens VKNXWorks' GitHub Sponsors page. It replaces the old "Support development" row: it now has a heart icon and reads "ArrCtrl is free and open source. Sponsor development on GitHub", the same as in the other Ctrl apps
+
 ## v1.0.1 (2026-10-19)
 
 ### Fixed

@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.BugReport
@@ -23,7 +24,6 @@ import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.RssFeed
@@ -119,7 +119,7 @@ fun AccountScreen() {
             }
 
             Group(stringResource(R.string.about)) {
-                GroupRow(stringResource(R.string.support), stringResource(R.string.support_subtitle), Icons.Outlined.FavoriteBorder, showChevron = true, onClick = { uri.openUri(SPONSORS_URL) })
+                GroupRow(stringResource(R.string.support_title), stringResource(R.string.support_subtitle), Icons.Filled.Favorite, showChevron = true, onClick = { uri.openUri(SPONSORS_URL) })
                 GroupRow(stringResource(R.string.source_code), stringResource(R.string.source_code_subtitle), Icons.Outlined.Code, showChevron = true, onClick = { uri.openUri(REPO_URL) })
                 GroupRow(stringResource(R.string.report_bug), stringResource(R.string.report_bug_subtitle), Icons.Outlined.BugReport, showChevron = true, onClick = { uri.openUri(ISSUES_URL) })
             }
