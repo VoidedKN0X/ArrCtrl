@@ -16,7 +16,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 - **Movies and Series**: your Radarr and Sonarr libraries with automatic and interactive search, monitoring, quality profiles, renaming and bulk edits
 - **Calendar** with upcoming movies and episodes from both
-- **Activity**: the Radarr and Sonarr queues with manual import, and your qBittorrent torrents with full controls
+- **Activity**: the Radarr and Sonarr queues with manual import, your qBittorrent torrents with full controls, and the Radarr and Sonarr history
 - **Add torrents** from magnet links and `.torrent` files, straight from the share sheet
 - **Subtitles** through Bazarr on every movie and episode: see what's there, get any other language, or pick one yourself
 - **Prowlarr** indexers and cross-indexer search, **Bazarr** subtitles, **autobrr** filters and releases, **Cleanuparr** stats and jobs
@@ -24,7 +24,11 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Notifications** without Google services: polling, or instant push through your own ntfy server
 - **Widgets** for upcoming releases and active downloads, and a quick settings tile for qBittorrent's alternative speed limits
 - **Every service is optional**, and you can add more than one of each (a second Radarr for 4K, say)
+- **Import all your servers at once** by pasting one block of settings or scanning it as a QR code
+- **Play in JellyCtrl** and **Open in SeerrCtrl** buttons when those apps are installed (for now they open the app)
+- **Light, dark or pure black**, in ArrCtrl's amber or your wallpaper colours
 - **Self-signed certificates** trusted per server, by fingerprint
+- **API keys and passwords are encrypted** on your phone with the Android Keystore; the server and import screens block screenshots, and ArrCtrl's preview is blank in recent apps
 
 ## Requirements
 
@@ -94,7 +98,7 @@ Tap **Add torrent** on the Torrents tab and paste a magnet link (or several), or
 
 ### Notifications
 
-Turn them on in **Account** (the profile button) → **Notifications**. ArrCtrl checks your servers itself and tells you about downloads, failed or stuck downloads, finished torrents, health warnings, low disk space and servers that stop answering. You choose which kinds, and which servers. Nothing goes through Google; there's no Firebase or Play Services.
+Turn them on in **Account and settings** (the button at the top right) → **Notifications**. ArrCtrl checks your servers itself and tells you about downloads, failed or stuck downloads, finished torrents, health warnings, low disk space and servers that stop answering. You choose which kinds, and which servers. Nothing goes through Google; there's no Firebase or Play Services.
 
 There are two ways ArrCtrl finds out, and you can use both:
 
@@ -120,6 +124,10 @@ An **Active downloads** notification (what's downloading and how fast) is also a
 
 If your ntfy server needs a login to publish, add the username and password (or access token) in the service's ntfy settings, or allow anonymous publishing to `up*` topics in ntfy's access control, which is what ntfy's UnifiedPush docs recommend.
 
+#### Notifications arrive late?
+
+Android limits apps in the background to save battery. The Notifications screen shows whether ArrCtrl is restricted and lets you lift it. Some phones go further on their own: OPPO and OnePlus (ColorOS), Xiaomi, Samsung and Huawei can stop apps in the background regardless. On those, open ArrCtrl's **App settings** from the same screen and allow background activity and auto-launch. Do the same for the ntfy app, since it has to stay connected for instant notifications.
+
 ### Widgets and the quick settings tile
 
 - **Upcoming** shows movies and episodes coming in the next two weeks, by day, with episode air times. A red dot means it's out and missing.
@@ -129,19 +137,17 @@ Long-press your home screen → Widgets → ArrCtrl. Both refresh every 30 minut
 
 The **Alt. speed** tile (pull down Quick Settings → edit → drag it in) turns qBittorrent's alternative speed limits on or off for all your qBittorrent servers, like the button on the Torrents tab. Long-press it to open the Torrents tab.
 
-#### Notifications arrive late?
-
-Android limits apps in the background to save battery. The Notifications screen shows whether ArrCtrl is restricted and lets you lift it. Some phones go further on their own: OPPO and OnePlus (ColorOS), Xiaomi, Samsung and Huawei can stop apps in the background regardless. On those, open ArrCtrl's **App settings** from the same screen and allow background activity and auto-launch. Do the same for the ntfy app, since it has to stay connected for instant notifications.
-
 ## Usage stats
 
-ArrCtrl can share anonymous usage stats, **only if you say yes**. It asks once after you add your first server, and you can change it any time in **Account** (the profile button) → **Settings** → **Usage stats**.
+ArrCtrl can share anonymous usage stats, **only if you say yes**. It asks once after you add your first server, and you can change it any time in **Account and settings** (the button at the top right) → **Settings** → **Usage stats**.
 
 - **Shared:** which screens you open (the kind of screen, such as "Movie", "Activity" or "Prowlarr", never which movie, series, torrent or server), when you add, search for or grab something and with which service (Radarr, Sonarr, Prowlarr or qBittorrent, never what it was), the app version, Android version, phone model, language, phone or tablet, your theme, and whether notifications are on.
 - **Never shared:** your server addresses, API keys, usernames or passwords, which movies, series, releases or torrents, what you search for, or any ID that stays the same between sessions.
 - **Where:** VKNXWorks' own self-hosted [Aptabase](https://aptabase.com) server. Nothing goes to Google or analytics companies. Like any website, the server sees your IP address; Aptabase uses it only to work out the country and doesn't store it.
 
 Builds from source don't include the stats key, so they can't send anything and the setting is hidden. The code is in [`Telemetry.kt`](app/src/main/java/com/vknxworks/arrctrl/data/telemetry/Telemetry.kt).
+
+Apart from these opt-in stats, ArrCtrl only talks to the servers you add. Posters and backdrops come from your own Radarr and Sonarr servers, never straight from sites like TMDB. Instant notifications come through your own UnifiedPush distributor (such as your ntfy server), and **Send a test wake-up** posts to your push address. Help links in System health open in your browser only when you tap them.
 
 ## Build from source
 

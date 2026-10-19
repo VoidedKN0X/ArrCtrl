@@ -4,6 +4,12 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+### Changed
+
+- **README brought up to date with 0.9.0.** The feature list now also mentions the Radarr and Sonarr history on the Activity tab, importing all your servers at once by paste or QR code, the Play in JellyCtrl and Open in SeerrCtrl buttons, the light, dark and pure black themes with wallpaper colours, and that API keys and passwords are encrypted on your phone and kept out of screenshots and recent apps. It now points to **Account and settings** (the button at the top right) for notifications and usage stats, the "Notifications arrive late?" tips sit under Notifications, and a new paragraph lists everything ArrCtrl connects to besides your own servers. No change to the app itself
+
 ## v0.9.0 (2026-10-19)
 
 Home screen widgets and a Quick Settings tile.
