@@ -109,6 +109,33 @@ data class Tag(val id: Int, val label: String)
 /** A search result for adding a movie. [inLibraryId] is set when it's already in Radarr. */
 data class LookupMovie(val raw: JsonObject, val title: String, val year: Int?, val overview: String?, val tmdbId: Int?, val inLibraryId: Int?, val runtime: Int?, val genres: List<String>)
 
+/** Reads one interactive-search result (same shape in Radarr and Sonarr). */
+fun parseRelease(o: JsonObject): Release? {
+    val guid = o.str("guid") ?: return null
+    return Release(
+        raw = o,
+        guid = guid,
+        indexerId = o.int("indexerId") ?: 0,
+        title = o.str("title").orEmpty(),
+        indexer = o.str("indexer"),
+        size = o.long("size") ?: 0,
+        ageHours = o.dbl("ageHours"),
+        seeders = o.int("seeders"),
+        leechers = o.int("leechers"),
+        protocol = o.str("protocol"),
+        quality = o.obj("quality").obj("quality").str("name"),
+        qualityWeight = o.int("qualityWeight") ?: 0,
+        customFormatScore = o.int("customFormatScore") ?: 0,
+        customFormats = o.arr("customFormats").objects().mapNotNull { it.str("name") },
+        rejected = o.bool("rejected") ?: false,
+        temporarilyRejected = o.bool("temporarilyRejected") ?: false,
+        rejections = o.arr("rejections").strings(),
+        releaseWeight = o.int("releaseWeight") ?: 0,
+        languages = o.arr("languages").objects().mapNotNull { it.str("name") },
+        infoUrl = o.str("infoUrl"),
+    )
+}
+
 // ---------- Client ----------
 
 /** Radarr v3 API for the Movies tab. */
@@ -264,33 +291,7 @@ class RadarrApi(private val http: Http, val server: Server) {
     /** Asks every indexer; can take a while, so the read timeout is longer than usual. */
     suspend fun releases(movieId: Int): List<Release> {
         val slow = client.newBuilder().readTimeout(120, java.util.concurrent.TimeUnit.SECONDS).build()
-        return Api.json(slow, Api.get(url("/release?movieId=$movieId"))).objects().mapNotNull(::release)
-    }
-
-    private fun release(o: JsonObject): Release? {
-        val guid = o.str("guid") ?: return null
-        return Release(
-            raw = o,
-            guid = guid,
-            indexerId = o.int("indexerId") ?: 0,
-            title = o.str("title").orEmpty(),
-            indexer = o.str("indexer"),
-            size = o.long("size") ?: 0,
-            ageHours = o.dbl("ageHours"),
-            seeders = o.int("seeders"),
-            leechers = o.int("leechers"),
-            protocol = o.str("protocol"),
-            quality = o.obj("quality").obj("quality").str("name"),
-            qualityWeight = o.int("qualityWeight") ?: 0,
-            customFormatScore = o.int("customFormatScore") ?: 0,
-            customFormats = o.arr("customFormats").objects().mapNotNull { it.str("name") },
-            rejected = o.bool("rejected") ?: false,
-            temporarilyRejected = o.bool("temporarilyRejected") ?: false,
-            rejections = o.arr("rejections").strings(),
-            releaseWeight = o.int("releaseWeight") ?: 0,
-            languages = o.arr("languages").objects().mapNotNull { it.str("name") },
-            infoUrl = o.str("infoUrl"),
-        )
+        return Api.json(slow, Api.get(url("/release?movieId=$movieId"))).objects().mapNotNull(::parseRelease)
     }
 
     /** Sends a release to the download client. */

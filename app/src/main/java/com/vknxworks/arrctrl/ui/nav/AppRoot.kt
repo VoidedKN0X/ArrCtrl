@@ -74,7 +74,12 @@ import com.vknxworks.arrctrl.ui.movies.AddMovieScreen
 import com.vknxworks.arrctrl.ui.movies.MovieReleasesScreen
 import com.vknxworks.arrctrl.ui.movies.MovieScreen
 import com.vknxworks.arrctrl.ui.movies.MoviesScreen
-import com.vknxworks.arrctrl.ui.tabs.SeriesScreen
+import com.vknxworks.arrctrl.ui.series.AddSeriesScreen
+import com.vknxworks.arrctrl.ui.series.EpisodeReleasesScreen
+import com.vknxworks.arrctrl.ui.series.SeasonReleasesScreen
+import com.vknxworks.arrctrl.ui.series.SeasonScreen
+import com.vknxworks.arrctrl.ui.series.SeriesDetailScreen
+import com.vknxworks.arrctrl.ui.series.SeriesScreen
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
 
@@ -226,6 +231,26 @@ private fun AppNavHost(navController: NavHostController) {
         composable<AddMovieRoute> {
             val r = it.toRoute<AddMovieRoute>()
             AddMovieScreen(r.serverId)
+        }
+        composable<SeriesDetailRoute> {
+            val r = it.toRoute<SeriesDetailRoute>()
+            SeriesDetailScreen(r.serverId, r.seriesId)
+        }
+        composable<SeasonRoute> {
+            val r = it.toRoute<SeasonRoute>()
+            SeasonScreen(r.serverId, r.seriesId, r.season)
+        }
+        composable<SeasonReleasesRoute> {
+            val r = it.toRoute<SeasonReleasesRoute>()
+            SeasonReleasesScreen(r.serverId, r.seriesId, r.season, r.title)
+        }
+        composable<EpisodeReleasesRoute> {
+            val r = it.toRoute<EpisodeReleasesRoute>()
+            EpisodeReleasesScreen(r.serverId, r.episodeId, r.title)
+        }
+        composable<AddSeriesRoute> {
+            val r = it.toRoute<AddSeriesRoute>()
+            AddSeriesScreen(r.serverId)
         }
         composable<AddTorrentRoute> {
             val r = it.toRoute<AddTorrentRoute>()

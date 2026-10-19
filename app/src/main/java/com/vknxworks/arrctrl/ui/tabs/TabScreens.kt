@@ -9,7 +9,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.HealthAndSafety
-import androidx.compose.material.icons.outlined.Tv
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -72,16 +71,6 @@ private fun PendingTab(
         }
     }
 }
-
-@Composable
-fun SeriesScreen() = PendingTab(
-    stringResource(R.string.tab_series),
-    Icons.Outlined.Tv,
-    listOf(ServiceType.SONARR),
-    stringResource(R.string.empty_series_title),
-    stringResource(R.string.empty_series_body),
-    stringResource(R.string.ready_series_body),
-)
 
 @Composable
 fun CalendarScreen() = PendingTab(

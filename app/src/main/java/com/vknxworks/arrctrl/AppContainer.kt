@@ -4,6 +4,7 @@ import android.content.Context
 import com.vknxworks.arrctrl.data.api.ArrApi
 import com.vknxworks.arrctrl.data.api.QbitApi
 import com.vknxworks.arrctrl.data.api.RadarrApi
+import com.vknxworks.arrctrl.data.api.SonarrApi
 import com.vknxworks.arrctrl.data.net.Http
 import com.vknxworks.arrctrl.data.server.Server
 import com.vknxworks.arrctrl.data.server.ServerStatus
@@ -26,6 +27,7 @@ class AppContainer(val context: Context) {
     fun arr(server: Server) = ArrApi(http, server)
     fun qbit(server: Server) = QbitApi(http, server)
     fun radarr(server: Server) = RadarrApi(http, server)
+    fun sonarr(server: Server) = SonarrApi(http, server)
 
     /** A magnet link or .torrent file handed to the app (share sheet, magnet: link), waiting to be added. */
     val pendingTorrent = MutableStateFlow<IncomingTorrent?>(null)
