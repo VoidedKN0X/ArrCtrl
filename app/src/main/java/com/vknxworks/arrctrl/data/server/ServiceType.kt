@@ -8,7 +8,7 @@ enum class AuthKind {
     /** One header with the API key on every request. */
     API_KEY,
 
-    /** qBittorrent: an API key (WebUI API 2.14.1+), or a cookie session from username and password. */
+    /** qBittorrent: an API key (qBittorrent 5.2+, sent as "Authorization: Bearer"), or a cookie session from username and password. */
     QBITTORRENT,
 }
 
@@ -28,12 +28,15 @@ enum class ServiceType(
 ) {
     RADARR("radarr", R.string.service_radarr, R.string.service_radarr_role, R.string.key_help_arr, "/api/v3", "X-Api-Key", AuthKind.API_KEY, 7878),
     SONARR("sonarr", R.string.service_sonarr, R.string.service_sonarr_role, R.string.key_help_arr, "/api/v3", "X-Api-Key", AuthKind.API_KEY, 8989),
-    QBITTORRENT("qbittorrent", R.string.service_qbittorrent, R.string.service_qbittorrent_role, R.string.key_help_qbittorrent, "/api/v2", "X-API-Key", AuthKind.QBITTORRENT, 8080),
+    QBITTORRENT("qbittorrent", R.string.service_qbittorrent, R.string.service_qbittorrent_role, R.string.key_help_qbittorrent, "/api/v2", "Authorization", AuthKind.QBITTORRENT, 8080),
     PROWLARR("prowlarr", R.string.service_prowlarr, R.string.service_prowlarr_role, R.string.key_help_arr, "/api/v1", "X-Api-Key", AuthKind.API_KEY, 9696),
     BAZARR("bazarr", R.string.service_bazarr, R.string.service_bazarr_role, R.string.key_help_bazarr, "/api", "X-API-KEY", AuthKind.API_KEY, 6767),
     AUTOBRR("autobrr", R.string.service_autobrr, R.string.service_autobrr_role, R.string.key_help_autobrr, "/api", "X-API-Token", AuthKind.API_KEY, 7474),
     CLEANUPARR("cleanuparr", R.string.service_cleanuparr, R.string.service_cleanuparr_role, R.string.key_help_cleanuparr, "/api", "X-Api-Key", AuthKind.API_KEY, 11011),
     ;
+
+    /** The header value carrying [key]: qBittorrent wants "Bearer <key>", the others the bare key. */
+    fun authValue(key: String): String = if (auth == AuthKind.QBITTORRENT) "Bearer $key" else key
 
     companion object {
         fun of(id: String?): ServiceType? =

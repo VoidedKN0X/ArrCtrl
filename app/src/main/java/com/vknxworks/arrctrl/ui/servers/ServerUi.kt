@@ -46,6 +46,13 @@ val ServiceType.icon: ImageVector
         ServiceType.CLEANUPARR -> Icons.Outlined.CleaningServices
     }
 
+/** Drops every cached poster and fanart image (memory and disk), e.g. after a server was removed. */
+suspend fun clearImageCaches(context: Context) {
+    val loader = coil3.SingletonImageLoader.get(context)
+    loader.memoryCache?.clear()
+    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { runCatching { loader.diskCache?.clear() } }
+}
+
 /** One line describing a connection test result for [type]. */
 @Composable
 fun resultText(result: TestResult, type: ServiceType): String = resultText(LocalContext.current, result, type)

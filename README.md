@@ -50,7 +50,7 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
 
 1. Tap the button at the top right of any tab, then **Add a server**.
 2. Pick the service and enter its address, e.g. `http://192.168.1.10:7878` or `https://radarr.example.com`. Add the path too if it runs under one behind a reverse proxy (`https://example.com/radarr`).
-3. Enter the API key (in the web UI under Settings → General → Security for Radarr, Sonarr, Prowlarr and Bazarr). For qBittorrent use your Web UI username and password, or an API key on recent versions.
+3. Enter the API key (in the web UI under Settings → General → Security for Radarr, Sonarr, Prowlarr and Bazarr). For qBittorrent use your Web UI username and password, or an API key on qBittorrent 5.2 or newer.
 4. Tap **Test**, then **Save**. If the server uses a self-signed certificate, tap **Review certificate**, check the fingerprint and trust it. ArrCtrl then accepts that exact certificate from that server only.
 
 Every service is optional, and you can add more than one of each.

@@ -287,3 +287,25 @@ fun MessageView(
         }
     }
 }
+
+// ---------- Privacy ----------
+
+/**
+ * Blocks screenshots, screen recording and casting while it's on screen. For screens that show API keys,
+ * passwords or pasted server settings.
+ */
+@Composable
+fun SecureWindow() {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    androidx.compose.runtime.DisposableEffect(context) {
+        val window = context.findActivity()?.window
+        window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        onDispose { window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE) }
+    }
+}
+
+private tailrec fun android.content.Context.findActivity(): android.app.Activity? = when (this) {
+    is android.app.Activity -> this
+    is android.content.ContextWrapper -> baseContext.findActivity()
+    else -> null
+}

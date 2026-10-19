@@ -100,7 +100,11 @@ private fun ignoringBattery(context: Context): Boolean =
     context.getSystemService(PowerManager::class.java).isIgnoringBatteryOptimizations(context.packageName)
 
 private fun copy(context: Context, label: String, text: String) {
-    context.getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText(label, text))
+    // The push address works like a password (anyone with it can wake ArrCtrl), so keep it out of clipboard previews.
+    val clip = ClipData.newPlainText(label, text).apply {
+        description.extras = android.os.PersistableBundle().apply { putBoolean(android.content.ClipDescription.EXTRA_IS_SENSITIVE, true) }
+    }
+    context.getSystemService(ClipboardManager::class.java).setPrimaryClip(clip)
     Toast.makeText(context, context.getString(R.string.copied), Toast.LENGTH_SHORT).show()
 }
 

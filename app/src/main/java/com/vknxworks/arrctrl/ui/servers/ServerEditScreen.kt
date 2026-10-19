@@ -68,6 +68,8 @@ import com.vknxworks.arrctrl.ui.components.Group
 import com.vknxworks.arrctrl.ui.components.GroupRow
 import com.vknxworks.arrctrl.ui.components.MessageView
 import com.vknxworks.arrctrl.ui.components.ScreenTopBar
+import com.vknxworks.arrctrl.ui.components.SecureWindow
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.theme.Gutter
 import kotlinx.coroutines.launch
@@ -92,7 +94,10 @@ fun ServerEditScreen(id: String?, typeId: String?) {
 
 @Composable
 private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit) {
-    val c = LocalContext.current.container
+    // API keys and passwords: no screenshots or screen recording while this screen is open.
+    SecureWindow()
+    val context = LocalContext.current
+    val c = context.container
     val scope = rememberCoroutineScope()
     val label = stringResource(type.label)
     val serverId = rememberSaveable { existing?.id ?: UUID.randomUUID().toString() }
@@ -104,6 +109,10 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
     var username by rememberSaveable { mutableStateOf(existing?.username.orEmpty()) }
     var password by remember { mutableStateOf(existing?.password.orEmpty()) }
     var cert by rememberSaveable { mutableStateOf(existing?.certSha256.orEmpty()) }
+    // The address a trusted certificate belongs to: it only counts for that exact scheme, host and port,
+    // so changing the address to another server doesn't carry the trust over.
+    var certFor by rememberSaveable { mutableStateOf(originKey(existing?.url).orEmpty()) }
+    var pendingCertFor by remember { mutableStateOf("") }
     // qBittorrent: sign in with username and password unless an API key is (or was) used.
     var qbitUsesKey by rememberSaveable { mutableStateOf(existing?.let { it.apiKey.isNotBlank() } ?: false) }
     var showSecret by rememberSaveable { mutableStateOf(false) }
@@ -132,7 +141,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
             apiKey = if (usesKey) apiKey.trim() else "",
             username = if (usesKey) "" else username.trim(),
             password = if (usesKey) "" else password,
-            certSha256 = if (u.startsWith("https://", ignoreCase = true)) cert else "",
+            certSha256 = if (u.startsWith("https://", ignoreCase = true) && originKey(u) == certFor) cert else "",
         )
     }
 
@@ -158,7 +167,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
         val u = normalised ?: return
         scope.launch {
             runCatching { Tls.fetchLeaf(u) }
-                .onSuccess { pendingCert = Tls.sha256(it) to changed }
+                .onSuccess { pendingCertFor = originKey(u).orEmpty(); pendingCert = Tls.sha256(it) to changed }
                 .onFailure { certError = true }
         }
     }
@@ -295,7 +304,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                 }
             }
 
-            if (cert.isNotBlank() && normalised?.startsWith("https://", ignoreCase = true) == true) {
+            if (cert.isNotBlank() && normalised?.startsWith("https://", ignoreCase = true) == true && originKey(normalised) == certFor) {
                 Group(stringResource(R.string.cert_section)) {
                     GroupRow(
                         stringResource(R.string.cert_pinned),
@@ -372,7 +381,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
             host = draft()?.httpUrl?.host.orEmpty(),
             fingerprint = fp,
             changed = changed,
-            onTrust = { cert = fp; pendingCert = null; test() },
+            onTrust = { cert = fp; certFor = pendingCertFor; pendingCert = null; test() },
             onCancel = { pendingCert = null },
         )
     }
@@ -398,6 +407,8 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                     scope.launch {
                         c.http.forget(existing)
                         c.servers.remove(existing.id)
+                        // Posters and fanart from that server shouldn't stay on the phone.
+                        clearImageCaches(context)
                         onDone()
                     }
                 }) { Text(stringResource(R.string.remove)) }
@@ -406,3 +417,6 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
         )
     }
 }
+
+/** "https://host:port" of an address, for tying a trusted certificate to exactly one server. */
+private fun originKey(url: String?): String? = url?.toHttpUrlOrNull()?.let { "${it.scheme}://${it.host.lowercase()}:${it.port}" }

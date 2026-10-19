@@ -47,13 +47,12 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="magnet" />
             </intent-filter>
-            <!-- Opening a .torrent file. -->
+            <!-- Opening a .torrent file (content:// from another app only; file:// paths are refused). -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="content" />
-                <data android:scheme="file" />
                 <data android:mimeType="application/x-bittorrent" />
             </intent-filter>
             <!-- Share sheet: a .torrent file, or text containing a magnet link. -->

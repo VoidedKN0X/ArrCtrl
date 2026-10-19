@@ -69,6 +69,17 @@ object Notifications {
         return PendingIntent.getActivity(context, code, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
+    /**
+     * What a locked phone shows instead of the real notification: the kind of event only, never which movie,
+     * series, torrent, server or error it's about. (Android shows the full notification on a locked screen
+     * only if you allowed sensitive notification content there.)
+     */
+    private fun redacted(context: Context, channel: String, title: String): android.app.Notification =
+        NotificationCompat.Builder(context, channel)
+            .setSmallIcon(R.drawable.ic_stat_arrctrl)
+            .setContentTitle(title)
+            .build()
+
     /** Posts [alerts], one per item, or one summary per kind when a check finds many at once. */
     fun post(context: Context, alerts: List<Alert>) {
         if (alerts.isEmpty() || !allowed(context)) return
@@ -87,6 +98,8 @@ object Notifications {
                     .setContentText(list.joinToString(", ") { it.title })
                     .setStyle(style.setBigContentTitle(title))
                     .setContentIntent(tap(context, if (event == NotifyEvent.HEALTH || event == NotifyEvent.DISK || event == NotifyEvent.OFFLINE) "health" else "activity", id))
+                    .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                    .setPublicVersion(redacted(context, event.channel, title))
                     .setAutoCancel(true)
                     .build()
                 runCatching { nm.notify(id, n) }
@@ -99,6 +112,8 @@ object Notifications {
                         .setContentText(a.text)
                         .setStyle(NotificationCompat.BigTextStyle().bigText(a.text))
                         .setContentIntent(tap(context, a.open, id))
+                        .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                        .setPublicVersion(redacted(context, event.channel, context.getString(event.label)))
                         .setAutoCancel(true)
                         .build()
                     runCatching { nm.notify(id, n) }
@@ -122,6 +137,9 @@ object Notifications {
             .setOnlyAlertOnce(true)
             .setSilent(true)
             .setContentIntent(tap(context, "activity", ONGOING_ID))
+            // The title is only a count and speed; the lines with names stay hidden on a locked screen.
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            .setPublicVersion(redacted(context, ONGOING_CHANNEL, title))
             .build()
         runCatching { NotificationManagerCompat.from(context).notify(ONGOING_ID, n) }
     }
