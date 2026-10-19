@@ -57,8 +57,8 @@
     <string name="source_code_subtitle">GitHub · GPL-3.0</string>
     <string name="report_bug">Report a bug</string>
     <string name="report_bug_subtitle">Opens the issue tracker on GitHub</string>
-    <string name="support">Support development</string>
-    <string name="support_subtitle">ArrCtrl is free. GitHub Sponsors keeps the Ctrl apps going.</string>
+    <string name="support_title">Support ArrCtrl</string>
+    <string name="support_subtitle">ArrCtrl is free and open source. Sponsor development on GitHub</string>
 
     <!-- Appearance -->
     <string name="appearance">Appearance</string>
