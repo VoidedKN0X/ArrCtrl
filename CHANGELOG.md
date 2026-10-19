@@ -4,6 +4,13 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.0.1 (2026-10-19)
+
+### Fixed
+
+- **Play in JellyCtrl opens the right movie or episode.** JellyCtrl kept saying the movie or series wasn't in your Jellyfin library. ArrCtrl now sends JellyCtrl the title, year and every id it knows (TMDB, IMDb and, for series, TVDB), so JellyCtrl can find it however Jellyfin has it catalogued. Update JellyCtrl to 0.1.21 or newer as well
+- **The Play in JellyCtrl button shows for every downloaded movie and episode**, also when Radarr or Sonarr has no TMDB or TVDB id for it
+
 ## v1.0.0 (2026-10-19)
 
 ArrCtrl 1.0: everything that was planned is in. Movies and Series from Radarr and Sonarr, the Calendar, the Activity tab with your queues, torrents and history, Prowlarr, Bazarr, autobrr and Cleanuparr, System health, subtitles in any language, notifications (with instant push through your own ntfy server), home screen widgets and the Alt. speed tile.

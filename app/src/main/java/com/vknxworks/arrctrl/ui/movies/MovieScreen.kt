@@ -188,9 +188,9 @@ fun MovieScreen(serverId: String, movieId: Int) {
                 }
                 Action(Icons.Outlined.Refresh, stringResource(R.string.movie_refresh)) { act(R.string.movie_refresh_started) { api.refresh(listOf(mv.id)) } }
                 if (mv.hasFile) Action(Icons.Outlined.DriveFileRenameOutline, stringResource(R.string.movie_rename)) { renaming = true }
-                if (mv.hasFile && mv.tmdbId != null && CtrlApps.installed(context, CtrlApps.JELLYCTRL)) {
+                if (mv.hasFile && CtrlApps.installed(context, CtrlApps.JELLYCTRL)) {
                     Action(Icons.Outlined.PlayArrow, stringResource(R.string.play_in_jellyctrl)) {
-                        CtrlApps.open(context, CtrlApps.JELLYCTRL, CtrlApps.jellyMovie(mv.tmdbId))
+                        CtrlApps.open(context, CtrlApps.JELLYCTRL, CtrlApps.jellyMovie(mv.tmdbId, mv.imdbId, mv.title, mv.year))
                     }
                 }
                 if (mv.tmdbId != null && CtrlApps.installed(context, CtrlApps.SEERRCTRL)) {

@@ -15,11 +15,21 @@ object CtrlApps {
     fun installed(context: Context, pkg: String): Boolean =
         runCatching { context.packageManager.getPackageInfo(pkg, 0); true }.getOrDefault(false)
 
-    /** jellyctrl://item?tmdb=…&type=movie (or tvdb, season and episode for episodes). */
-    fun jellyMovie(tmdbId: Int): Uri = Uri.parse("jellyctrl://item?type=movie&tmdb=$tmdbId")
+    private fun jelly(type: String, vararg params: Pair<String, Any?>): Uri =
+        Uri.Builder().scheme("jellyctrl").authority("item").appendQueryParameter("type", type).apply {
+            params.forEach { (k, v) -> if (v != null && v.toString().isNotBlank()) appendQueryParameter(k, v.toString()) }
+        }.build()
 
-    fun jellyEpisode(tvdbId: Int, season: Int, episode: Int): Uri =
-        Uri.parse("jellyctrl://item?type=episode&tvdb=$tvdbId&season=$season&episode=$episode")
+    /**
+     * jellyctrl://item?type=movie&tmdb=…&imdb=…&title=…&year=…. Every id ArrCtrl knows plus the title and year, so
+     * JellyCtrl can find the movie even when Jellyfin has it under a different provider.
+     */
+    fun jellyMovie(tmdbId: Int?, imdbId: String?, title: String, year: Int?): Uri =
+        jelly("movie", "tmdb" to tmdbId, "imdb" to imdbId, "title" to title, "year" to year)
+
+    /** jellyctrl://item?type=episode&tvdb=…&tmdb=…&imdb=…&title=…&year=…&season=…&episode=… (ids and title are the series'). */
+    fun jellyEpisode(tvdbId: Int?, tmdbId: Int?, imdbId: String?, seriesTitle: String, year: Int?, season: Int, episode: Int): Uri =
+        jelly("episode", "tvdb" to tvdbId, "tmdb" to tmdbId, "imdb" to imdbId, "title" to seriesTitle, "year" to year, "season" to season, "episode" to episode)
 
     /** seerrctrl://movie/{tmdbId} and seerrctrl://tv/{tmdbId}. */
     fun seerrMovie(tmdbId: Int): Uri = Uri.parse("seerrctrl://movie/$tmdbId")

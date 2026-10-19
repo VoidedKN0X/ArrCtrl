@@ -383,10 +383,9 @@ private fun EpisodeSheet(
             if (e.hasFile && series != null) {
                 EpisodeSubtitlesButton(series.id, series.tvdbId, series.title, e.id, "${series.title} · ${e.code}", onOpen = onDismiss)
             }
-            val tvdb = series?.tvdbId
-            if (e.hasFile && tvdb != null && CtrlApps.installed(context, CtrlApps.JELLYCTRL)) {
+            if (e.hasFile && series != null && CtrlApps.installed(context, CtrlApps.JELLYCTRL)) {
                 OutlinedButton(
-                    onClick = { CtrlApps.open(context, CtrlApps.JELLYCTRL, CtrlApps.jellyEpisode(tvdb, e.season, e.number)) },
+                    onClick = { CtrlApps.open(context, CtrlApps.JELLYCTRL, CtrlApps.jellyEpisode(series.tvdbId, series.tmdbId, series.imdbId, series.title, series.year, e.season, e.number)) },
                     shape = CircleShape,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
