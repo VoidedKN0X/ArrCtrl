@@ -72,12 +72,6 @@ class CalendarLoader(private val c: AppContainer) {
             .sortedWith(compareBy<CalendarEntry> { it.at }.thenBy { it.title.lowercase() })
         entries to results.mapNotNull { (s, r) -> r.exceptionOrNull()?.let { s to it.toTestResult() } }.toMap()
     }
- by mutableStateOf<List<CalendarEntry>>(emptyList()); private set
-    var errors by mutableStateOf<Map<Server, TestResult>>(emptyMap()); private set
-    var loading by mutableStateOf(false); private set
-    var loaded by mutableStateOf(false); private set
-    private var loadedRange: Triple<LocalDate, LocalDate, Boolean>? = null
-
 
     private suspend fun movies(s: Server, start: String, end: String, unmonitored: Boolean): List<CalendarEntry> {
         val now = Instant.now()
