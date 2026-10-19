@@ -193,6 +193,13 @@ class SonarrApi(private val http: Http, val server: Server) {
         )
     }
 
+    /** Episodes airing between [start] and [end] (ISO-8601), each with its series. */
+    suspend fun calendar(start: String, end: String, unmonitored: Boolean): List<Pair<Episode, Series?>> =
+        Api.json(client, Api.get(url("/calendar?start=$start&end=$end&unmonitored=$unmonitored&includeSeries=true"))).objects().mapNotNull { o ->
+            val e = episode(o) ?: return@mapNotNull null
+            e to o.obj("series")?.let(::series)
+        }
+
     // ---------- Images (through the server, never from TheTVDB directly) ----------
 
     fun poster(seriesId: Int, large: Boolean = false): String = url("/mediacover/$seriesId/poster-${if (large) 500 else 250}.jpg")

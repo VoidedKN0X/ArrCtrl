@@ -78,8 +78,6 @@
     <string name="hide">Hide</string>
 
     <!-- Tabs once a server is added (their content arrives in later updates) -->
-    <string name="tab_connected_title">Server added</string>
-    <string name="ready_calendar_body">Your servers are set up. The combined calendar arrives in an upcoming update.</string>
     <string name="more_connected">Added</string>
 
     <!-- Servers -->
@@ -568,4 +566,26 @@
     <string name="series_search_cutoff_help">Also look for better versions of episodes below the quality cutoff</string>
     <string name="series_add_button">Add to Sonarr</string>
     <string name="series_added">Added to Sonarr</string>
+
+    <!-- Calendar -->
+    <string name="calendar_both">Both</string>
+    <string name="calendar_monitored_only">Monitored only</string>
+    <string name="calendar_upcoming">Upcoming</string>
+    <string name="calendar_today">Today</string>
+    <string name="calendar_tomorrow">Tomorrow</string>
+    <string name="calendar_yesterday">Yesterday</string>
+    <string name="calendar_agenda">Show as agenda</string>
+    <string name="calendar_month">Show as month</string>
+    <string name="calendar_earlier">Show last week</string>
+    <string name="calendar_even_earlier">Show a week earlier</string>
+    <string name="calendar_show_more">Show the next four weeks</string>
+    <string name="calendar_nothing">Nothing coming up</string>
+    <string name="calendar_nothing_body">No movies or episodes in these weeks. Try showing more, or turn off Monitored only.</string>
+    <string name="calendar_day_empty">Nothing on this day</string>
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="calendar_cinema">Cinema</string>
+    <string name="calendar_digital">Digital</string>
+    <string name="calendar_physical">Physical</string>
+    <string name="calendar_premiere">Premiere</string>
 </resources>

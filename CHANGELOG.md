@@ -4,6 +4,27 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.6.0 (2026-10-19)
+
+The Calendar tab, and a fix for the selection bar in Movies and Series.
+
+### New
+
+- **Calendar** with upcoming movies from Radarr and episodes from Sonarr, from all your servers, in one place
+- **Agenda view** (the default): day by day from today, with "Today", "Tomorrow" and the date as headings. Load the next four weeks at a time, or go back a week at a time to see what aired recently
+- **Month view**: a month grid with a dot for every movie or episode on that day (and "+n" when there are more than three). Tap a day to list it underneath; move between months with the arrows. The week starts on your phone's first day of the week
+- **Colours** show at a glance what you have: downloaded, missing (aired or released and not downloaded yet), upcoming, or unmonitored. A legend at the top explains them
+- **Episodes** show their air time in your time zone, the episode number and title, and whether it's a premiere or a finale
+- **Movies** show which release falls on that day: cinema, digital or physical. A cinema date in the past doesn't count as missing, since the movie can't be downloaded yet
+- **Filters** for movies, series or both, and for monitored items only (on by default). The view and filters are remembered
+- **Today** button to jump back, and pull to refresh
+- Tap an episode to open its season, or a movie to open its page
+- One server that can't be reached shows a red card; the others still fill the calendar
+
+### Fixed
+
+- When you selected movies or series with a long-press, "1 selected" wrapped over three lines because the bar had too many buttons. The count now stays on one line: monitor, unmonitor, search and delete are buttons, and select all and change quality profile moved to the ⋮ menu
+
 ## v0.5.0 (2026-10-19)
 
 The Series tab: your Sonarr library, down to every season and episode.

@@ -37,6 +37,11 @@ data class AppSettings(
     /** Series tab sort, a SeriesSort name. */
     val seriesSort: String = "TITLE",
     val seriesSortDescending: Boolean = false,
+    /** Calendar: month grid (true) or agenda list (the default). */
+    val calendarMonth: Boolean = false,
+    /** Calendar: ALL, MOVIES or SERIES. */
+    val calendarKind: String = "ALL",
+    val calendarMonitoredOnly: Boolean = true,
 )
 
 class SettingsRepository(private val context: Context, scope: CoroutineScope) {
@@ -49,6 +54,9 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         val seriesGrid = booleanPreferencesKey("series_grid")
         val seriesSort = stringPreferencesKey("series_sort")
         val seriesDesc = booleanPreferencesKey("series_sort_desc")
+        val calMonth = booleanPreferencesKey("calendar_month")
+        val calKind = stringPreferencesKey("calendar_kind")
+        val calMonitored = booleanPreferencesKey("calendar_monitored_only")
     }
 
     val settings: StateFlow<AppSettings> = context.appDataStore.data
@@ -64,6 +72,9 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         seriesGrid = this[K.seriesGrid] ?: true,
         seriesSort = this[K.seriesSort] ?: "TITLE",
         seriesSortDescending = this[K.seriesDesc] ?: false,
+        calendarMonth = this[K.calMonth] ?: false,
+        calendarKind = this[K.calKind] ?: "ALL",
+        calendarMonitoredOnly = this[K.calMonitored] ?: true,
     )
 
     suspend fun update(transform: (AppSettings) -> AppSettings) {
@@ -77,6 +88,9 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             p[K.seriesGrid] = s.seriesGrid
             p[K.seriesSort] = s.seriesSort
             p[K.seriesDesc] = s.seriesSortDescending
+            p[K.calMonth] = s.calendarMonth
+            p[K.calKind] = s.calendarKind
+            p[K.calMonitored] = s.calendarMonitoredOnly
         }
     }
 
