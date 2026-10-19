@@ -4,6 +4,20 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.7.1 (2026-10-19)
+
+Bazarr fixes, and you can now choose which subtitle languages Bazarr gets.
+
+### New
+
+- **Change subtitle languages** for a movie or a series. Tap a wanted item in Bazarr and choose **Change languages**, or use the languages button at the top of a manual subtitle search. Pick any of the languages profiles you've set up in Bazarr (each shows the languages in it, and whether they're hearing impaired or forced), or None to stop downloading subtitles for it. For episodes, the profile applies to the whole series, as it does in Bazarr. Bazarr then works out again what's missing, and a manual search runs again in the new languages
+- **Language filter** in manual subtitle search: when results come in more than one language, chips at the top show just one language at a time
+- **Reset throttled providers** from the Providers tab, so Bazarr uses them again straight away instead of waiting for the retry time
+
+### Fixed
+
+- The Bazarr Providers tab showed every working provider as failing, with a warning sign and "Good · retry -". Working providers now show a tick and "Working", throttled ones show a warning with the reason and when Bazarr will retry, problems are listed first, and the top shows how many providers are working. Pull down to refresh
+
 ## v0.7.0 (2026-10-19)
 
 The More tab comes alive: Prowlarr, Bazarr, autobrr and Cleanuparr each get their own screen, and System health shows every warning from every server in one place.
