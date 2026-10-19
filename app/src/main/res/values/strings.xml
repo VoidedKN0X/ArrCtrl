@@ -109,6 +109,7 @@
     <string name="field_username">Username</string>
     <string name="field_password">Password</string>
     <string name="field_required">Required</string>
+    <string name="server_not_encrypted">Not encrypted (HTTP)</string>
     <string name="http_warning">Not encrypted (HTTP). Fine on your home network, but use https if you connect over the internet.</string>
     <string name="qbit_login">Username and password</string>
     <string name="qbit_api_key">API key</string>
@@ -116,7 +117,7 @@
     <string name="key_help_bazarr">In the web UI: Settings → General → Security → API Key</string>
     <string name="key_help_autobrr">In the web UI: Settings → API Keys → add a key</string>
     <string name="key_help_cleanuparr">In the web UI: Settings → Account → API key</string>
-    <string name="key_help_qbittorrent">Only in recent qBittorrent versions (Web API 2.14.1 or newer). Create one in the Web UI options.</string>
+    <string name="key_help_qbittorrent">Only in qBittorrent 5.2 or newer. Create one in the Web UI options.</string>
     <string name="key_help_qbittorrent_login">Your qBittorrent Web UI login</string>
     <string name="test_connection">Test</string>
     <string name="save_anyway_title">Save without a working connection?</string>
@@ -164,6 +165,7 @@
     <string name="import_preview">Found</string>
     <string name="import_new">new</string>
     <string name="import_updates">updates the saved server</string>
+    <string name="import_cert">trusts certificate %1$s</string>
     <string name="import_entry">Server %1$d</string>
     <string name="import_problem_type">Unknown service \"%1$s\"</string>
     <string name="import_problem_url">Not a valid address: %1$s</string>
@@ -339,6 +341,7 @@
     <string name="torrent_add_no_qbit_body">Add your qBittorrent server to add torrents from ArrCtrl.</string>
     <string name="torrent_file_too_big">That file is too big to be a .torrent file</string>
     <string name="torrent_file_unreadable">Couldn\'t read the file</string>
+    <string name="torrent_file_invalid">That isn\'t a .torrent file</string>
     <plurals name="torrent_add_n">
         <item quantity="one">Add %1$d torrent</item>
         <item quantity="other">Add %1$d torrents</item>

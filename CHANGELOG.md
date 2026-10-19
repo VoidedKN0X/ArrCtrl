@@ -4,13 +4,35 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
-## Unreleased
+## v0.8.2 (2026-10-19)
 
-Not in a release yet; this goes out with the next version.
+A security and privacy update: safer handling of shared .torrent files, redirects and certificates, less on the lock screen and in screenshots, and a fix for qBittorrent API keys.
+
+### Security
+
+- **Shared and opened .torrent files are checked before they're read.** ArrCtrl now only accepts .torrent files handed over by another app through Android's normal file sharing. `file://` paths and links into ArrCtrl's own storage are refused, so another app can no longer get ArrCtrl to read one of its own private files and send it to your qBittorrent. The file is read in small pieces and stops at 10 MB instead of being loaded whole first, it must actually look like a .torrent file, and its name is cleaned up before it's sent to qBittorrent
+- **Nothing follows a redirect away from your server.** If a server or reverse proxy answers with a redirect to another address (another site, another port, or from https down to plain http), ArrCtrl no longer re-sends your qBittorrent password, an uploaded .torrent file or any other change there; the request stops with an error instead. API keys already never followed such redirects
+- **qBittorrent's sign-in cookie stays with that server.** The session cookie is only accepted from, and only sent back to, the exact address you saved (same host and port), never to other ports on the same machine
+- **Trusted certificates stay with their server.** A self-signed certificate you trust belongs to that exact address. If you change a server's address to another host or port, the old trust no longer applies and ArrCtrl asks you to review the new server's certificate
+- **Imports show the certificate they trust.** When imported server settings include a certificate fingerprint, the preview shows it before you add them. Importing settings for a server you already have keeps its trusted certificate unless the import names a different one
+- **No screenshots of API keys.** The add/edit server screen and the Import screen now block screenshots and screen recording, and pasted import text (which holds keys and passwords) is no longer kept in Android's saved app state
+- **Hidden in recent apps.** ArrCtrl's preview in the recent-apps screen is now blank, so your servers, downloads and keys don't show there
+- **Less on the lock screen.** On a locked phone, notifications now show only the kind of event (for example "Downloaded" or "Health warnings") and the active-downloads notification only the count and speed, never movie, series, torrent or server names, unless you've allowed sensitive notification content on the lock screen in Android's settings
+- **"Can't reach" notifications no longer show raw errors.** When qBittorrent can't be reached, the notification gives a plain reason (for example "Connection refused") instead of the technical error, which could include the server's address
+- **Health links open only web pages.** Links in System health come from your servers; ArrCtrl now only opens them if they're normal http(s) web links
+- **Push address copied privately.** Copying the push address, ntfy server or topic marks it as sensitive, so Android doesn't show it in the clipboard preview
+- **Usage stats switched off means nothing more is sent.** Turning usage stats off now also throws away any event that was still waiting to be sent, and the next session after switching back on starts fresh
+- **Images from a removed server are cleared.** Removing a server also clears ArrCtrl's cached posters and fanart
+
+### Fixed
+
+- **qBittorrent API keys now work.** ArrCtrl sent the API key in a header qBittorrent doesn't read, so signing in with an API key failed. It now uses the `Authorization: Bearer` header qBittorrent expects (qBittorrent 5.2 or newer); the help text under the field says which versions support keys
 
 ### Changed
 
+- **"Not encrypted (HTTP)" in the server list.** Servers you reach over plain http now say so in Account → Servers and in the Import preview, not only on the edit screen
 - **All Ctrl apps in the README.** The README's Ctrl series table now lists all 14 apps. New in the table: [PaperCtrl](https://github.com/VoidedKN0X/PaperCtrl) (scan and browse documents on Paperless-ngx), [PrintCtrl](https://github.com/VoidedKN0X/PrintCtrl) (Bambu Lab printers through Bambuddy, and Spoolman spools), [ProxCtrl](https://github.com/VoidedKN0X/ProxCtrl) (manage your Proxmox VE server) and [TrueCtrl](https://github.com/VoidedKN0X/TrueCtrl) (monitor and manage your TrueNAS server). Every app in the table is also in the [CtrlF-Droid repo](https://voidedkn0x.github.io/CtrlF-Droid/) for automatic updates. No change to the app itself.
+- The README now says API keys need qBittorrent 5.2 or newer
 
 ## v0.8.1 (2026-10-19)
 

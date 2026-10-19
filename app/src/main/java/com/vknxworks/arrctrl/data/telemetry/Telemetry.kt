@@ -90,6 +90,8 @@ class Telemetry(
                         firstRead && openPending && s.usageStats -> { openPending = false; trackOpened(s) }
                         // Switched on in Settings or the first-run question: start a fresh session.
                         !firstRead && !wasOptedIn && s.usageStats -> { resetSession(); trackOpened(s) }
+                        // Switched off: drop anything still waiting to be sent, and forget the session.
+                        wasOptedIn && !s.usageStats -> { dropQueued(); resetSession() }
                     }
                 }
             }
@@ -148,6 +150,11 @@ class Telemetry(
      * ("radarr", "sonarr", "prowlarr", "qbittorrent"), never what it was.
      */
     fun action(action: String, service: String) = track("action_used", mapOf("action" to action, "service" to service))
+
+    /** Throws away queued events that haven't been sent yet. */
+    private fun dropQueued() {
+        while (queue.tryReceive().isSuccess) Unit
+    }
 
     /** A fresh session after opting back in, so stats from before and after aren't linked. */
     private fun resetSession() {

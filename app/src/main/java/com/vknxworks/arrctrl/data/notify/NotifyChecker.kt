@@ -6,6 +6,7 @@ import com.vknxworks.arrctrl.R
 import com.vknxworks.arrctrl.data.api.Format
 import com.vknxworks.arrctrl.data.api.HistoryKind
 import com.vknxworks.arrctrl.data.api.QbitApi
+import com.vknxworks.arrctrl.data.api.toTestResult
 import com.vknxworks.arrctrl.data.server.Server
 import com.vknxworks.arrctrl.data.server.ServiceType
 import com.vknxworks.arrctrl.data.settings.AppSettings
@@ -142,7 +143,8 @@ class NotifyChecker(private val c: AppContainer) {
                         throw e
                     } catch (e: Throwable) {
                         if (!seen.offline) {
-                            alerts += Alert(NotifyEvent.OFFLINE, s.id, context.getString(R.string.notify_offline_title, s.name), e.message, "activity")
+                            // A plain reason, never the raw error (it can contain the server's address).
+                            alerts += Alert(NotifyEvent.OFFLINE, s.id, context.getString(R.string.notify_offline_title, s.name), resultText(context, e.toTestResult(), s.type), "activity")
                         }
                         save(s.id, seen.copy(offline = true))
                         return if (first) emptyList() else alerts

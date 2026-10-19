@@ -29,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -48,6 +47,8 @@ import com.vknxworks.arrctrl.data.server.Server
 import com.vknxworks.arrctrl.ui.components.Group
 import com.vknxworks.arrctrl.ui.components.GroupRow
 import com.vknxworks.arrctrl.ui.components.ScreenTopBar
+import com.vknxworks.arrctrl.ui.components.SecureWindow
+import com.vknxworks.arrctrl.data.net.Tls
 import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.theme.Gutter
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -56,13 +57,16 @@ import kotlinx.coroutines.launch
 /** Adds several servers at once from the ArrCtrl JSON format, pasted or scanned from a QR code. */
 @Composable
 fun ImportScreen() {
+    // Pasted or scanned settings hold API keys and passwords: no screenshots or screen recording here.
+    SecureWindow()
     val c = LocalContext.current.container
     val nav = LocalNavigator.current
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboardManager.current
     val saved by c.servers.servers.collectAsStateWithLifecycle()
 
-    var text by rememberSaveable { mutableStateOf("") }
+    // Not saveable: the text holds API keys and passwords, which mustn't end up in saved instance state.
+    var text by remember { mutableStateOf("") }
     var parsed by remember { mutableStateOf<List<ImportFormat.Entry>?>(null) }
     var formatError by remember { mutableStateOf(false) }
 
@@ -161,10 +165,13 @@ fun ImportScreen() {
                                 val updates = saved.any { it.sameEndpoint(s) }
                                 GroupRow(
                                     s.name,
-                                    listOf(
+                                    listOfNotNull(
                                         labels.getValue(s.type),
                                         s.url,
                                         stringResource(if (updates) R.string.import_updates else R.string.import_new),
+                                        if (!s.isEncrypted) stringResource(R.string.server_not_encrypted) else null,
+                                        // A certificate in the import is trusted for this server, so show which one.
+                                        s.certSha256.takeIf { it.isNotBlank() }?.let { stringResource(R.string.import_cert, Tls.pretty(it)) },
                                     ).joinToString(" · "),
                                     s.type.icon,
                                 )

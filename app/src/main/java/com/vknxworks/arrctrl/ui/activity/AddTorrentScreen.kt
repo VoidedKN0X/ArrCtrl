@@ -1,5 +1,8 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import android.content.ContentResolver
+import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.widget.Toast
@@ -61,9 +64,48 @@ import com.vknxworks.arrctrl.ui.theme.Gutter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 
 /** Largest .torrent file accepted; real ones are a few hundred KB at most. */
 private const val MAX_TORRENT_BYTES = 10L * 1024 * 1024
+
+/**
+ * Whether a .torrent file handed over by another app may be read: only content:// URIs from another app's
+ * provider. file:// paths and ArrCtrl's own providers are refused, so another app can't trick ArrCtrl into
+ * reading (and uploading) its own private files.
+ */
+fun isForeignContentUri(context: Context, uri: Uri): Boolean {
+    if (uri.scheme?.lowercase() != ContentResolver.SCHEME_CONTENT) return false
+    val authority = uri.authority?.takeIf { it.isNotBlank() } ?: return false
+    val owner = runCatching {
+        context.packageManager.resolveContentProvider(authority, PackageManager.ComponentInfoFlags.of(0))?.packageName
+    }.getOrNull()
+    return owner != context.packageName
+}
+
+/** Reads at most [limit] bytes; throws [tooBig] as the message when there's more. */
+private fun readCapped(input: java.io.InputStream, limit: Long, tooBig: String): ByteArray {
+    val out = ByteArrayOutputStream()
+    val buf = ByteArray(64 * 1024)
+    var total = 0L
+    while (true) {
+        val n = input.read(buf)
+        if (n < 0) break
+        total += n
+        if (total > limit) throw IllegalStateException(tooBig)
+        out.write(buf, 0, n)
+    }
+    return out.toByteArray()
+}
+
+/** A file name safe to hand to qBittorrent: no folders, only plain characters, ending in .torrent. */
+private fun safeTorrentName(raw: String?): String {
+    val base = raw.orEmpty().substringAfterLast('/').substringAfterLast('\\')
+        .replace(Regex("""[^A-Za-z0-9 ._()\[\]-]"""), "_")
+        .trim().trimStart('.').take(120)
+    if (base.isBlank()) return "file.torrent"
+    return if (base.endsWith(".torrent", ignoreCase = true)) base else "$base.torrent"
+}
 
 /** Links that qBittorrent can add: magnets, and http(s) links to .torrent files. */
 fun extractTorrentLinks(text: String): List<String> =
@@ -116,6 +158,7 @@ fun AddTorrentScreen(initialLink: String?, initialFile: String?) {
     val addedText = stringResource(R.string.torrent_added)
     val tooBig = stringResource(R.string.torrent_file_too_big)
     val unreadable = stringResource(R.string.torrent_file_unreadable)
+    val notTorrent = stringResource(R.string.torrent_file_invalid)
 
     fun add() {
         adding = true
@@ -124,14 +167,14 @@ fun AddTorrentScreen(initialLink: String?, initialFile: String?) {
                 val api = c.qbit(server)
                 val f = fileUri
                 if (f != null) {
+                    val uri = Uri.parse(f)
+                    if (!isForeignContentUri(context, uri)) throw IllegalStateException(unreadable)
                     val bytes = withContext(Dispatchers.IO) {
-                        context.contentResolver.openInputStream(Uri.parse(f))?.use { input ->
-                            val data = input.readBytes()
-                            if (data.size > MAX_TORRENT_BYTES) throw IllegalStateException(tooBig)
-                            data
-                        }
+                        context.contentResolver.openInputStream(uri)?.use { input -> readCapped(input, MAX_TORRENT_BYTES, tooBig) }
                     } ?: throw IllegalStateException(unreadable)
-                    api.addFile(fileName ?: "file.torrent", bytes, category.ifBlank { null }, stopped)
+                    // Every .torrent file is a bencoded dictionary, so it starts with "d".
+                    if (bytes.isEmpty() || bytes[0] != 'd'.code.toByte()) throw IllegalStateException(notTorrent)
+                    api.addFile(safeTorrentName(fileName), bytes, category.ifBlank { null }, stopped)
                 } else {
                     api.addLinks(links, category.ifBlank { null }, stopped)
                 }
@@ -214,7 +257,7 @@ fun AddTorrentScreen(initialLink: String?, initialFile: String?) {
     }
 }
 
-private fun displayName(context: android.content.Context, uri: Uri): String? = runCatching {
+private fun displayName(context: Context, uri: Uri): String? = if (!isForeignContentUri(context, uri)) null else runCatching {
     context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
         if (cursor.moveToFirst()) cursor.getString(0) else null
     }

@@ -54,13 +54,14 @@ class ServerStore(private val context: Context, scope: CoroutineScope) {
 
     /**
      * Adds imported servers. One that points at the same service and address as an existing
-     * server replaces its credentials and certificate instead of adding a duplicate.
+     * server replaces its credentials instead of adding a duplicate; its trusted certificate is kept
+     * unless the import names another one.
      */
     suspend fun import(incoming: List<Server>) = edit { list ->
         val out = list.toMutableList()
         for (s in incoming) {
             val i = out.indexOfFirst { it.sameEndpoint(s) }
-            if (i >= 0) out[i] = s.copy(id = out[i].id) else out += s
+            if (i >= 0) out[i] = s.copy(id = out[i].id, certSha256 = s.certSha256.ifBlank { out[i].certSha256 }) else out += s
         }
         out
     }

@@ -214,7 +214,8 @@ fun HealthScreen() {
                             h.problems.sortedBy { it.severity }.forEach { p ->
                                 Row(
                                     Modifier.fillMaxWidth().then(
-                                        if (p.wikiUrl != null) Modifier.clickable {
+                                        // Only real web links: the address comes from the server, so no other schemes or apps.
+                                        if (p.wikiUrl != null && Regex("^https?://", RegexOption.IGNORE_CASE).containsMatchIn(p.wikiUrl)) Modifier.clickable {
                                             runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(p.wikiUrl)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
                                         } else Modifier,
                                     ),

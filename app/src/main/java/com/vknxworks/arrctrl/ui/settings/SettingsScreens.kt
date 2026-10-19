@@ -154,7 +154,11 @@ private fun ServersSection() {
         servers.forEach { s ->
             GroupRow(
                 s.name,
-                "${stringResource(s.type.label)} · ${checkText(status[s.id], s.type)}",
+                listOfNotNull(
+                    stringResource(s.type.label),
+                    if (!s.isEncrypted) stringResource(R.string.server_not_encrypted) else null,
+                    checkText(status[s.id], s.type),
+                ).joinToString(" · "),
                 s.type.icon,
                 onClick = { nav.navigate(ServerEditRoute(id = s.id)) },
                 trailing = { CheckIcon(status[s.id]) },

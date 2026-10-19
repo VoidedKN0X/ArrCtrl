@@ -16,12 +16,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.arrctrl.data.notify.Notifications
 import com.vknxworks.arrctrl.data.settings.ThemeChoice
 import com.vknxworks.arrctrl.ui.activity.extractTorrentLinks
+import com.vknxworks.arrctrl.ui.activity.isForeignContentUri
 import com.vknxworks.arrctrl.ui.nav.AppRoot
 import com.vknxworks.arrctrl.ui.theme.ArrCtrlTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Keep server names, downloads and API key screens out of the recent-apps thumbnails.
+        setRecentsScreenshotEnabled(false)
         enableEdgeToEdge()
         if (savedInstanceState == null) handleIntent(intent)
         val c = container
@@ -53,7 +56,8 @@ class MainActivity : ComponentActivity() {
 
     /**
      * Magnet links (opened or shared) and .torrent files (opened or shared) go to the Add torrent screen.
-     * Shared text without a magnet or link is ignored.
+     * Shared text without a magnet or link is ignored, and so are file:// paths and ArrCtrl's own
+     * content URIs (another app must not get ArrCtrl to read its own private files).
      */
     private fun handleIntent(intent: Intent?) {
         intent ?: return
@@ -66,7 +70,7 @@ class MainActivity : ComponentActivity() {
                 val uri = intent.data ?: return
                 when (uri.scheme?.lowercase()) {
                     "magnet" -> IncomingTorrent(link = uri.toString())
-                    "content", "file" -> IncomingTorrent(fileUri = uri.toString())
+                    "content" -> if (isForeignContentUri(this, uri)) IncomingTorrent(fileUri = uri.toString()) else null
                     else -> null
                 }
             }
@@ -74,7 +78,7 @@ class MainActivity : ComponentActivity() {
                 val stream = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
                 val text = intent.getStringExtra(Intent.EXTRA_TEXT)
                 when {
-                    stream != null -> IncomingTorrent(fileUri = stream.toString())
+                    stream != null -> if (isForeignContentUri(this, stream)) IncomingTorrent(fileUri = stream.toString()) else null
                     text != null && extractTorrentLinks(text).isNotEmpty() -> IncomingTorrent(link = extractTorrentLinks(text).joinToString("\n"))
                     else -> null
                 }
