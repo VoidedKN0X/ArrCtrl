@@ -209,6 +209,16 @@ fun SettingsScreen() {
                     checked = s.dynamicColor,
                 ) { v -> update { it.copy(dynamicColor = v) } }
             }
+
+            if (c.telemetry.available) {
+                Group(stringResource(R.string.usage_stats), footer = stringResource(R.string.usage_stats_description)) {
+                    GroupSwitch(
+                        stringResource(R.string.usage_stats_switch),
+                        stringResource(R.string.usage_stats_switch_subtitle),
+                        checked = s.usageStats,
+                    ) { v -> update { it.copy(usageStats = v, usageStatsAsked = true) } }
+                }
+            }
         }
     }
 }

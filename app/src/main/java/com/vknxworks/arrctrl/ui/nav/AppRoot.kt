@@ -65,6 +65,7 @@ import com.vknxworks.arrctrl.ui.servers.ServerEditScreen
 import com.vknxworks.arrctrl.ui.settings.AccountScreen
 import com.vknxworks.arrctrl.ui.settings.NotificationsScreen
 import com.vknxworks.arrctrl.ui.settings.SettingsScreen
+import com.vknxworks.arrctrl.ui.settings.UsageStatsPrompt
 import com.vknxworks.arrctrl.ui.activity.ActivityScreen
 import com.vknxworks.arrctrl.ui.activity.AddTorrentScreen
 import com.vknxworks.arrctrl.ui.activity.ManualImportScreen
@@ -149,6 +150,14 @@ private fun MainScaffold() {
         }
     }
 
+    // Usage stats (only if the user opted in): the kind of screen, never the movie, series, torrent or server it shows.
+    val entryId = backStack?.id
+    val screen = dest?.route?.let(::screenName)
+    LaunchedEffect(entryId) {
+        if (screen != null) c.telemetry.track("screen_viewed", mapOf("screen" to screen))
+    }
+    UsageStatsPrompt()
+
     CompositionLocalProvider(LocalNavigator provides navigator) {
         BoxWithConstraints(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
             if (maxWidth >= 600.dp) {
@@ -178,6 +187,13 @@ private fun MainScaffold() {
         }
     }
 }
+
+/**
+ * "com.vknxworks.arrctrl.ui.nav.MovieRoute/{serverId}/{movieId}?…" -> "Movie". Only the route's class name:
+ * arguments (server IDs, movie and series IDs, titles, torrent hashes, links) are dropped.
+ */
+private fun screenName(route: String): String =
+    route.substringBefore('/').substringBefore('?').substringAfterLast('.').removeSuffix("Route")
 
 /**
  * Phones: content runs edge to edge and scrolls under a floating glass island.

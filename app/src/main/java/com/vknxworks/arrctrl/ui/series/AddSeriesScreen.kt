@@ -245,6 +245,7 @@ private fun AddSeriesSheet(api: SonarrApi, s: LookupSeries, onDismiss: () -> Uni
                         scope.launch {
                             runCatching { api.add(s, p, f, monitor, seriesType, seasonFolder, searchMissing, searchCutoff, chosenTags.toList()) }
                                 .onSuccess {
+                                    context.container.telemetry.action("add", "sonarr")
                                     Toast.makeText(context, addedText, Toast.LENGTH_SHORT).show()
                                     onAdded(it?.id)
                                 }

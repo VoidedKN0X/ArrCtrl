@@ -61,6 +61,10 @@ data class AppSettings(
     val pushEnabled: Boolean = false,
     /** The UnifiedPush endpoint your servers post to; set by the distributor. */
     val pushEndpoint: String? = null,
+    /** Opt-in anonymous usage stats (off until the user says yes). */
+    val usageStats: Boolean = false,
+    /** Whether the one-time usage stats question has been answered. */
+    val usageStatsAsked: Boolean = false,
 )
 
 /** Events notified out of the box; see NotifyEvent. */
@@ -87,6 +91,8 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         val notifyOngoing = booleanPreferencesKey("notify_ongoing")
         val push = booleanPreferencesKey("push_enabled")
         val pushEndpoint = stringPreferencesKey("push_endpoint")
+        val usageStats = booleanPreferencesKey("usage_stats")
+        val usageStatsAsked = booleanPreferencesKey("usage_stats_asked")
     }
 
     val settings: StateFlow<AppSettings> = context.appDataStore.data
@@ -113,6 +119,8 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         notifyOngoing = this[K.notifyOngoing] ?: false,
         pushEnabled = this[K.push] ?: false,
         pushEndpoint = this[K.pushEndpoint],
+        usageStats = this[K.usageStats] ?: false,
+        usageStatsAsked = this[K.usageStatsAsked] ?: false,
     )
 
     /** Every stored change, without the placeholder value [settings] starts with. */
@@ -143,6 +151,8 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             p[K.notifyOngoing] = s.notifyOngoing
             p[K.push] = s.pushEnabled
             if (s.pushEndpoint != null) p[K.pushEndpoint] = s.pushEndpoint else p.remove(K.pushEndpoint)
+            p[K.usageStats] = s.usageStats
+            p[K.usageStatsAsked] = s.usageStatsAsked
         }
     }
 
