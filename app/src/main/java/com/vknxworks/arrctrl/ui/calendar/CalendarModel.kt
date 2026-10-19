@@ -46,48 +46,38 @@ data class CalendarEntry(
 }
 
 /**
- * Upcoming movies and episodes from every Radarr and Sonarr server, for any date range.
- * A server that fails only adds an error card; the others still show.
+ * Fetches calendar entries from Radarr and Sonarr servers. Shared by the Calendar tab and the Upcoming widget.
+ * A server that fails is returned in the error map; the others still count.
  */
-class CalendarModel(private val c: AppContainer) : ViewModel() {
+class CalendarLoader(private val c: AppContainer) {
     private val zone: ZoneId get() = ZoneId.systemDefault()
 
-    var entries by mutableStateOf<List<CalendarEntry>>(emptyList()); private set
+    /** Entries on [from]..[to] (inclusive), sorted by time, plus the servers that failed. */
+    suspend fun load(servers: List<Server>, from: LocalDate, to: LocalDate, monitoredOnly: Boolean): Pair<List<CalendarEntry>, Map<Server, TestResult>> = coroutineScope {
+        // Ask for a day either side so time zones don't drop anything at the edges.
+        val start = from.minusDays(1).atStartOfDay(zone).toInstant().toString()
+        val end = to.plusDays(2).atStartOfDay(zone).toInstant().toString()
+        val unmonitored = !monitoredOnly
+        val jobs = servers.filter { it.type == ServiceType.RADARR || it.type == ServiceType.SONARR }.map { s ->
+            async {
+                s to runCatching {
+                    if (s.type == ServiceType.RADARR) movies(s, start, end, unmonitored) else episodes(s, start, end, unmonitored)
+                }
+            }
+        }
+        val results = jobs.awaitAll()
+        results.forEach { (_, r) -> r.exceptionOrNull()?.let { if (it is CancellationException) throw it } }
+        val entries = results.flatMap { (_, r) -> r.getOrNull().orEmpty() }
+            .filter { !it.day.isBefore(from) && !it.day.isAfter(to) }
+            .sortedWith(compareBy<CalendarEntry> { it.at }.thenBy { it.title.lowercase() })
+        entries to results.mapNotNull { (s, r) -> r.exceptionOrNull()?.let { s to it.toTestResult() } }.toMap()
+    }
+ by mutableStateOf<List<CalendarEntry>>(emptyList()); private set
     var errors by mutableStateOf<Map<Server, TestResult>>(emptyMap()); private set
     var loading by mutableStateOf(false); private set
     var loaded by mutableStateOf(false); private set
     private var loadedRange: Triple<LocalDate, LocalDate, Boolean>? = null
 
-    /** Loads [from]..[to] (inclusive). Skipped when that exact range is already on screen, unless [force]. */
-    suspend fun load(from: LocalDate, to: LocalDate, monitoredOnly: Boolean, force: Boolean = false) = coroutineScope {
-        val range = Triple(from, to, monitoredOnly)
-        if (!force && range == loadedRange && loaded) return@coroutineScope
-        loading = true
-        try {
-            // Ask for a day either side so time zones don't drop anything at the edges.
-            val start = from.minusDays(1).atStartOfDay(zone).toInstant().toString()
-            val end = to.plusDays(2).atStartOfDay(zone).toInstant().toString()
-            val unmonitored = !monitoredOnly
-            val servers = c.servers.servers.value
-            val jobs = servers.filter { it.type == ServiceType.RADARR || it.type == ServiceType.SONARR }.map { s ->
-                async {
-                    s to runCatching {
-                        if (s.type == ServiceType.RADARR) movies(s, start, end, unmonitored) else episodes(s, start, end, unmonitored)
-                    }
-                }
-            }
-            val results = jobs.awaitAll()
-            results.forEach { (_, r) -> r.exceptionOrNull()?.let { if (it is CancellationException) throw it } }
-            entries = results.flatMap { (_, r) -> r.getOrNull().orEmpty() }
-                .filter { !it.day.isBefore(from) && !it.day.isAfter(to) }
-                .sortedWith(compareBy<CalendarEntry> { it.at }.thenBy { it.title.lowercase() })
-            errors = results.mapNotNull { (s, r) -> r.exceptionOrNull()?.let { s to it.toTestResult() } }.toMap()
-            loadedRange = range
-            loaded = true
-        } finally {
-            loading = false
-        }
-    }
 
     private suspend fun movies(s: Server, start: String, end: String, unmonitored: Boolean): List<CalendarEntry> {
         val now = Instant.now()
@@ -141,6 +131,37 @@ class CalendarModel(private val c: AppContainer) : ViewModel() {
                 finale = e.finaleType != null,
                 premiere = e.number == 1,
             )
+        }
+    }
+
+}
+
+/**
+ * Upcoming movies and episodes from every Radarr and Sonarr server, for any date range.
+ * A server that fails only adds an error card; the others still show.
+ */
+class CalendarModel(private val c: AppContainer) : ViewModel() {
+    private val loader = CalendarLoader(c)
+
+    var entries by mutableStateOf<List<CalendarEntry>>(emptyList()); private set
+    var errors by mutableStateOf<Map<Server, TestResult>>(emptyMap()); private set
+    var loading by mutableStateOf(false); private set
+    var loaded by mutableStateOf(false); private set
+    private var loadedRange: Triple<LocalDate, LocalDate, Boolean>? = null
+
+    /** Loads [from]..[to] (inclusive). Skipped when that exact range is already on screen, unless [force]. */
+    suspend fun load(from: LocalDate, to: LocalDate, monitoredOnly: Boolean, force: Boolean = false) {
+        val range = Triple(from, to, monitoredOnly)
+        if (!force && range == loadedRange && loaded) return
+        loading = true
+        try {
+            val (e, err) = loader.load(c.servers.servers.value, from, to, monitoredOnly)
+            entries = e
+            errors = err
+            loadedRange = range
+            loaded = true
+        } finally {
+            loading = false
         }
     }
 

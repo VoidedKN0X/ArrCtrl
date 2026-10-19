@@ -65,6 +65,10 @@ class MainActivity : ComponentActivity() {
             container.pendingOpen.value = open
             return
         }
+        if (intent.action == "android.service.quicksettings.action.QS_TILE_PREFERENCES") {
+            container.pendingOpen.value = "activity"
+            return
+        }
         val incoming = when (intent.action) {
             Intent.ACTION_VIEW -> {
                 val uri = intent.data ?: return

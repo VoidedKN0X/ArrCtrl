@@ -845,4 +845,24 @@
         <item quantity="one">%1$d download · %2$s</item>
         <item quantity="other">%1$d downloads · %2$s</item>
     </plurals>
+    <!-- Widgets and Quick Settings tile -->
+    <string name="widget_upcoming">Upcoming</string>
+    <string name="widget_upcoming_description">Movies and episodes coming in the next two weeks</string>
+    <string name="widget_downloads">Downloads</string>
+    <string name="widget_downloads_speed">Downloads · %1$s</string>
+    <string name="widget_downloads_description">What\'s downloading right now, with progress</string>
+    <string name="widget_refresh">Refresh</string>
+    <string name="widget_loading">Loading…</string>
+    <string name="widget_no_calendar">Add a Radarr or Sonarr server in ArrCtrl</string>
+    <string name="widget_no_downloads_server">Add Radarr, Sonarr or qBittorrent in ArrCtrl</string>
+    <string name="widget_nothing_upcoming">Nothing in the next %1$d days</string>
+    <string name="widget_nothing_downloading">Nothing downloading</string>
+    <string name="tile_alt_speed">Alt. speed</string>
+    <string name="tile_on">On</string>
+    <string name="tile_off">Off</string>
+    <string name="tile_mixed">On for some servers</string>
+    <string name="tile_checking">Checking…</string>
+    <string name="tile_no_server">Add qBittorrent</string>
+    <string name="tile_unreachable">Can\'t reach qBittorrent</string>
+    <string name="tile_some_unreachable">Some servers unreachable</string>
 </resources>

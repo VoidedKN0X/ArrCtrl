@@ -143,6 +143,7 @@ private fun MainScaffold() {
         val parts = o.split('/')
         when (parts.firstOrNull()) {
             "activity" -> selectTab(tops.indexOfFirst { it.route == ActivityRoute })
+            "calendar" -> selectTab(tops.indexOfFirst { it.route == CalendarRoute })
             "health" -> navController.navigate(HealthRoute) { launchSingleTop = true }
             "movie" -> parts.getOrNull(2)?.toIntOrNull()?.let { id -> navController.navigate(MovieRoute(parts[1], id)) { launchSingleTop = true } }
             "series" -> parts.getOrNull(2)?.toIntOrNull()?.let { id -> navController.navigate(SeriesDetailRoute(parts[1], id)) { launchSingleTop = true } }

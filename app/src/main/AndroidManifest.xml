@@ -40,6 +40,10 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Long-pressing the Quick Settings tile opens the Torrents tab. -->
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+            </intent-filter>
             <!-- magnet: links from browsers and other apps (ArrCtrl can be set as the default). -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -75,6 +79,45 @@
             <intent-filter>
                 <action android:name="org.unifiedpush.android.connector.PUSH_EVENT" />
             </intent-filter>
+        </service>
+
+        <!-- Home screen widgets (Glance). -->
+        <receiver
+            android:name=".widget.UpcomingWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_upcoming">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/upcoming_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.DownloadsWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_downloads">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/downloads_widget_info" />
+        </receiver>
+
+        <!-- Quick Settings tile: qBittorrent's alternative speed limits. -->
+        <service
+            android:name=".tile.AltSpeedTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_tile_speed"
+            android:label="@string/tile_alt_speed"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+                android:value="true" />
         </service>
 
         <!-- QR scanner from zxing-android-embedded: follow the phone's rotation instead of forcing landscape. -->
