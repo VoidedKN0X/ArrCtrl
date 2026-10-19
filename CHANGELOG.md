@@ -4,6 +4,12 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.0.3 (2026-10-19)
+
+### Changed
+
+- **One About section in every Ctrl app**: Support, Report a bug, Source code and Licence (GPL-3.0), with the version underneath, at the bottom of the Account and settings page (tap your profile picture). The rows are in the same order, with the same wording and icons, as in the other Ctrl apps. Report a bug now reads "Found a problem or have an idea? Open an issue on GitHub", Source code shows the repository address, and the new Licence row opens the full GNU General Public License v3.0
+
 ## v1.0.2 (2026-10-19)
 
 ### Changed
