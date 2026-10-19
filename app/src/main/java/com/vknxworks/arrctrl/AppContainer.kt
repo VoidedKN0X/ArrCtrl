@@ -39,6 +39,9 @@ class AppContainer(val context: Context) {
 
     /** A magnet link or .torrent file handed to the app (share sheet, magnet: link), waiting to be added. */
     val pendingTorrent = MutableStateFlow<IncomingTorrent?>(null)
+
+    /** Where a tapped notification wants to go (see Alert.open), waiting for the UI. */
+    val pendingOpen = MutableStateFlow<String?>(null)
 }
 
 /** What another app gave us to add: a magnet/URL, or a .torrent file's content URI. */

@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.serialization.Serializable
@@ -36,6 +37,9 @@ class ServerStore(private val context: Context, scope: CoroutineScope) {
     val servers: StateFlow<List<Server>> = context.appDataStore.data
         .map { decode(it[key]) }
         .stateIn(scope, SharingStarted.Eagerly, emptyList())
+
+    /** Reads the stored list directly; for background work, where [servers] may not have loaded yet. */
+    suspend fun current(): List<Server> = decode(context.appDataStore.data.first()[key])
 
     fun byId(id: String): Server? = servers.value.firstOrNull { it.id == id }
     fun ofType(type: ServiceType): List<Server> = servers.value.filter { it.type == type }

@@ -8,11 +8,13 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.vknxworks.arrctrl.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -45,7 +47,24 @@ data class AppSettings(
     val calendarMonitoredOnly: Boolean = true,
     /** System health warns when a disk has less than this percentage free. */
     val diskWarnPercent: Int = 10,
+    /** Master switch for notifications. Off until you turn it on. */
+    val notifyEnabled: Boolean = false,
+    /** Minutes between background checks; 0 = only when a push wakes the app. */
+    val notifyInterval: Int = 30,
+    /** NotifyEvent names that are switched on. */
+    val notifyEvents: Set<String> = DEFAULT_NOTIFY_EVENTS,
+    /** Server ids you don't want notifications from. */
+    val notifyMuted: Set<String> = emptySet(),
+    /** Ongoing notification with active downloads (off by default). */
+    val notifyOngoing: Boolean = false,
+    /** Instant checks through a UnifiedPush distributor (e.g. ntfy). */
+    val pushEnabled: Boolean = false,
+    /** The UnifiedPush endpoint your servers post to; set by the distributor. */
+    val pushEndpoint: String? = null,
 )
+
+/** Events notified out of the box; see NotifyEvent. */
+val DEFAULT_NOTIFY_EVENTS = setOf("IMPORTED", "FAILED", "ATTENTION", "HEALTH", "DISK")
 
 class SettingsRepository(private val context: Context, scope: CoroutineScope) {
     private object K {
@@ -61,6 +80,13 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         val calKind = stringPreferencesKey("calendar_kind")
         val calMonitored = booleanPreferencesKey("calendar_monitored_only")
         val diskWarn = intPreferencesKey("disk_warn_percent")
+        val notify = booleanPreferencesKey("notify_enabled")
+        val notifyInterval = intPreferencesKey("notify_interval")
+        val notifyEvents = stringSetPreferencesKey("notify_events")
+        val notifyMuted = stringSetPreferencesKey("notify_muted")
+        val notifyOngoing = booleanPreferencesKey("notify_ongoing")
+        val push = booleanPreferencesKey("push_enabled")
+        val pushEndpoint = stringPreferencesKey("push_endpoint")
     }
 
     val settings: StateFlow<AppSettings> = context.appDataStore.data
@@ -80,7 +106,20 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         calendarKind = this[K.calKind] ?: "ALL",
         calendarMonitoredOnly = this[K.calMonitored] ?: true,
         diskWarnPercent = this[K.diskWarn] ?: 10,
+        notifyEnabled = this[K.notify] ?: false,
+        notifyInterval = this[K.notifyInterval] ?: 30,
+        notifyEvents = this[K.notifyEvents] ?: DEFAULT_NOTIFY_EVENTS,
+        notifyMuted = this[K.notifyMuted] ?: emptySet(),
+        notifyOngoing = this[K.notifyOngoing] ?: false,
+        pushEnabled = this[K.push] ?: false,
+        pushEndpoint = this[K.pushEndpoint],
     )
+
+    /** Every stored change, without the placeholder value [settings] starts with. */
+    val changes: kotlinx.coroutines.flow.Flow<AppSettings> = context.appDataStore.data.map { it.toSettings() }
+
+    /** Reads the stored settings directly; for background work, where [settings] may not have loaded yet. */
+    suspend fun current(): AppSettings = context.appDataStore.data.first().toSettings()
 
     suspend fun update(transform: (AppSettings) -> AppSettings) {
         context.appDataStore.edit { p ->
@@ -97,6 +136,13 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             p[K.calKind] = s.calendarKind
             p[K.calMonitored] = s.calendarMonitoredOnly
             p[K.diskWarn] = s.diskWarnPercent
+            p[K.notify] = s.notifyEnabled
+            p[K.notifyInterval] = s.notifyInterval
+            p[K.notifyEvents] = s.notifyEvents
+            p[K.notifyMuted] = s.notifyMuted
+            p[K.notifyOngoing] = s.notifyOngoing
+            p[K.push] = s.pushEnabled
+            if (s.pushEndpoint != null) p[K.pushEndpoint] = s.pushEndpoint else p.remove(K.pushEndpoint)
         }
     }
 

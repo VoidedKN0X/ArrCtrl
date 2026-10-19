@@ -11,3 +11,11 @@
 -dontwarn org.conscrypt.**
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
+
+# UnifiedPush connector + Tink (Web Push decryption). Tink reads protobuf message fields reflectively.
+-keep class org.unifiedpush.android.connector.** { *; }
+-keepclassmembers class * extends com.google.crypto.tink.shaded.protobuf.GeneratedMessageLite { <fields>; }
+-dontwarn com.google.errorprone.annotations.**
+-dontwarn javax.annotation.**
+-dontwarn com.google.api.client.**
+-dontwarn org.joda.time.**

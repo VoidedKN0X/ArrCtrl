@@ -22,8 +22,8 @@ android {
         minSdk = 33
         targetSdk = 36
         // Bump both to publish a new release (see CHANGELOG.md).
-        versionCode = 8
-        versionName = "0.7.1"
+        versionCode = 9
+        versionName = "0.8.0"
     }
 
     signingConfigs {
@@ -123,4 +123,21 @@ dependencies {
     // QR import of server settings. Pure zxing, no Google Play Services (F-Droid safe).
     implementation(libs.zxing.embedded)
     implementation(libs.zxing.core)
+
+    // Notifications: periodic checks, and instant wake-ups through a UnifiedPush distributor such as ntfy.
+    // Both are open source; no Firebase or Google Play Services (F-Droid safe).
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.unifiedpush.connector)
+}
+
+// The UnifiedPush connector depends on the JVM build of Tink (for Web Push decryption).
+// Use the Android build instead, as the connector's docs recommend: it's smaller and ships its own shrinker rules.
+configurations.all {
+    resolutionStrategy {
+        val tink = "com.google.crypto.tink:tink-android:${libs.versions.tink.get()}"
+        force(tink)
+        dependencySubstitution {
+            substitute(module("com.google.crypto.tink:tink")).using(module(tink))
+        }
+    }
 }

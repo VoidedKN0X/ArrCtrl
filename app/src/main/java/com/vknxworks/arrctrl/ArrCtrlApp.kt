@@ -6,6 +6,11 @@ import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.vknxworks.arrctrl.data.net.ServerCallFactory
+import com.vknxworks.arrctrl.data.notify.NotifySchedule
+import com.vknxworks.arrctrl.data.notify.Notifications
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class ArrCtrlApp : Application(), SingletonImageLoader.Factory {
     lateinit var container: AppContainer
@@ -14,6 +19,14 @@ class ArrCtrlApp : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         container = AppContainer(this)
+        Notifications.ensureChannels(this)
+        // Keep background checks, ongoing updates and the UnifiedPush registration in line with the settings.
+        container.appScope.launch {
+            container.settings.changes
+                .map { listOf(it.notifyEnabled, it.notifyInterval, it.notifyOngoing, it.pushEnabled) to it }
+                .distinctUntilChanged { a, b -> a.first == b.first }
+                .collect { (_, s) -> runCatching { NotifySchedule.apply(this@ArrCtrlApp, s) } }
+        }
     }
 
     /** Posters and fanart come from your own servers, through the same clients (keys, pinned certificates) as everything else. */

@@ -1,5 +1,7 @@
 package com.vknxworks.arrctrl.ui.servers
 
+import androidx.compose.ui.platform.LocalContext
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -46,26 +48,29 @@ val ServiceType.icon: ImageVector
 
 /** One line describing a connection test result for [type]. */
 @Composable
-fun resultText(result: TestResult, type: ServiceType): String {
-    val service = stringResource(type.label)
+fun resultText(result: TestResult, type: ServiceType): String = resultText(LocalContext.current, result, type)
+
+/** The same text outside Compose (background checks and notifications). */
+fun resultText(context: Context, result: TestResult, type: ServiceType): String {
+    val service = context.getString(type.label)
     return when (result) {
         is TestResult.Ok ->
-            if (result.version.isNullOrBlank()) stringResource(R.string.test_ok)
-            else stringResource(R.string.test_ok_version, service, result.version)
+            if (result.version.isNullOrBlank()) context.getString(R.string.test_ok)
+            else context.getString(R.string.test_ok_version, service, result.version)
         is TestResult.WrongService ->
-            if (result.found.isNullOrBlank()) stringResource(R.string.test_wrong_service, service)
-            else stringResource(R.string.test_wrong_service_found, result.found, service)
-        TestResult.BadKey -> stringResource(R.string.test_bad_key)
-        TestResult.BadLogin -> stringResource(R.string.test_bad_login)
-        TestResult.Banned -> stringResource(R.string.test_banned)
+            if (result.found.isNullOrBlank()) context.getString(R.string.test_wrong_service, service)
+            else context.getString(R.string.test_wrong_service_found, result.found, service)
+        TestResult.BadKey -> context.getString(R.string.test_bad_key)
+        TestResult.BadLogin -> context.getString(R.string.test_bad_login)
+        TestResult.Banned -> context.getString(R.string.test_banned)
         is TestResult.Untrusted ->
-            if (result.changed) stringResource(R.string.test_cert_changed) else stringResource(R.string.test_cert_untrusted)
-        is TestResult.TlsFailed -> stringResource(R.string.test_tls_failed)
-        TestResult.HostNotFound -> stringResource(R.string.test_host_not_found)
-        TestResult.Refused -> stringResource(R.string.test_refused)
-        TestResult.Timeout -> stringResource(R.string.test_timeout)
-        is TestResult.Unreachable -> stringResource(R.string.test_unreachable)
-        is TestResult.HttpError -> stringResource(R.string.test_http_error, result.code)
+            if (result.changed) context.getString(R.string.test_cert_changed) else context.getString(R.string.test_cert_untrusted)
+        is TestResult.TlsFailed -> context.getString(R.string.test_tls_failed)
+        TestResult.HostNotFound -> context.getString(R.string.test_host_not_found)
+        TestResult.Refused -> context.getString(R.string.test_refused)
+        TestResult.Timeout -> context.getString(R.string.test_timeout)
+        is TestResult.Unreachable -> context.getString(R.string.test_unreachable)
+        is TestResult.HttpError -> context.getString(R.string.test_http_error, result.code)
     }
 }
 
