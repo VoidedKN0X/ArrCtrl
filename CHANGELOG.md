@@ -4,6 +4,36 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.7.0 (2026-10-19)
+
+The More tab comes alive: Prowlarr, Bazarr, autobrr and Cleanuparr each get their own screen, and System health shows every warning from every server in one place.
+
+### New
+
+- **Prowlarr: indexers.** Every indexer with its protocol, privacy (public, semi-private or private) and priority, plus a summary of how many are enabled and how many are failing. Failing indexers show since when, or until when Prowlarr has paused them after repeated failures
+- **Prowlarr: enable, disable and test.** Switch an indexer on or off with its toggle, or test it from its menu; a failed test shows Prowlarr's reasons
+- **Prowlarr: search.** Search all your indexers at once. Results show the indexer, size, age, seeders and peers, categories and grab count. Tap one to send it to the download client set up in Prowlarr (the app warns that Radarr and Sonarr won't import it automatically)
+- **Prowlarr: stats.** Queries, grabs and failures for each indexer, with the average response time
+- **Bazarr: wanted.** Missing subtitles for movies and episodes, with the languages that are missing. Search one automatically, search a whole series, or search everything that's wanted at once
+- **Bazarr: manual subtitle search.** See every subtitle your providers offer, with its score, language, provider, whether it's hearing impaired or forced, and what does or doesn't match your file. Tap one to download it
+- **Bazarr: history** of downloaded subtitles with their language, provider and score, and **providers** that are throttled or failing, with when Bazarr will retry them
+- **autobrr: stats** for releases seen, pushed, rejected and failed
+- **autobrr: releases.** The latest announced releases with their indexer, size, which filter caught them and what happened: approved or rejected by the filter, pushed, rejected by the download client, or failed to push. Load older ones at the bottom
+- **autobrr: filters.** Turn each filter on or off with its toggle
+- **autobrr: IRC.** Each network and channel, whether it's connected and being monitored, and when the last announce came in. autobrr's IRC passwords are never read or shown
+- **Cleanuparr: stats** for the last 24 hours, 7 days or 30 days: downloads removed, strikes given, downloads that recovered and jobs that ran fine
+- **Cleanuparr: connections** to your download clients and *arr apps, with any that can't be reached shown in red
+- **Cleanuparr: jobs** with when each last ran and runs next. **Run now** starts a job once straight away (Seeker can't be started by hand, so it has no button)
+- **Cleanuparr: recent strikes**, with strikes from dry runs marked, and the **event log**, with older events at the bottom
+- **System health** (the Health row in More): warnings from Radarr, Sonarr and Prowlarr, Bazarr's health checks, autobrr IRC networks or channels that are down, Cleanuparr download clients it can't reach, and qBittorrent servers that don't respond. Servers that are fine say so; the count of problems is at the top
+- **Disk space** for every Radarr and Sonarr root folder and drive, as a bar with free and total space. Drives below your warning threshold are flagged; set the threshold from 5% to 25% (10% by default)
+- With more than one server of a kind, chips at the top of each tool switch between them
+- Tools you haven't added a server for take you straight to adding one
+
+### Changed
+
+- The More tab no longer shows a "connected" line under each tool; tools without a server now offer to add one
+
 ## v0.6.0 (2026-10-19)
 
 The Calendar tab, and a fix for the selection bar in Movies and Series.
