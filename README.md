@@ -10,7 +10,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/VoidedKN0X/ArrCtrl"><img src=".github/assets/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a> <a href="https://voidedkn0x.github.io/CtrlF-Droid/"><img src=".github/assets/badge_ctrlf-droid.png" alt="Get it from our F-Droid repo" height="80"></a>
 
-> **Early development.** Servers, Movies, Series, Calendar, Activity (queue, torrents, history), the More tools (Prowlarr, Bazarr, autobrr, Cleanuparr, System health), notifications, widgets and the quick settings tile all work; expect rough edges while it settles. See the [changelog](CHANGELOG.md).
+> **ArrCtrl 1.0.** Everything planned is in: Movies, Series, Calendar, Activity, the More tools, subtitles, notifications, widgets and the quick settings tile. Found a bug? [Open an issue](https://github.com/VoidedKN0X/ArrCtrl/issues). See the [changelog](CHANGELOG.md) for what's new.
 
 ## Features
 

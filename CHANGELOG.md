@@ -4,6 +4,16 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.0.0 (2026-10-19)
+
+ArrCtrl 1.0: everything that was planned is in. Movies and Series from Radarr and Sonarr, the Calendar, the Activity tab with your queues, torrents and history, Prowlarr, Bazarr, autobrr and Cleanuparr, System health, subtitles in any language, notifications (with instant push through your own ntfy server), home screen widgets and the Alt. speed tile.
+
+### Changed
+
+- **Play in JellyCtrl opens the movie or episode.** With JellyCtrl 0.1.20 or newer, the Play in JellyCtrl button on a movie page or in an episode's sheet opens that movie or episode in JellyCtrl, ready to play, instead of only starting the app. If the episode isn't in Jellyfin yet you land on the series; if the movie or series isn't there, JellyCtrl tells you. Older JellyCtrl versions still just open
+- **Open in SeerrCtrl opens the movie or series.** With SeerrCtrl 1.4.7 or newer, the Open in SeerrCtrl button on a movie or series page opens that movie or series in SeerrCtrl instead of only starting the app
+- **README:** the "early development" note is gone; it now says ArrCtrl 1.0 is complete and where to report bugs
+
 ## v0.9.1 (2026-10-19)
 
 ArrCtrl is now completely Google-free. Nothing changes in how you use it.
