@@ -30,14 +30,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.BookmarkRemove
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.outlined.HighQuality
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.SearchOff
-import androidx.compose.material.icons.outlined.SelectAll
 import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.outlined.Tv
 import androidx.compose.material.icons.outlined.ViewList
@@ -84,6 +80,8 @@ import com.vknxworks.arrctrl.ui.components.Chip
 import com.vknxworks.arrctrl.ui.components.ChoiceSheet
 import com.vknxworks.arrctrl.ui.components.LocalBottomClearance
 import com.vknxworks.arrctrl.ui.components.MessageView
+import com.vknxworks.arrctrl.ui.components.SelectionAction
+import com.vknxworks.arrctrl.ui.components.SelectionBar
 import com.vknxworks.arrctrl.ui.components.ServerErrorCard
 import com.vknxworks.arrctrl.ui.components.TabTitle
 import com.vknxworks.arrctrl.ui.movies.Poster
@@ -126,7 +124,7 @@ fun SeriesScreen() {
     var searching by remember { mutableStateOf(model.query.isNotEmpty()) }
     var sortSheet by remember { mutableStateOf(false) }
     var refreshing by remember { mutableStateOf(false) }
-    var bulk by remember { mutableStateOf<SeriesBulk?>(null) }
+    var bulk by remember { mutableStateOf<SelectionAction?>(null) }
     val server = model.server ?: return
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -142,16 +140,12 @@ fun SeriesScreen() {
 
     Column(Modifier.fillMaxSize().statusBarsPadding()) {
         if (selecting) {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { model.selection = emptySet() }) { Icon(Icons.Outlined.Close, stringResource(R.string.selection_clear)) }
-                Text(stringResource(R.string.selection_count, model.selection.size), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-                IconButton(onClick = { model.selection = visible.map { it.id }.toSet() }) { Icon(Icons.Outlined.SelectAll, stringResource(R.string.selection_all)) }
-                IconButton(onClick = { bulk = SeriesBulk.MONITOR }) { Icon(Icons.Outlined.BookmarkBorder, stringResource(R.string.bulk_monitor)) }
-                IconButton(onClick = { bulk = SeriesBulk.UNMONITOR }) { Icon(Icons.Outlined.BookmarkRemove, stringResource(R.string.bulk_unmonitor)) }
-                IconButton(onClick = { bulk = SeriesBulk.PROFILE }) { Icon(Icons.Outlined.HighQuality, stringResource(R.string.bulk_profile)) }
-                IconButton(onClick = { bulk = SeriesBulk.SEARCH }) { Icon(Icons.Outlined.Search, stringResource(R.string.bulk_search)) }
-                IconButton(onClick = { bulk = SeriesBulk.DELETE }) { Icon(Icons.Outlined.Delete, stringResource(R.string.bulk_delete), tint = MaterialTheme.colorScheme.error) }
-            }
+            SelectionBar(
+                count = model.selection.size,
+                onClose = { model.selection = emptySet() },
+                onSelectAll = { model.selection = visible.map { it.id }.toSet() },
+                onAction = { bulk = it },
+            )
         } else {
             TabTitle(stringResource(R.string.tab_series)) {
                 IconButton(onClick = { searching = !searching; if (!searching) model.query = "" }) {
@@ -247,7 +241,7 @@ fun SeriesScreen() {
     }
 
     bulk?.let { action ->
-        SeriesBulkDialog(action, model, onDismiss = { bulk = null }) { msg ->
+        SelectionActionDialog(action, model, onDismiss = { bulk = null }) { msg ->
             bulk = null
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
             model.selection = emptySet()
@@ -370,10 +364,8 @@ private fun ListRow(s: Series, model: SeriesModel, selected: Boolean, onClick: (
     }
 }
 
-enum class SeriesBulk { MONITOR, UNMONITOR, PROFILE, SEARCH, DELETE }
-
 @Composable
-private fun SeriesBulkDialog(action: SeriesBulk, model: SeriesModel, onDismiss: () -> Unit, onDone: (String) -> Unit) {
+private fun SelectionActionDialog(action: SelectionAction, model: SeriesModel, onDismiss: () -> Unit, onDone: (String) -> Unit) {
     val c = LocalContext.current.container
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -391,13 +383,13 @@ private fun SeriesBulkDialog(action: SeriesBulk, model: SeriesModel, onDismiss: 
     }
 
     when (action) {
-        SeriesBulk.PROFILE -> ChoiceSheet(
+        SelectionAction.PROFILE -> ChoiceSheet(
             stringResource(R.string.bulk_profile),
             model.profiles.map { it.id to it.name },
             selected = null,
             onDismiss = onDismiss,
         ) { id -> exec { api.editor(ids, qualityProfileId = id) } }
-        SeriesBulk.DELETE -> {
+        SelectionAction.DELETE -> {
             var files by remember { mutableStateOf(false) }
             var exclude by remember { mutableStateOf(false) }
             AlertDialog(
@@ -420,8 +412,8 @@ private fun SeriesBulkDialog(action: SeriesBulk, model: SeriesModel, onDismiss: 
         else -> {
             val title = stringResource(
                 when (action) {
-                    SeriesBulk.MONITOR -> R.string.bulk_monitor
-                    SeriesBulk.UNMONITOR -> R.string.bulk_unmonitor
+                    SelectionAction.MONITOR -> R.string.bulk_monitor
+                    SelectionAction.UNMONITOR -> R.string.bulk_unmonitor
                     else -> R.string.bulk_search
                 },
             )
@@ -433,8 +425,8 @@ private fun SeriesBulkDialog(action: SeriesBulk, model: SeriesModel, onDismiss: 
                     TextButton(onClick = {
                         exec {
                             when (action) {
-                                SeriesBulk.MONITOR -> api.editor(ids, monitored = true)
-                                SeriesBulk.UNMONITOR -> api.editor(ids, monitored = false)
+                                SelectionAction.MONITOR -> api.editor(ids, monitored = true)
+                                SelectionAction.UNMONITOR -> api.editor(ids, monitored = false)
                                 else -> api.searchMany(ids)
                             }
                         }

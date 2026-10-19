@@ -216,6 +216,10 @@ class RadarrApi(private val http: Http, val server: Server) {
         )
     }
 
+    /** Movies with a cinema, digital or physical release between [start] and [end] (ISO-8601). */
+    suspend fun calendar(start: String, end: String, unmonitored: Boolean): List<Movie> =
+        Api.json(client, Api.get(url("/calendar?start=$start&end=$end&unmonitored=$unmonitored"))).objects().mapNotNull(::movie)
+
     // ---------- Images (always through the server, never straight from TMDB) ----------
 
     fun poster(movieId: Int, large: Boolean = false): String = url("/mediacover/$movieId/poster-${if (large) 500 else 250}.jpg")

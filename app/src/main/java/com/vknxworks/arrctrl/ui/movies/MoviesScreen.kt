@@ -29,15 +29,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.BookmarkBorder
-import androidx.compose.material.icons.outlined.BookmarkRemove
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.outlined.HighQuality
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.SearchOff
-import androidx.compose.material.icons.outlined.SelectAll
 import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.filled.CheckCircle
@@ -79,6 +75,8 @@ import com.vknxworks.arrctrl.ui.activity.CheckRow
 import com.vknxworks.arrctrl.ui.components.ChoiceSheet
 import com.vknxworks.arrctrl.ui.components.LocalBottomClearance
 import com.vknxworks.arrctrl.ui.components.MessageView
+import com.vknxworks.arrctrl.ui.components.SelectionAction
+import com.vknxworks.arrctrl.ui.components.SelectionBar
 import com.vknxworks.arrctrl.ui.components.ServerErrorCard
 import com.vknxworks.arrctrl.ui.components.TabTitle
 import com.vknxworks.arrctrl.ui.nav.AddMovieRoute
@@ -119,7 +117,7 @@ fun MoviesScreen() {
     var searching by remember { mutableStateOf(model.query.isNotEmpty()) }
     var sortSheet by remember { mutableStateOf(false) }
     var refreshing by remember { mutableStateOf(false) }
-    var bulk by remember { mutableStateOf<BulkAction?>(null) }
+    var bulk by remember { mutableStateOf<SelectionAction?>(null) }
     val server = model.server ?: return
 
     // Reload whenever the tab comes back into view (after editing, adding or deleting a movie).
@@ -353,25 +351,9 @@ private fun ListRow(m: Movie, model: MoviesModel, selected: Boolean, onClick: ()
 
 // ---------- Bulk editing ----------
 
-enum class BulkAction { MONITOR, UNMONITOR, PROFILE, SEARCH, DELETE }
-
-@Composable
-private fun SelectionBar(count: Int, onClose: () -> Unit, onSelectAll: () -> Unit, onAction: (BulkAction) -> Unit) {
-    Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onClose) { Icon(Icons.Outlined.Close, stringResource(R.string.selection_clear)) }
-        Text(stringResource(R.string.selection_count, count), style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
-        IconButton(onClick = onSelectAll) { Icon(Icons.Outlined.SelectAll, stringResource(R.string.selection_all)) }
-        IconButton(onClick = { onAction(BulkAction.MONITOR) }) { Icon(Icons.Outlined.BookmarkBorder, stringResource(R.string.bulk_monitor)) }
-        IconButton(onClick = { onAction(BulkAction.UNMONITOR) }) { Icon(Icons.Outlined.BookmarkRemove, stringResource(R.string.bulk_unmonitor)) }
-        IconButton(onClick = { onAction(BulkAction.PROFILE) }) { Icon(Icons.Outlined.HighQuality, stringResource(R.string.bulk_profile)) }
-        IconButton(onClick = { onAction(BulkAction.SEARCH) }) { Icon(Icons.Outlined.Search, stringResource(R.string.bulk_search)) }
-        IconButton(onClick = { onAction(BulkAction.DELETE) }) { Icon(Icons.Outlined.Delete, stringResource(R.string.bulk_delete), tint = MaterialTheme.colorScheme.error) }
-    }
-}
-
 /** Confirms (and for profile and delete, configures) a bulk action, then runs it. [onDone] gets a message to show. */
 @Composable
-private fun BulkDialog(action: BulkAction, model: MoviesModel, onDismiss: () -> Unit, onDone: (String) -> Unit) {
+private fun BulkDialog(action: SelectionAction, model: MoviesModel, onDismiss: () -> Unit, onDone: (String) -> Unit) {
     val c = LocalContext.current.container
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -389,13 +371,13 @@ private fun BulkDialog(action: BulkAction, model: MoviesModel, onDismiss: () -> 
     }
 
     when (action) {
-        BulkAction.PROFILE -> ChoiceSheet(
+        SelectionAction.PROFILE -> ChoiceSheet(
             stringResource(R.string.bulk_profile),
             model.profiles.map { it.id to it.name },
             selected = null,
             onDismiss = onDismiss,
         ) { id -> exec { api.editor(ids, qualityProfileId = id) } }
-        BulkAction.DELETE -> {
+        SelectionAction.DELETE -> {
             var files by remember { mutableStateOf(false) }
             var exclude by remember { mutableStateOf(false) }
             AlertDialog(
@@ -418,8 +400,8 @@ private fun BulkDialog(action: BulkAction, model: MoviesModel, onDismiss: () -> 
         else -> {
             val title = stringResource(
                 when (action) {
-                    BulkAction.MONITOR -> R.string.bulk_monitor
-                    BulkAction.UNMONITOR -> R.string.bulk_unmonitor
+                    SelectionAction.MONITOR -> R.string.bulk_monitor
+                    SelectionAction.UNMONITOR -> R.string.bulk_unmonitor
                     else -> R.string.bulk_search
                 },
             )
@@ -431,8 +413,8 @@ private fun BulkDialog(action: BulkAction, model: MoviesModel, onDismiss: () -> 
                     TextButton(onClick = {
                         exec {
                             when (action) {
-                                BulkAction.MONITOR -> api.editor(ids, monitored = true)
-                                BulkAction.UNMONITOR -> api.editor(ids, monitored = false)
+                                SelectionAction.MONITOR -> api.editor(ids, monitored = true)
+                                SelectionAction.UNMONITOR -> api.editor(ids, monitored = false)
                                 else -> api.search(ids)
                             }
                         }

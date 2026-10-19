@@ -68,7 +68,7 @@ import com.vknxworks.arrctrl.ui.activity.ActivityScreen
 import com.vknxworks.arrctrl.ui.activity.AddTorrentScreen
 import com.vknxworks.arrctrl.ui.activity.ManualImportScreen
 import com.vknxworks.arrctrl.ui.activity.TorrentScreen
-import com.vknxworks.arrctrl.ui.tabs.CalendarScreen
+import com.vknxworks.arrctrl.ui.calendar.CalendarScreen
 import com.vknxworks.arrctrl.ui.tabs.MoreScreen
 import com.vknxworks.arrctrl.ui.movies.AddMovieScreen
 import com.vknxworks.arrctrl.ui.movies.MovieReleasesScreen
