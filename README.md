@@ -124,6 +124,16 @@ If your ntfy server needs a login to publish, add the username and password (or 
 
 Android limits apps in the background to save battery. The Notifications screen shows whether ArrCtrl is restricted and lets you lift it. Some phones go further on their own: OPPO and OnePlus (ColorOS), Xiaomi, Samsung and Huawei can stop apps in the background regardless. On those, open ArrCtrl's **App settings** from the same screen and allow background activity and auto-launch. Do the same for the ntfy app, since it has to stay connected for instant notifications.
 
+## Usage stats
+
+ArrCtrl can share anonymous usage stats, **only if you say yes**. It asks once after you add your first server, and you can change it any time in **Account** (the profile button) → **Settings** → **Usage stats**.
+
+- **Shared:** which screens you open (the kind of screen, such as "Movie", "Activity" or "Prowlarr", never which movie, series, torrent or server), when you add, search for or grab something and with which service (Radarr, Sonarr, Prowlarr or qBittorrent, never what it was), the app version, Android version, phone model, language, phone or tablet, your theme, and whether notifications are on.
+- **Never shared:** your server addresses, API keys, usernames or passwords, which movies, series, releases or torrents, what you search for, or any ID that stays the same between sessions.
+- **Where:** VKNXWorks' own self-hosted [Aptabase](https://aptabase.com) server. Nothing goes to Google or analytics companies. Like any website, the server sees your IP address; Aptabase uses it only to work out the country and doesn't store it.
+
+Builds from source don't include the stats key, so they can't send anything and the setting is hidden. The code is in [`Telemetry.kt`](app/src/main/java/com/vknxworks/arrctrl/data/telemetry/Telemetry.kt).
+
 ## Build from source
 
 You need [Android Studio](https://developer.android.com/studio), or JDK 17 and the Android SDK.

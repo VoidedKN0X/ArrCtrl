@@ -4,6 +4,19 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.8.1 (2026-10-19)
+
+### New
+
+- **Optional anonymous usage stats.** After you add your first server, ArrCtrl asks once whether you'd like to share anonymous usage stats. Nothing is sent unless you tap **Share stats**, and you can switch it on or off any time in **Account → Settings → Usage stats**
+- **What's shared:** which screens you open (for example "Movies", "Movie", "Activity" or "Prowlarr", never which movie, series, torrent or server), when you add a movie, series or torrent, start a search or grab a release and which kind of service did it (Radarr, Sonarr, Prowlarr or qBittorrent), the app version, Android version, phone model, language, phone or tablet, your theme, and whether notifications are on
+- **What's never shared:** your server addresses, API keys, usernames, passwords, which movies, series, releases or torrents, what you search for, or any ID that follows you between sessions. Each session gets a new random ID, and stats from before and after you switch them off and on again aren't linked
+- **Where it goes:** to VKNXWorks' own self-hosted server (Aptabase), not to Google or any analytics company. Builds you make from source can't send stats at all, and the setting doesn't appear in them
+
+### Changed
+
+- The README has a new **Usage stats** section listing exactly what's collected
+
 ## v0.8.0 (2026-10-19)
 
 Notifications, and subtitles in any language for every movie and episode.

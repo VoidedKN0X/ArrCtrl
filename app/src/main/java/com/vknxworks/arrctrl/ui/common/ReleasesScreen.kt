@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.vknxworks.arrctrl.R
+import com.vknxworks.arrctrl.container
 import com.vknxworks.arrctrl.data.api.Format
 import com.vknxworks.arrctrl.data.api.Release
 import com.vknxworks.arrctrl.data.api.toTestResult
@@ -91,6 +92,7 @@ fun ReleasesScreen(title: String, type: ServiceType, load: suspend () -> List<Re
     var hideRejected by rememberSaveable { mutableStateOf(false) }
     var confirm by remember { mutableStateOf<Release?>(null) }
     var grabbed by remember { mutableStateOf<Set<String>>(emptySet()) }
+    val telemetry = context.container.telemetry
 
     LaunchedEffect(attempt) {
         releases = null
@@ -104,6 +106,7 @@ fun ReleasesScreen(title: String, type: ServiceType, load: suspend () -> List<Re
             runCatching { grab(r) }
                 .onSuccess {
                     grabbed = grabbed + r.guid
+                    telemetry.action("grab", type.id)
                     Toast.makeText(context, sentText, Toast.LENGTH_SHORT).show()
                 }
                 .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }

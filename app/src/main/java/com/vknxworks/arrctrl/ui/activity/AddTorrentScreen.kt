@@ -139,6 +139,7 @@ fun AddTorrentScreen(initialLink: String?, initialFile: String?) {
             adding = false
             result
                 .onSuccess {
+                    c.telemetry.action("add", "qbittorrent")
                     Toast.makeText(context, addedText, Toast.LENGTH_SHORT).show()
                     nav.back()
                 }

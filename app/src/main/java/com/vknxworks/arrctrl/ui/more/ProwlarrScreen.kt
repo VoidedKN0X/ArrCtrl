@@ -198,6 +198,7 @@ private fun IndexerSheet(api: ProwlarrApi, i: Indexer, onDismiss: () -> Unit) {
 @Composable
 private fun SearchTab(server: Server, api: ProwlarrApi) {
     val context = LocalContext.current
+    val telemetry = context.container.telemetry
     val scope = rememberCoroutineScope()
     val focus = LocalFocusManager.current
     var query by rememberSaveable { mutableStateOf("") }
@@ -211,7 +212,7 @@ private fun SearchTab(server: Server, api: ProwlarrApi) {
         if (query.isBlank()) return
         focus.clearFocus(); searching = true; error = null
         scope.launch {
-            runCatching { api.search(query) }.onSuccess { results = it.sortedByDescending { r -> r.seeders ?: -1 } }.onFailure { error = it.toTestResult() }
+            runCatching { api.search(query) }.onSuccess { results = it.sortedByDescending { r -> r.seeders ?: -1 }; telemetry.action("search", "prowlarr") }.onFailure { error = it.toTestResult() }
             searching = false
         }
     }
@@ -272,7 +273,7 @@ private fun SearchTab(server: Server, api: ProwlarrApi) {
                     confirm = null
                     scope.launch {
                         runCatching { api.grab(s) }
-                            .onSuccess { sent = sent + s.guid; Toast.makeText(context, sentText, Toast.LENGTH_SHORT).show() }
+                            .onSuccess { sent = sent + s.guid; telemetry.action("grab", "prowlarr"); Toast.makeText(context, sentText, Toast.LENGTH_SHORT).show() }
                             .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
                     }
                 }) { Text(stringResource(R.string.prowlarr_grab)) }

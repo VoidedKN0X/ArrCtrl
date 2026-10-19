@@ -427,7 +427,7 @@ private fun SelectionActionDialog(action: SelectionAction, model: SeriesModel, o
                             when (action) {
                                 SelectionAction.MONITOR -> api.editor(ids, monitored = true)
                                 SelectionAction.UNMONITOR -> api.editor(ids, monitored = false)
-                                else -> api.searchMany(ids)
+                                else -> { api.searchMany(ids); c.telemetry.action("search", "sonarr") }
                             }
                         }
                     }) { Text(stringResource(R.string.ok)) }
