@@ -1,5 +1,7 @@
 package com.vknxworks.arrctrl.ui.settings
 
+import com.vknxworks.arrctrl.ui.nav.NotificationsRoute
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -105,6 +107,14 @@ fun AccountScreen() {
                     Icons.Outlined.Settings,
                     showChevron = true,
                     onClick = { nav.navigate(SettingsRoute) },
+                )
+                val settings by LocalContext.current.container.settings.settings.collectAsStateWithLifecycle()
+                GroupRow(
+                    stringResource(R.string.notifications),
+                    notificationsSummary(settings),
+                    Icons.Outlined.Notifications,
+                    showChevron = true,
+                    onClick = { nav.navigate(NotificationsRoute) },
                 )
             }
 

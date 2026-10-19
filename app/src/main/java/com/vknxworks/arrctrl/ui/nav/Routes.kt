@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
 // Pushed screens
 @Serializable data object AccountRoute
 @Serializable data object SettingsRoute
+@Serializable data object NotificationsRoute
 
 /** Add ([type] set) or edit ([id] set) a server. */
 @Serializable data class ServerEditRoute(val id: String? = null, val type: String? = null)
@@ -40,4 +41,5 @@ import kotlinx.serialization.Serializable
 @Serializable data object AutobrrRoute
 @Serializable data object CleanuparrRoute
 @Serializable data object HealthRoute
+@Serializable data class MediaSubtitlesRoute(val bazarrId: String, val radarrId: Int? = null, val seriesId: Int? = null, val episodeId: Int? = null, val title: String)
 @Serializable data class SubtitleSearchRoute(val serverId: String, val radarrId: Int? = null, val seriesId: Int? = null, val episodeId: Int? = null, val title: String)

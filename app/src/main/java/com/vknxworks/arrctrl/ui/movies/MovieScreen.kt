@@ -78,6 +78,7 @@ import com.vknxworks.arrctrl.data.net.TestResult
 import com.vknxworks.arrctrl.ui.activity.CheckRow
 import com.vknxworks.arrctrl.ui.activity.Detail
 import com.vknxworks.arrctrl.ui.common.CtrlApps
+import com.vknxworks.arrctrl.ui.more.MovieSubtitlesGroup
 import com.vknxworks.arrctrl.ui.components.Group
 import com.vknxworks.arrctrl.ui.components.GroupChoice
 import com.vknxworks.arrctrl.ui.components.GroupRow
@@ -264,6 +265,8 @@ fun MovieScreen(serverId: String, movieId: Int) {
                     )
                 }
             }
+
+            MovieSubtitlesGroup(mv.id, mv.imdbId, mv.title, mv.hasFile)
 
             Group(stringResource(R.string.movie_release_dates)) {
                 Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {

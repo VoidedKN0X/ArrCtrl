@@ -5,6 +5,7 @@ import com.vknxworks.arrctrl.data.server.Server
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import okhttp3.FormBody
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.concurrent.TimeUnit
@@ -46,6 +47,24 @@ data class SubHistory(val title: String, val detail: String?, val description: S
 data class SubProvider(val name: String, val status: String, val retry: String?) {
     val working: Boolean get() = status.isBlank() || status.equals("Good", ignoreCase = true)
 }
+
+/** A subtitle Bazarr knows about for a file: external ([path] set) or embedded in the video. */
+data class BazarrSub(val name: String, val code: String, val path: String?, val hi: Boolean, val forced: Boolean, val size: Long?, val embedded: Boolean) {
+    val fileName: String? get() = path?.substringAfterLast('/')?.substringAfterLast('\\')
+}
+
+/** A movie, series or episode as Bazarr sees it. */
+data class BazarrMedia(
+    val title: String,
+    val profileId: Int?,
+    val subtitles: List<BazarrSub>,
+    val missing: List<SubLanguage>,
+    val imdbId: String?,
+    val tvdbId: Int?,
+)
+
+/** A language Bazarr can search for; [enabled] ones are those turned on in Bazarr's language settings. */
+data class BazarrLanguage(val name: String, val code: String, val enabled: Boolean)
 
 /** One language in a languages profile. */
 data class ProfileLanguage(val code: String, val hi: Boolean, val forced: Boolean)
@@ -168,16 +187,87 @@ class BazarrApi(private val http: Http, val server: Server) {
         )
     }
 
+    /** Every language Bazarr knows (GET /system/languages returns a bare list). */
+    suspend fun languages(): List<BazarrLanguage> = data(Api.json(client, Api.get(url("/system/languages")))).mapNotNull { o ->
+        BazarrLanguage(o.str("name") ?: return@mapNotNull null, o.str("code2") ?: return@mapNotNull null, o.bool("enabled") ?: false)
+    }
+
     /** Language names by two-letter code, for showing what's in a profile. */
-    suspend fun languageNames(): Map<String, String> = data(Api.json(client, Api.get(url("/system/languages"))))
-        .mapNotNull { o -> o.str("code2")?.let { code -> o.str("name")?.let { code to it } } }.toMap()
+    suspend fun languageNames(): Map<String, String> = languages().associate { it.code to it.name }
+
+    private fun subs(o: JsonObject) = o.arr("subtitles").objects().mapNotNull { x ->
+        val path = x.str("path")
+        BazarrSub(
+            name = x.str("name") ?: x.str("code2") ?: return@mapNotNull null,
+            code = x.str("code2") ?: return@mapNotNull null,
+            path = path,
+            hi = x.bool("hi") ?: false,
+            forced = x.bool("forced") ?: false,
+            size = x.long("file_size")?.takeIf { it > 0 },
+            embedded = path == null || x.int("embedded_track_id") != null,
+        )
+    }
+
+    private fun media(o: JsonObject?, title: String?): BazarrMedia? = o?.let {
+        BazarrMedia(title ?: it.str("title").orEmpty(), it.int("profileId"), subs(it), langs(it, "missing_subtitles"), it.str("imdbId"), it.int("tvdbId"))
+    }
+
+    /** The movie with this Radarr id, or null when this Bazarr doesn't have it. */
+    suspend fun movie(radarrId: Int): BazarrMedia? =
+        media(data(Api.json(client, Api.get(url("/movies?radarrid%5B%5D=$radarrId")))).firstOrNull(), null)
+
+    /** The series with this Sonarr id (no subtitles at series level). */
+    suspend fun series(seriesId: Int): BazarrMedia? =
+        media(data(Api.json(client, Api.get(url("/series?seriesid%5B%5D=$seriesId")))).firstOrNull(), null)
+
+    /** The episode with this Sonarr id (GET /episodes returns a bare list). */
+    suspend fun episode(episodeId: Int): BazarrMedia? =
+        media(data(Api.json(client, Api.get(url("/episodes?episodeid%5B%5D=$episodeId")))).firstOrNull(), null)
 
     /** The movie's languages profile id, or null when it has none. */
-    suspend fun movieProfile(radarrId: Int): Int? =
-        data(Api.json(client, Api.get(url("/movies?radarrid%5B%5D=$radarrId")))).firstOrNull().int("profileId")
+    suspend fun movieProfile(radarrId: Int): Int? = movie(radarrId)?.profileId
 
-    suspend fun seriesProfile(seriesId: Int): Int? =
-        data(Api.json(client, Api.get(url("/series?seriesid%5B%5D=$seriesId")))).firstOrNull().int("profileId")
+    suspend fun seriesProfile(seriesId: Int): Int? = series(seriesId)?.profileId
+
+    private fun query(path: String, vararg params: Pair<String, String>): String =
+        url(path).toHttpUrl().newBuilder().apply { params.forEach { (k, v) -> addQueryParameter(k, v) } }.build().toString()
+
+    private fun flag(b: Boolean) = if (b) "True" else "False"
+
+    /**
+     * Searches the providers for one language, whether or not it's in the profile (PATCH /movies/subtitles).
+     * Bazarr queues it as a job and answers straight away.
+     */
+    suspend fun searchMovieLanguage(radarrId: Int, code: String, hi: Boolean, forced: Boolean) = Api.send(
+        client,
+        Request.Builder().url(query("/movies/subtitles", "radarrid" to radarrId.toString(), "language" to code, "hi" to flag(hi), "forced" to flag(forced)))
+            .patch(ByteArray(0).toRequestBody(null)).build(),
+    )
+
+    suspend fun searchEpisodeLanguage(seriesId: Int, episodeId: Int, code: String, hi: Boolean, forced: Boolean) = Api.send(
+        client,
+        Request.Builder().url(
+            query("/episodes/subtitles", "seriesid" to seriesId.toString(), "episodeid" to episodeId.toString(), "language" to code, "hi" to flag(hi), "forced" to flag(forced)),
+        ).patch(ByteArray(0).toRequestBody(null)).build(),
+    )
+
+    /** Deletes an external subtitle file. Embedded subtitles can't be deleted. */
+    suspend fun deleteMovieSubtitle(radarrId: Int, sub: BazarrSub) = Api.send(
+        client,
+        Request.Builder().url(
+            query("/movies/subtitles", "radarrid" to radarrId.toString(), "language" to sub.code, "hi" to flag(sub.hi), "forced" to flag(sub.forced), "path" to sub.path.orEmpty()),
+        ).delete().build(),
+    )
+
+    suspend fun deleteEpisodeSubtitle(seriesId: Int, episodeId: Int, sub: BazarrSub) = Api.send(
+        client,
+        Request.Builder().url(
+            query(
+                "/episodes/subtitles", "seriesid" to seriesId.toString(), "episodeid" to episodeId.toString(),
+                "language" to sub.code, "hi" to flag(sub.hi), "forced" to flag(sub.forced), "path" to sub.path.orEmpty(),
+            ),
+        ).delete().build(),
+    )
 
     /** Sets the languages profile; null removes it ("" is Bazarr's "no profile"). Bazarr then recomputes what's missing. */
     suspend fun setMovieProfile(radarrId: Int, profileId: Int?) = Api.send(

@@ -7,6 +7,10 @@
     <!-- Only for scanning a server-settings QR code; asked for when you tap Scan. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <!-- Notifications (asked for when you turn them on in Settings → Notifications). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Lets the Notifications screen ask Android to stop delaying ArrCtrl's checks. Nothing is changed without your OK. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <!-- Package visibility for the "Play in JellyCtrl" and "Open in SeerrCtrl" buttons. -->
     <queries>
@@ -64,6 +68,15 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+
+        <!-- UnifiedPush: wake-ups from your distributor (e.g. ntfy). Not exported; the connector library relays to it. -->
+        <service
+            android:name=".data.notify.PushReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="org.unifiedpush.android.connector.PUSH_EVENT" />
+            </intent-filter>
+        </service>
 
         <!-- QR scanner from zxing-android-embedded: follow the phone's rotation instead of forcing landscape. -->
         <activity

@@ -72,6 +72,7 @@ import com.vknxworks.arrctrl.data.api.toTestResult
 import com.vknxworks.arrctrl.data.net.TestResult
 import com.vknxworks.arrctrl.ui.activity.Detail
 import com.vknxworks.arrctrl.ui.common.CtrlApps
+import com.vknxworks.arrctrl.ui.more.EpisodeSubtitlesButton
 import com.vknxworks.arrctrl.ui.components.Chip
 import com.vknxworks.arrctrl.ui.components.MessageView
 import com.vknxworks.arrctrl.ui.components.ScreenTopBar
@@ -378,6 +379,9 @@ private fun EpisodeSheet(
             ) {
                 Icon(if (e.monitored) Icons.Outlined.BookmarkBorder else Icons.Outlined.Bookmark, null)
                 Text(stringResource(if (e.monitored) R.string.season_unmonitor else R.string.season_monitor), Modifier.padding(start = 8.dp))
+            }
+            if (e.hasFile && series != null) {
+                EpisodeSubtitlesButton(series.id, series.tvdbId, series.title, e.id, "${series.title} · ${e.code}", onOpen = onDismiss)
             }
             val tvdb = series?.tvdbId
             if (e.hasFile && tvdb != null && CtrlApps.installed(context, CtrlApps.JELLYCTRL)) {

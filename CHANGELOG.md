@@ -4,6 +4,32 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.8.0 (2026-10-19)
+
+Notifications, and subtitles in any language for every movie and episode.
+
+### New
+
+- **Notifications**, under Account (the profile button) → Notifications. They're off until you turn them on, and Android asks for permission the first time. ArrCtrl checks your servers itself; nothing goes through Google, Firebase or Play Services
+- **Choose what you're told about**: downloaded and imported, download failed, needs attention (for example a download that can't be imported automatically), health warnings, low disk space (using the threshold from System health) and servers that stop answering are on by default; grabbed and torrent finished can be turned on. Each kind is also its own channel in Android's notification settings, so you can change its sound or silence it there
+- **Choose which servers** notify you, one switch per server
+- **Background checks** every 15 minutes, 30 minutes (the default), hour or 3 hours, or only when woken by push. **Check now** checks straight away and the screen shows when the last check ran
+- **Instant notifications with UnifiedPush**: with a distributor app such as ntfy, your servers wake ArrCtrl the moment something happens and ArrCtrl checks and notifies you. The app shows the push address to give your servers, already split into the ntfy server and topic (tap to copy, or share it), and **Send a test wake-up** to try it. The message is only a wake-up call; its content is ignored. The README has step-by-step setup for Radarr, Sonarr, Prowlarr, Bazarr, autobrr, Cleanuparr and qBittorrent
+- **Active downloads**: an optional quiet, ongoing notification with what's downloading, how far along it is and the total speed. Off by default; it updates about once a minute while something downloads and disappears when nothing does
+- **Battery**: the Notifications screen shows whether Android is holding ArrCtrl back to save battery and lets you lift that, with a shortcut to the app settings for phones (such as OPPO/ColorOS, Xiaomi and Samsung) that also need background activity allowed there
+- Tapping a notification opens the movie or series it's about, the Activity tab, or System health. When one check finds lots of one kind at once, they're bundled into a single notification
+- The first check after turning notifications on only notes what's already there, so you aren't flooded with old events
+- **Subtitles on movie pages**: when Bazarr has the movie, a Subtitles section shows which subtitle languages it has and which are missing. Tap it for the full subtitles screen
+- **Subtitles for episodes**: a Subtitles button in an episode's sheet (for downloaded episodes) opens the same screen
+- **The subtitles screen** lists every subtitle with its language, whether it's hearing impaired or forced, and whether it's a separate file (with name and size) or inside the video. From there you can:
+  - **Search another language**: any language Bazarr knows, even one that isn't in the languages profile, optionally hearing impaired or forced. Your enabled languages are listed first, with all languages a tap away and a search box
+  - Tap a missing language to search for just that one
+  - **Search manually** to pick a subtitle yourself
+  - **Change the languages profile** (for an episode, it applies to the whole series)
+  - **Delete** a subtitle file you don't want (subtitles inside the video can't be deleted)
+- **Subtitles on series pages**: the series' languages profile, with a button to change it, and a search for all its missing subtitles
+- ArrCtrl finds the right Bazarr by itself when you have more than one, by checking the IMDb or TVDB id
+
 ## v0.7.1 (2026-10-19)
 
 Bazarr fixes, and you can now choose which subtitle languages Bazarr gets.

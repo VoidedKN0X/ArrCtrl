@@ -63,6 +63,7 @@ import com.vknxworks.arrctrl.ui.components.LocalHazeState
 import com.vknxworks.arrctrl.ui.servers.ImportScreen
 import com.vknxworks.arrctrl.ui.servers.ServerEditScreen
 import com.vknxworks.arrctrl.ui.settings.AccountScreen
+import com.vknxworks.arrctrl.ui.settings.NotificationsScreen
 import com.vknxworks.arrctrl.ui.settings.SettingsScreen
 import com.vknxworks.arrctrl.ui.activity.ActivityScreen
 import com.vknxworks.arrctrl.ui.activity.AddTorrentScreen
@@ -75,6 +76,7 @@ import com.vknxworks.arrctrl.ui.more.BazarrScreen
 import com.vknxworks.arrctrl.ui.more.CleanuparrScreen
 import com.vknxworks.arrctrl.ui.more.HealthScreen
 import com.vknxworks.arrctrl.ui.more.ProwlarrScreen
+import com.vknxworks.arrctrl.ui.more.MediaSubtitlesScreen
 import com.vknxworks.arrctrl.ui.more.SubtitleSearchScreen
 import com.vknxworks.arrctrl.ui.movies.AddMovieScreen
 import com.vknxworks.arrctrl.ui.movies.MovieReleasesScreen
@@ -130,6 +132,21 @@ private fun MainScaffold() {
         val t = incoming ?: return@LaunchedEffect
         c.pendingTorrent.value = null
         navController.navigate(AddTorrentRoute(link = t.link, file = t.fileUri)) { launchSingleTop = true }
+    }
+
+    // A tapped notification: "activity", "health", "movie/<serverId>/<id>" or "series/<serverId>/<id>".
+    val open by c.pendingOpen.collectAsStateWithLifecycle()
+    LaunchedEffect(open) {
+        val o = open ?: return@LaunchedEffect
+        c.pendingOpen.value = null
+        val parts = o.split('/')
+        when (parts.firstOrNull()) {
+            "activity" -> selectTab(tops.indexOfFirst { it.route == ActivityRoute })
+            "health" -> navController.navigate(HealthRoute) { launchSingleTop = true }
+            "movie" -> parts.getOrNull(2)?.toIntOrNull()?.let { id -> navController.navigate(MovieRoute(parts[1], id)) { launchSingleTop = true } }
+            "series" -> parts.getOrNull(2)?.toIntOrNull()?.let { id -> navController.navigate(SeriesDetailRoute(parts[1], id)) { launchSingleTop = true } }
+            else -> Unit
+        }
     }
 
     CompositionLocalProvider(LocalNavigator provides navigator) {
@@ -263,6 +280,11 @@ private fun AppNavHost(navController: NavHostController) {
         composable<AutobrrRoute> { AutobrrScreen() }
         composable<CleanuparrRoute> { CleanuparrScreen() }
         composable<HealthRoute> { HealthScreen() }
+        composable<NotificationsRoute> { NotificationsScreen() }
+        composable<MediaSubtitlesRoute> {
+            val r = it.toRoute<MediaSubtitlesRoute>()
+            MediaSubtitlesScreen(r.bazarrId, r.radarrId, r.seriesId, r.episodeId, r.title)
+        }
         composable<SubtitleSearchRoute> {
             val r = it.toRoute<SubtitleSearchRoute>()
             SubtitleSearchScreen(r.serverId, r.radarrId, r.seriesId, r.episodeId, r.title)

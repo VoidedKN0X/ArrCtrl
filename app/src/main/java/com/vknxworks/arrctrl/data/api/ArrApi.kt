@@ -65,6 +65,8 @@ data class HistoryItem(
     val quality: String?,
     val date: Instant?,
     val reason: String?,
+    /** The movie (Radarr) or series (Sonarr) this is about, when known. */
+    val mediaId: Int? = null,
 ) {
     val key: String get() = "${server.id}:$id"
 }
@@ -179,6 +181,7 @@ class ArrApi(private val http: Http, val server: Server) {
                 quality = o.obj("quality").obj("quality").str("name"),
                 date = Format.instant(o.str("date")),
                 reason = data.str("message") ?: data.str("reason"),
+                mediaId = if (isSonarr) o.int("seriesId") else o.int("movieId"),
             )
         }
         return items to (body.int("totalRecords") ?: items.size)

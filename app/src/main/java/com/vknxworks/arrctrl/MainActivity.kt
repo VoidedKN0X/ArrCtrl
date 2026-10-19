@@ -13,6 +13,7 @@ import androidx.core.content.IntentCompat
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vknxworks.arrctrl.data.notify.Notifications
 import com.vknxworks.arrctrl.data.settings.ThemeChoice
 import com.vknxworks.arrctrl.ui.activity.extractTorrentLinks
 import com.vknxworks.arrctrl.ui.nav.AppRoot
@@ -55,6 +56,10 @@ class MainActivity : ComponentActivity() {
      */
     private fun handleIntent(intent: Intent?) {
         intent ?: return
+        intent.getStringExtra(Notifications.EXTRA_OPEN)?.let { open ->
+            container.pendingOpen.value = open
+            return
+        }
         val incoming = when (intent.action) {
             Intent.ACTION_VIEW -> {
                 val uri = intent.data ?: return

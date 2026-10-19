@@ -84,6 +84,7 @@ import com.vknxworks.arrctrl.data.api.toTestResult
 import com.vknxworks.arrctrl.data.net.TestResult
 import com.vknxworks.arrctrl.ui.activity.CheckRow
 import com.vknxworks.arrctrl.ui.common.CtrlApps
+import com.vknxworks.arrctrl.ui.more.SeriesSubtitlesGroup
 import com.vknxworks.arrctrl.ui.components.Chip
 import com.vknxworks.arrctrl.ui.components.Group
 import com.vknxworks.arrctrl.ui.components.GroupChoice
@@ -285,6 +286,8 @@ fun SeriesDetailScreen(serverId: String, seriesId: Int) {
                 )
                 s.path?.let { GroupRow(stringResource(R.string.detail_path), it) }
             }
+
+            SeriesSubtitlesGroup(s.id, s.tvdbId, s.title)
 
             val h = history
             if (!h.isNullOrEmpty()) {

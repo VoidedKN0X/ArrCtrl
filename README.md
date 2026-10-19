@@ -10,7 +10,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/VoidedKN0X/ArrCtrl"><img src=".github/assets/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a> <a href="https://voidedkn0x.github.io/CtrlF-Droid/"><img src=".github/assets/badge_ctrlf-droid.png" alt="Get it from our F-Droid repo" height="80"></a>
 
-> **Early development.** Servers, Movies, Series, Calendar, Activity (queue, torrents, history) and the More tools (Prowlarr, Bazarr, autobrr, Cleanuparr, System health) work; notifications and widgets arrive over the next updates. See the [changelog](CHANGELOG.md).
+> **Early development.** Servers, Movies, Series, Calendar, Activity (queue, torrents, history), the More tools (Prowlarr, Bazarr, autobrr, Cleanuparr, System health) and notifications work; widgets and the quick settings tile arrive in the next update. See the [changelog](CHANGELOG.md).
 
 ## Features
 
@@ -18,6 +18,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Calendar** with upcoming movies and episodes from both
 - **Activity**: the Radarr and Sonarr queues with manual import, and your qBittorrent torrents with full controls
 - **Add torrents** from magnet links and `.torrent` files, straight from the share sheet
+- **Subtitles** through Bazarr on every movie and episode: see what's there, get any other language, or pick one yourself
 - **Prowlarr** indexers and cross-indexer search, **Bazarr** subtitles, **autobrr** filters and releases, **Cleanuparr** stats and jobs
 - **System health** for every server in one place, with low disk space warnings
 - **Notifications** without Google services: polling, or instant push through your own ntfy server
@@ -90,6 +91,38 @@ To make a QR code on Linux, save the JSON as `arrctrl.json` and run `qrencode -t
 ### Adding torrents
 
 Tap **Add torrent** on the Torrents tab and paste a magnet link (or several), or pick a `.torrent` file. ArrCtrl also shows up when you open a `magnet:` link or a `.torrent` file, and in the share sheet. To make it the default for magnet links, open one and pick **ArrCtrl** → **Always**, or set it in Android's Settings → Apps → Default apps → Opening links.
+
+### Notifications
+
+Turn them on in **Account** (the profile button) → **Notifications**. ArrCtrl checks your servers itself and tells you about downloads, failed or stuck downloads, finished torrents, health warnings, low disk space and servers that stop answering. You choose which kinds, and which servers. Nothing goes through Google; there's no Firebase or Play Services.
+
+There are two ways ArrCtrl finds out, and you can use both:
+
+- **Background checks** every 15 minutes to 3 hours. Nothing to set up, but Android can delay them, especially when the phone is idle.
+- **Instant, with UnifiedPush.** Your servers wake ArrCtrl the moment something happens, and ArrCtrl then checks and notifies you. The message itself is only a wake-up call: ArrCtrl ignores its content and asks your servers directly, so it doesn't matter what a service puts in it.
+
+An **Active downloads** notification (what's downloading and how fast) is also available. It's off by default because it updates every minute while something downloads.
+
+#### Setting up instant notifications with ntfy
+
+1. Install the [ntfy app](https://f-droid.org/packages/io.heckel.ntfy/) and, in its settings, set your own ntfy server as the default server (any UnifiedPush distributor works; ntfy is the usual one).
+2. In ArrCtrl, turn on **Instant with UnifiedPush**. ArrCtrl shows a **push address** such as `https://ntfy.example.com/upAbC123xyz?up=1`, split into the **ntfy server** (`https://ntfy.example.com`) and **topic** (`upAbC123xyz`). Tap a row to copy it.
+3. Point each service at it, below. You only need the services you want instant notifications for; the rest are still covered by background checks.
+4. Tap **Send a test wake-up**. "Last wake-up" updates when it arrives.
+
+| Service | Where | What to enter |
+|---|---|---|
+| **Radarr**, **Sonarr**, **Prowlarr** | Settings → Connect → **+** → **ntfy** | Server URL: the ntfy server. Topics: the topic. Tick the events you care about (On Grab, On Import, On Health Issue, and so on) and **Test**. |
+| **Bazarr** | Settings → Notifications → add | An Apprise URL: `ntfys://ntfy.example.com/upAbC123xyz` (`ntfy://` for plain HTTP). |
+| **autobrr** | Settings → Notifications → add → **ntfy** | URL: the whole push address (autobrr posts straight to it), e.g. `https://ntfy.example.com/upAbC123xyz`. Pick the events. |
+| **Cleanuparr** | Settings → Notifications → add → **ntfy** | Server URL: the ntfy server. Topics: the topic. |
+| **qBittorrent** | Options → Downloads → **Run external program** → *on torrent finished* | `curl -s -d done https://ntfy.example.com/upAbC123xyz` (the container or host needs `curl`). |
+
+If your ntfy server needs a login to publish, add the username and password (or access token) in the service's ntfy settings, or allow anonymous publishing to `up*` topics in ntfy's access control, which is what ntfy's UnifiedPush docs recommend.
+
+#### Notifications arrive late?
+
+Android limits apps in the background to save battery. The Notifications screen shows whether ArrCtrl is restricted and lets you lift it. Some phones go further on their own: OPPO and OnePlus (ColorOS), Xiaomi, Samsung and Huawei can stop apps in the background regardless. On those, open ArrCtrl's **App settings** from the same screen and allow background activity and auto-launch. Do the same for the ntfy app, since it has to stay connected for instant notifications.
 
 ## Build from source
 
