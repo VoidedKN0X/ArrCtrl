@@ -16,13 +16,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.CleaningServices
-import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Palette
@@ -75,6 +76,7 @@ import kotlinx.coroutines.launch
 private const val REPO_URL = "https://github.com/VoidedKN0X/ArrCtrl"
 private const val ISSUES_URL = "https://github.com/VoidedKN0X/ArrCtrl/issues"
 private const val SPONSORS_URL = "https://github.com/sponsors/VoidedKN0X"
+private const val LICENCE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
 
 /** Opened from the profile picture: servers, settings and about. */
 @Composable
@@ -118,14 +120,15 @@ fun AccountScreen() {
                 )
             }
 
-            Group(stringResource(R.string.about)) {
+            Group(stringResource(R.string.group_about)) {
                 GroupRow(stringResource(R.string.support_title), stringResource(R.string.support_subtitle), Icons.Filled.Favorite, showChevron = true, onClick = { uri.openUri(SPONSORS_URL) })
-                GroupRow(stringResource(R.string.source_code), stringResource(R.string.source_code_subtitle), Icons.Outlined.Code, showChevron = true, onClick = { uri.openUri(REPO_URL) })
-                GroupRow(stringResource(R.string.report_bug), stringResource(R.string.report_bug_subtitle), Icons.Outlined.BugReport, showChevron = true, onClick = { uri.openUri(ISSUES_URL) })
+                GroupRow(stringResource(R.string.bugs_title), stringResource(R.string.bugs_subtitle), Icons.Filled.BugReport, showChevron = true, onClick = { uri.openUri(ISSUES_URL) })
+                GroupRow(stringResource(R.string.source_title), stringResource(R.string.source_subtitle), Icons.Filled.Code, showChevron = true, onClick = { uri.openUri(REPO_URL) })
+                GroupRow(stringResource(R.string.licence_title), stringResource(R.string.licence_subtitle), Icons.Filled.Gavel, showChevron = true, onClick = { uri.openUri(LICENCE_URL) })
             }
 
             Text(
-                stringResource(R.string.version_line, BuildConfig.VERSION_NAME),
+                stringResource(R.string.about_footer, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth().padding(16.dp),

@@ -170,7 +170,7 @@ Or open the folder in Android Studio and press **Run** with your phone connected
 
 ## Support the project
 
-ArrCtrl is free and open source. If it's useful to you, you can support development on [GitHub Sponsors](https://github.com/sponsors/VoidedKN0X), or tap **Support ArrCtrl** under About on the Account and settings page (tap your profile picture). Starring the repo and [reporting bugs](https://github.com/VoidedKN0X/ArrCtrl/issues) helps too.
+ArrCtrl is free and open source. If it's useful to you, you can support development on [GitHub Sponsors](https://github.com/sponsors/VoidedKN0X). In the app, the About section at the bottom of the Account and settings page (tap your profile picture) has **Support ArrCtrl** and **Report a bug**, which opens the [issue tracker](https://github.com/VoidedKN0X/ArrCtrl/issues). Starring the repo helps too.
 
 ## The Ctrl series
 
