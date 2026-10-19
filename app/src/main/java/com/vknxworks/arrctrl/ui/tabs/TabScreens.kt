@@ -23,7 +23,12 @@ import com.vknxworks.arrctrl.ui.components.Group
 import com.vknxworks.arrctrl.ui.components.GroupRow
 import com.vknxworks.arrctrl.ui.components.LocalBottomClearance
 import com.vknxworks.arrctrl.ui.components.TabTitle
+import com.vknxworks.arrctrl.ui.nav.AutobrrRoute
+import com.vknxworks.arrctrl.ui.nav.BazarrRoute
+import com.vknxworks.arrctrl.ui.nav.CleanuparrRoute
+import com.vknxworks.arrctrl.ui.nav.HealthRoute
 import com.vknxworks.arrctrl.ui.nav.LocalNavigator
+import com.vknxworks.arrctrl.ui.nav.ProwlarrRoute
 import com.vknxworks.arrctrl.ui.nav.ServerEditRoute
 import com.vknxworks.arrctrl.ui.servers.icon
 
@@ -33,12 +38,17 @@ private fun savedServers(): List<Server> {
     return list
 }
 
-/** Prowlarr, Bazarr, autobrr, Cleanuparr and system health. Each opens in a later update. */
+/** Prowlarr, Bazarr, autobrr, Cleanuparr and system health. */
 @Composable
 fun MoreScreen() {
     val nav = LocalNavigator.current
     val servers = savedServers()
-    val tools = listOf(ServiceType.PROWLARR, ServiceType.BAZARR, ServiceType.AUTOBRR, ServiceType.CLEANUPARR)
+    val tools = listOf(
+        ServiceType.PROWLARR to ProwlarrRoute,
+        ServiceType.BAZARR to BazarrRoute,
+        ServiceType.AUTOBRR to AutobrrRoute,
+        ServiceType.CLEANUPARR to CleanuparrRoute,
+    )
     Column(Modifier.fillMaxSize().statusBarsPadding()) {
         TabTitle(stringResource(R.string.tab_more))
         Column(
@@ -48,15 +58,15 @@ fun MoreScreen() {
                 .padding(bottom = 24.dp + LocalBottomClearance.current),
         ) {
             Group(stringResource(R.string.more_tools), footer = stringResource(R.string.more_footer)) {
-                tools.forEach { t ->
+                tools.forEach { (t, route) ->
                     val count = servers.count { it.type == t }
-                    val state = if (count == 0) stringResource(R.string.not_set_up) else stringResource(R.string.more_connected)
+                    val state = if (count == 0) stringResource(R.string.not_set_up) else stringResource(t.role)
                     GroupRow(
                         stringResource(t.label),
-                        "${stringResource(t.role)} · $state",
+                        state,
                         t.icon,
-                        showChevron = count == 0,
-                        onClick = if (count == 0) ({ nav.navigate(ServerEditRoute(type = t.id)) }) else null,
+                        showChevron = true,
+                        onClick = { if (count == 0) nav.navigate(ServerEditRoute(type = t.id)) else nav.navigate(route) },
                     )
                 }
             }
@@ -65,7 +75,9 @@ fun MoreScreen() {
                     stringResource(R.string.system_health),
                     stringResource(R.string.system_health_role),
                     Icons.Outlined.HealthAndSafety,
-                    enabled = false,
+                    showChevron = true,
+                    enabled = servers.isNotEmpty(),
+                    onClick = { nav.navigate(HealthRoute) },
                 )
             }
         }

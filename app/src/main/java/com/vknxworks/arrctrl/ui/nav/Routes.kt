@@ -33,3 +33,11 @@ import kotlinx.serialization.Serializable
 @Serializable data class SeasonReleasesRoute(val serverId: String, val seriesId: Int, val season: Int, val title: String)
 @Serializable data class EpisodeReleasesRoute(val serverId: String, val episodeId: Int, val title: String)
 @Serializable data class AddSeriesRoute(val serverId: String)
+
+// More
+@Serializable data object ProwlarrRoute
+@Serializable data object BazarrRoute
+@Serializable data object AutobrrRoute
+@Serializable data object CleanuparrRoute
+@Serializable data object HealthRoute
+@Serializable data class SubtitleSearchRoute(val serverId: String, val radarrId: Int? = null, val seriesId: Int? = null, val episodeId: Int? = null, val title: String)

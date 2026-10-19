@@ -43,7 +43,7 @@
     <string name="empty_activity_title">No downloads to show</string>
     <string name="empty_activity_body">Add Radarr, Sonarr or qBittorrent to see your queue and torrents here.</string>
     <string name="more_tools">Tools</string>
-    <string name="more_footer">Tap a tool to add its server. Their screens arrive in later updates.</string>
+    <string name="more_footer">Tools without a server offer to add one.</string>
 
     <!-- Account and settings -->
     <string name="servers">Servers</string>
@@ -76,9 +76,6 @@
     <string name="remove">Remove</string>
     <string name="show">Show</string>
     <string name="hide">Hide</string>
-
-    <!-- Tabs once a server is added (their content arrives in later updates) -->
-    <string name="more_connected">Added</string>
 
     <!-- Servers -->
     <string name="add_server">Add a server</string>
@@ -588,4 +585,125 @@
     <string name="calendar_digital">Digital</string>
     <string name="calendar_physical">Physical</string>
     <string name="calendar_premiere">Premiere</string>
+
+    <!-- More tools -->
+    <string name="tool_no_server">No %1$s server yet</string>
+
+    <!-- Prowlarr -->
+    <string name="prowlarr_indexers">Indexers</string>
+    <string name="prowlarr_stats">Stats</string>
+    <string name="prowlarr_summary">%1$d of %2$d enabled · %3$d failing</string>
+    <string name="prowlarr_no_indexers">No indexers set up in Prowlarr</string>
+    <string name="prowlarr_priority">Priority %1$d</string>
+    <string name="prowlarr_disabled">Disabled</string>
+    <string name="prowlarr_failing">Failing</string>
+    <string name="prowlarr_paused_until">Paused after failures until %1$s</string>
+    <string name="prowlarr_failing_since">Failing since %1$s</string>
+    <string name="prowlarr_public">Public</string>
+    <string name="prowlarr_semi_private">Semi-private</string>
+    <string name="prowlarr_private">Private</string>
+    <string name="prowlarr_test">Test indexer</string>
+    <string name="prowlarr_test_passed">Test passed</string>
+    <string name="prowlarr_search_hint">Search all indexers</string>
+    <string name="prowlarr_search_intro">Search every indexer</string>
+    <string name="prowlarr_search_intro_body">Results come straight from your indexers through Prowlarr. Tap one to send it to the download client set up in Prowlarr.</string>
+    <string name="prowlarr_grabs">%1$d grabs</string>
+    <string name="prowlarr_grab">Send</string>
+    <string name="prowlarr_grab_title">Send to the download client?</string>
+    <string name="prowlarr_grab_body">Prowlarr sends it to its own download client. Radarr and Sonarr won\'t know about it, so it won\'t be imported automatically.</string>
+    <string name="prowlarr_sent">Sent to the download client</string>
+    <string name="prowlarr_no_stats">No stats yet</string>
+    <string name="prowlarr_queries">Queries</string>
+    <string name="prowlarr_grabs_label">Grabs</string>
+    <string name="prowlarr_failures">Failures</string>
+    <string name="prowlarr_stat_line">%1$d queries · %2$d grabs · %3$d failures · %4$d ms average</string>
+
+    <!-- Bazarr -->
+    <string name="bazarr_wanted">Wanted</string>
+    <string name="bazarr_providers">Providers</string>
+    <string name="bazarr_episodes">Episodes</string>
+    <string name="bazarr_nothing_wanted">No subtitles missing</string>
+    <string name="bazarr_wanted_count">%1$d missing subtitles</string>
+    <string name="bazarr_missing">Missing: %1$s</string>
+    <string name="bazarr_search_auto">Search automatically</string>
+    <string name="bazarr_search_series">Search the whole series</string>
+    <string name="bazarr_search_manual">Search manually</string>
+    <string name="bazarr_search_all">Search all wanted</string>
+    <string name="bazarr_search_all_movies">Bazarr searches every provider for all missing movie subtitles. This can take a while.</string>
+    <string name="bazarr_search_all_episodes">Bazarr searches every provider for all missing episode subtitles. This can take a while.</string>
+    <string name="bazarr_searching">Asking your subtitle providers…</string>
+    <string name="bazarr_no_results">No subtitles found</string>
+    <string name="bazarr_score_pct">%1$d%%</string>
+    <string name="bazarr_score">score %1$s</string>
+    <string name="bazarr_hi">Hearing impaired</string>
+    <string name="bazarr_forced">Forced</string>
+    <string name="bazarr_matches">Matches: %1$s</string>
+    <string name="bazarr_dont_match">Doesn\'t match: %1$s</string>
+    <string name="bazarr_download">Download</string>
+    <string name="bazarr_download_title">Download this subtitle?</string>
+    <string name="bazarr_downloaded">Downloaded</string>
+    <string name="bazarr_providers_ok">All providers are working</string>
+    <string name="bazarr_providers_ok_body">Bazarr lists providers here only while they\'re throttled or failing.</string>
+    <string name="bazarr_retry">retry %1$s</string>
+
+    <!-- autobrr -->
+    <string name="autobrr_seen">Seen</string>
+    <string name="autobrr_approved">Pushed</string>
+    <string name="autobrr_rejected">Rejected</string>
+    <string name="autobrr_errors">Errors</string>
+    <string name="autobrr_releases">Releases</string>
+    <string name="autobrr_filters">Filters</string>
+    <string name="autobrr_irc">IRC</string>
+    <string name="autobrr_pushed">Pushed</string>
+    <string name="autobrr_push_rejected">Rejected by client</string>
+    <string name="autobrr_push_error">Push failed</string>
+    <string name="autobrr_filter_rejected">Rejected</string>
+    <string name="autobrr_filter_approved">Approved</string>
+    <string name="autobrr_pending">Pending</string>
+    <string name="autobrr_no_releases">No releases yet</string>
+    <string name="autobrr_no_filters">No filters set up</string>
+    <string name="autobrr_no_irc">No IRC networks set up</string>
+    <string name="autobrr_disconnected">Disconnected</string>
+    <string name="autobrr_unhealthy">Unhealthy</string>
+    <string name="autobrr_since">since %1$s</string>
+    <string name="autobrr_monitoring">Monitoring</string>
+    <string name="autobrr_not_monitoring">Not monitoring</string>
+    <string name="autobrr_last_announce">last announce %1$s</string>
+
+    <!-- Cleanuparr -->
+    <string name="cleanuparr_24h">Last 24 hours</string>
+    <string name="cleanuparr_7d">Last 7 days</string>
+    <string name="cleanuparr_30d">Last 30 days</string>
+    <string name="cleanuparr_removed">Removed</string>
+    <string name="cleanuparr_strikes">Strikes</string>
+    <string name="cleanuparr_recovered">Recovered</string>
+    <string name="cleanuparr_job_runs">Jobs OK</string>
+    <string name="cleanuparr_connections">Connections</string>
+    <string name="cleanuparr_jobs">Jobs</string>
+    <string name="cleanuparr_last_run">last ran %1$s</string>
+    <string name="cleanuparr_next_run">next %1$s</string>
+    <string name="cleanuparr_run_now">Run now</string>
+    <string name="cleanuparr_run_title">Run %1$s now?</string>
+    <string name="cleanuparr_run_body">It runs once now, as well as on its normal schedule.</string>
+    <string name="cleanuparr_started">Job started</string>
+    <string name="cleanuparr_recent_strikes">Recent strikes</string>
+    <string name="cleanuparr_dry_run">dry run</string>
+    <string name="cleanuparr_events">Events</string>
+
+    <!-- System health -->
+    <string name="health_all_good">Everything looks healthy</string>
+    <plurals name="health_problems">
+        <item quantity="one">%1$d problem</item>
+        <item quantity="other">%1$d problems</item>
+    </plurals>
+    <string name="health_no_servers">Add a server to see its health here.</string>
+    <string name="health_no_issues">No issues</string>
+    <string name="health_disk_threshold">Warn when free disk space is below</string>
+    <string name="health_disk_threshold_value">%1$d%%</string>
+    <string name="health_disk_free">%1$s free of %2$s</string>
+    <string name="health_disk_low">Less than %1$d%% free</string>
+    <string name="health_irc_disconnected">IRC network %1$s is disconnected</string>
+    <string name="health_irc_unhealthy">IRC network %1$s is unhealthy</string>
+    <string name="health_irc_channel">Not monitoring %1$s on %2$s</string>
+    <string name="health_client_down">Can\'t reach this client</string>
 </resources>

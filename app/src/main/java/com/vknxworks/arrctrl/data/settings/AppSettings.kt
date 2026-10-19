@@ -6,6 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.vknxworks.arrctrl.R
@@ -42,6 +43,8 @@ data class AppSettings(
     /** Calendar: ALL, MOVIES or SERIES. */
     val calendarKind: String = "ALL",
     val calendarMonitoredOnly: Boolean = true,
+    /** System health warns when a disk has less than this percentage free. */
+    val diskWarnPercent: Int = 10,
 )
 
 class SettingsRepository(private val context: Context, scope: CoroutineScope) {
@@ -57,6 +60,7 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         val calMonth = booleanPreferencesKey("calendar_month")
         val calKind = stringPreferencesKey("calendar_kind")
         val calMonitored = booleanPreferencesKey("calendar_monitored_only")
+        val diskWarn = intPreferencesKey("disk_warn_percent")
     }
 
     val settings: StateFlow<AppSettings> = context.appDataStore.data
@@ -75,6 +79,7 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         calendarMonth = this[K.calMonth] ?: false,
         calendarKind = this[K.calKind] ?: "ALL",
         calendarMonitoredOnly = this[K.calMonitored] ?: true,
+        diskWarnPercent = this[K.diskWarn] ?: 10,
     )
 
     suspend fun update(transform: (AppSettings) -> AppSettings) {
@@ -91,6 +96,7 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             p[K.calMonth] = s.calendarMonth
             p[K.calKind] = s.calendarKind
             p[K.calMonitored] = s.calendarMonitoredOnly
+            p[K.diskWarn] = s.diskWarnPercent
         }
     }
 

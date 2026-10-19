@@ -70,6 +70,12 @@ import com.vknxworks.arrctrl.ui.activity.ManualImportScreen
 import com.vknxworks.arrctrl.ui.activity.TorrentScreen
 import com.vknxworks.arrctrl.ui.calendar.CalendarScreen
 import com.vknxworks.arrctrl.ui.tabs.MoreScreen
+import com.vknxworks.arrctrl.ui.more.AutobrrScreen
+import com.vknxworks.arrctrl.ui.more.BazarrScreen
+import com.vknxworks.arrctrl.ui.more.CleanuparrScreen
+import com.vknxworks.arrctrl.ui.more.HealthScreen
+import com.vknxworks.arrctrl.ui.more.ProwlarrScreen
+import com.vknxworks.arrctrl.ui.more.SubtitleSearchScreen
 import com.vknxworks.arrctrl.ui.movies.AddMovieScreen
 import com.vknxworks.arrctrl.ui.movies.MovieReleasesScreen
 import com.vknxworks.arrctrl.ui.movies.MovieScreen
@@ -251,6 +257,15 @@ private fun AppNavHost(navController: NavHostController) {
         composable<AddSeriesRoute> {
             val r = it.toRoute<AddSeriesRoute>()
             AddSeriesScreen(r.serverId)
+        }
+        composable<ProwlarrRoute> { ProwlarrScreen() }
+        composable<BazarrRoute> { BazarrScreen() }
+        composable<AutobrrRoute> { AutobrrScreen() }
+        composable<CleanuparrRoute> { CleanuparrScreen() }
+        composable<HealthRoute> { HealthScreen() }
+        composable<SubtitleSearchRoute> {
+            val r = it.toRoute<SubtitleSearchRoute>()
+            SubtitleSearchScreen(r.serverId, r.radarrId, r.seriesId, r.episodeId, r.title)
         }
         composable<AddTorrentRoute> {
             val r = it.toRoute<AddTorrentRoute>()
