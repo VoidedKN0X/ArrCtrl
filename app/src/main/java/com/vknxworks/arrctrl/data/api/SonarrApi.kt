@@ -204,9 +204,11 @@ class SonarrApi(private val http: Http, val server: Server) {
         Api.json(client, Api.get(url("/episode?seriesId=$seriesId"))).objects().mapNotNull(::episode)
             .sortedWith(compareByDescending<Episode> { it.season }.thenByDescending { it.number })
 
-    private fun episode(o: JsonObject): Episode? = Episode(
+    private fun episode(o: JsonObject): Episode? {
+        val id = o.int("id") ?: return null
+        return Episode(
         raw = o,
-        id = o.int("id") ?: return null,
+        id = id,
         seriesId = o.int("seriesId") ?: 0,
         season = o.int("seasonNumber") ?: 0,
         number = o.int("episodeNumber") ?: 0,
@@ -221,6 +223,7 @@ class SonarrApi(private val http: Http, val server: Server) {
         runtime = o.int("runtime")?.takeIf { it > 0 },
         tvdbId = o.int("tvdbId")?.takeIf { it > 0 },
     )
+    }
 
     suspend fun episodeFile(fileId: Int): EpisodeFileInfo? {
         val f = Api.json(client, Api.get(url("/episodefile/$fileId"))) as? JsonObject ?: return null
