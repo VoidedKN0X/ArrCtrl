@@ -30,6 +30,10 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Self-signed certificates** trusted per server, by fingerprint
 - **API keys and passwords are encrypted** on your phone with the Android Keystore; the server and import screens block screenshots, and ArrCtrl's preview is blank in recent apps
 
+## Screenshots
+
+Coming soon.
+
 ## Requirements
 
 - Android 13 or newer
