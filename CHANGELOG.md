@@ -4,10 +4,18 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
-## Unreleased
+## v0.9.1 (2026-10-19)
+
+ArrCtrl is now completely Google-free. Nothing changes in how you use it.
+
+### Privacy
+
+- **Emoji no longer make ArrCtrl ask Google for a font.** A standard Android library inside the app asked Google Play services for a downloadable emoji font every time ArrCtrl started, which could make Google Play services fetch that font from Google. This lookup is now switched off: emoji are drawn with your phone's own emoji font. On phones without Google Play services nothing changes; on other phones, emoji can look slightly different if the phone's built-in emoji font is older.
+- **Checked: ArrCtrl is Google-free.** It contains no Google Play services, Firebase, ML Kit, Google Cast or Play Core, and it doesn't load fonts or anything else from Google's servers. It also never switches server addresses by itself: it always uses the address you set up, and only you can change it.
 
 ### Changed
 
+- **README: new Google-free line** under Requirements: works without Google Play services, contains no Google libraries that contact Google, and draws emoji with your phone's own emoji font.
 - **README brought up to date with 0.9.0.** The feature list now also mentions the Radarr and Sonarr history on the Activity tab, importing all your servers at once by paste or QR code, the Play in JellyCtrl and Open in SeerrCtrl buttons, the light, dark and pure black themes with wallpaper colours, and that API keys and passwords are encrypted on your phone and kept out of screenshots and recent apps. It now points to **Account and settings** (the button at the top right) for notifications and usage stats, the "Notifications arrive late?" tips sit under Notifications, and a new paragraph lists everything ArrCtrl connects to besides your own servers. No change to the app itself
 
 ## v0.9.0 (2026-10-19)
