@@ -79,7 +79,6 @@
 
     <!-- Tabs once a server is added (their content arrives in later updates) -->
     <string name="tab_connected_title">Server added</string>
-    <string name="ready_series_body">Your Sonarr server is set up. Series and episodes arrive in an upcoming update.</string>
     <string name="ready_calendar_body">Your servers are set up. The combined calendar arrives in an upcoming update.</string>
     <string name="more_connected">Added</string>
 
@@ -492,4 +491,81 @@
         <item quantity="one">%1$d release, %2$d allowed</item>
         <item quantity="other">%1$d releases, %2$d allowed</item>
     </plurals>
+
+    <!-- Series -->
+    <string name="series_search_hint">Search your series</string>
+    <string name="series_none">No series yet</string>
+    <string name="series_no_match">No series match</string>
+    <string name="series_continuing">Continuing</string>
+    <string name="series_ended">Ended</string>
+    <string name="filter_continuing">Continuing</string>
+    <string name="filter_ended">Ended</string>
+    <string name="sort_next_airing">Next airing</string>
+    <string name="sort_previous_airing">Last aired</string>
+    <string name="sort_progress">Episodes downloaded</string>
+    <plurals name="season_count">
+        <item quantity="one">%1$d season</item>
+        <item quantity="other">%1$d seasons</item>
+    </plurals>
+    <plurals name="bulk_confirm_series">
+        <item quantity="one">Apply to %1$d series?</item>
+        <item quantity="other">Apply to %1$d series?</item>
+    </plurals>
+    <plurals name="series_delete_title">
+        <item quantity="one">Delete %1$d series?</item>
+        <item quantity="other">Delete %1$d series?</item>
+    </plurals>
+    <string name="series_delete_files">Also delete the series folder and all its episodes</string>
+    <string name="series_deleted">Series deleted</string>
+    <string name="series_gone">This series is no longer in Sonarr.</string>
+    <string name="series_search_all">Search monitored</string>
+    <string name="series_monitored_on">Sonarr looks for monitored episodes of this series</string>
+    <string name="series_monitored_off">Sonarr leaves this series alone</string>
+    <string name="series_type">Series type</string>
+    <string name="series_type_standard">Standard (S01E05)</string>
+    <string name="series_type_daily">Daily (by air date)</string>
+    <string name="series_type_anime">Anime (absolute numbers)</string>
+    <string name="series_season_folder">Season folders</string>
+    <string name="series_season_folder_help">Keep each season in its own folder</string>
+    <string name="series_move_body">Move the series\' files to %1$s too, or only change where Sonarr expects them?</string>
+    <string name="series_rename_nothing">All files already have the right names.</string>
+    <string name="series_next_airing">Next episode %1$s</string>
+    <string name="seasons">Seasons</string>
+    <string name="season_n">Season %1$d</string>
+    <string name="specials">Specials</string>
+    <string name="season_monitor">Monitor</string>
+    <string name="season_unmonitor">Unmonitor</string>
+    <string name="season_monitor_all_episodes">Monitor every episode</string>
+    <string name="season_unmonitor_all_episodes">Unmonitor every episode</string>
+    <string name="season_search">Search season</string>
+    <string name="season_search_title">Search %1$s?</string>
+    <string name="season_search_body">Sonarr looks for a season pack first, then for the missing monitored episodes one by one.</string>
+    <string name="season_interactive">Interactive season search</string>
+    <string name="season_no_episodes">No episodes in this season</string>
+    <string name="episode_tba">TBA</string>
+    <string name="episode_finale">Finale</string>
+    <string name="episode_not_aired">Not aired yet</string>
+    <string name="episode_absolute">Absolute %1$d</string>
+    <string name="episode_search">Search for this episode</string>
+
+    <!-- Add series -->
+    <string name="series_add">Add series</string>
+    <string name="series_add_hint">Title or TVDB id</string>
+    <string name="series_add_intro">Find a series</string>
+    <string name="series_add_intro_body">Search by title, or by id: tvdb:81189. Results don\'t have posters until the series is in Sonarr.</string>
+    <string name="series_monitor_all">All episodes</string>
+    <string name="series_monitor_future">Future episodes</string>
+    <string name="series_monitor_missing">Missing episodes</string>
+    <string name="series_monitor_existing">Existing episodes</string>
+    <string name="series_monitor_recent">Recent episodes</string>
+    <string name="series_monitor_pilot">Pilot episode</string>
+    <string name="series_monitor_first">First season</string>
+    <string name="series_monitor_last">Last season</string>
+    <string name="series_monitor_none">None</string>
+    <string name="series_search_missing">Search for missing episodes</string>
+    <string name="series_search_missing_help">Start looking as soon as the series is added</string>
+    <string name="series_search_cutoff">Search for upgrades</string>
+    <string name="series_search_cutoff_help">Also look for better versions of episodes below the quality cutoff</string>
+    <string name="series_add_button">Add to Sonarr</string>
+    <string name="series_added">Added to Sonarr</string>
 </resources>

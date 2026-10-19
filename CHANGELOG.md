@@ -4,6 +4,29 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.5.0 (2026-10-19)
+
+The Series tab: your Sonarr library, down to every season and episode.
+
+### New
+
+- **Series library** with posters in a grid, or a list with network, number of seasons, size and quality profile. Grid or list is remembered
+- **Episode progress** on every series, like 18/24, with a bar that shows complete series, series still missing episodes, ended series with gaps, and unmonitored series in different colours
+- **Search, filter and sort**: filter by monitored, unmonitored, continuing, ended, missing episodes or downloading; sort by title, year, date added, next airing, last aired, size or how many episodes you have, in either direction (remembered too)
+- **Several Sonarr servers** (an anime one, say): switch with the chips at the top
+- **Series page** with backdrop, poster, year, network, runtime, certificate, genres, rating, status, progress and when the next episode airs
+- **Seasons** with their own progress (downloaded of aired episodes) and size. Tap the bookmark to monitor or unmonitor a season; tap the season to open it
+- **Season page** with every episode, its air date and whether it's downloaded, downloading, missing or not aired yet. Monitor or unmonitor single episodes, or every episode in the season at once. Search the whole season (Sonarr looks for a season pack first), or open **interactive season search** to see and grab season packs and single episodes yourself
+- **Episode details**: overview, air date, runtime, absolute number, and the file's quality (and whether an upgrade is still wanted), size, video and audio, subtitles, release group and format score. Search for the episode, run an interactive search, monitor or unmonitor it, or delete its file
+- **Series settings**: monitored, quality profile, series type (standard, daily or anime), season folders, root folder (choose whether the files move too) and tags
+- **Search all monitored episodes**, **refresh**, and **rename** with a preview of every new file name
+- **History** for the series, with the episode each event was for
+- **Delete a series**, optionally with all its files and an import list exclusion
+- **Add series**: search by title or `tvdb:` id, then pick the quality profile, root folder (with free space), which episodes to monitor (all, future, missing, existing, recent, pilot, first season, last season or none), series type, season folders and tags, and whether to start searching for missing episodes and for upgrades straight away. Series already in your library are marked and open their page
+- **Select several series** (long-press) to monitor or unmonitor them, change their quality profile, search them or delete them
+- **Play in JellyCtrl** on downloaded episodes and **Open in SeerrCtrl** on series, when those apps are installed (for now they open the app)
+- Posters and backdrops come from your Sonarr server, through the same connection as everything else
+
 ## v0.4.0 (2026-10-19)
 
 The Movies tab: your whole Radarr library, with everything you need to manage it from your phone.

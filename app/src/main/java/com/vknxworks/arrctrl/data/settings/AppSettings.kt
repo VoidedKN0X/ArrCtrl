@@ -33,6 +33,10 @@ data class AppSettings(
     /** Movies tab sort, a MovieSort name. */
     val moviesSort: String = "TITLE",
     val moviesSortDescending: Boolean = false,
+    val seriesGrid: Boolean = true,
+    /** Series tab sort, a SeriesSort name. */
+    val seriesSort: String = "TITLE",
+    val seriesSortDescending: Boolean = false,
 )
 
 class SettingsRepository(private val context: Context, scope: CoroutineScope) {
@@ -42,6 +46,9 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         val moviesGrid = booleanPreferencesKey("movies_grid")
         val moviesSort = stringPreferencesKey("movies_sort")
         val moviesDesc = booleanPreferencesKey("movies_sort_desc")
+        val seriesGrid = booleanPreferencesKey("series_grid")
+        val seriesSort = stringPreferencesKey("series_sort")
+        val seriesDesc = booleanPreferencesKey("series_sort_desc")
     }
 
     val settings: StateFlow<AppSettings> = context.appDataStore.data
@@ -54,6 +61,9 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         moviesGrid = this[K.moviesGrid] ?: true,
         moviesSort = this[K.moviesSort] ?: "TITLE",
         moviesSortDescending = this[K.moviesDesc] ?: false,
+        seriesGrid = this[K.seriesGrid] ?: true,
+        seriesSort = this[K.seriesSort] ?: "TITLE",
+        seriesSortDescending = this[K.seriesDesc] ?: false,
     )
 
     suspend fun update(transform: (AppSettings) -> AppSettings) {
@@ -64,6 +74,9 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             p[K.moviesGrid] = s.moviesGrid
             p[K.moviesSort] = s.moviesSort
             p[K.moviesDesc] = s.moviesSortDescending
+            p[K.seriesGrid] = s.seriesGrid
+            p[K.seriesSort] = s.seriesSort
+            p[K.seriesDesc] = s.seriesSortDescending
         }
     }
 
