@@ -381,7 +381,7 @@ private fun SeriesHeader(s: Series, api: SonarrApi) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             if (s.genres.isNotEmpty()) Text(s.genres.take(3).joinToString(", "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            s.rating?.let { Text("TVDB " + String.format(java.util.Locale.getDefault(), "%.1f", it), style = MaterialTheme.typography.labelMedium) }
+            s.rating?.let { Text(stringResource(R.string.series_rating_tvdb, String.format(java.util.Locale.getDefault(), "%.1f", it)), style = MaterialTheme.typography.labelMedium) }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                 Chip(stringResource(if (s.ended) R.string.series_ended else R.string.series_continuing))
                 if (!s.monitored) Chip(stringResource(R.string.badge_unmonitored))
