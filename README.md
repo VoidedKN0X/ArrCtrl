@@ -34,6 +34,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 - Android 13 or newer
 - Any of: Radarr, Sonarr, Prowlarr, Bazarr, qBittorrent, autobrr, Cleanuparr
+- **Google-free:** works without Google Play services, contains no Google libraries that contact Google, and draws emoji with your phone's own emoji font
 
 ## Install
 
