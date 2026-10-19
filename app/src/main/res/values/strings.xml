@@ -642,8 +642,24 @@
     <string name="bazarr_download">Download</string>
     <string name="bazarr_download_title">Download this subtitle?</string>
     <string name="bazarr_downloaded">Downloaded</string>
-    <string name="bazarr_providers_ok">All providers are working</string>
-    <string name="bazarr_providers_ok_body">Bazarr lists providers here only while they\'re throttled or failing.</string>
+    <string name="bazarr_no_providers">No subtitle providers enabled in Bazarr</string>
+    <string name="bazarr_providers_summary">%1$d of %2$d providers working</string>
+    <string name="bazarr_provider_ok">Working</string>
+    <string name="bazarr_provider_throttled">Throttled</string>
+    <string name="bazarr_reset_providers">Reset</string>
+    <string name="bazarr_reset_providers_title">Reset throttled providers?</string>
+    <string name="bazarr_reset_providers_body">Bazarr stops waiting and uses every throttled provider again straight away. If the problem is still there, they\'ll be throttled again.</string>
+    <string name="bazarr_providers_reset_done">Providers reset</string>
+    <string name="bazarr_change_languages">Change languages</string>
+    <string name="bazarr_languages_title">Subtitle languages</string>
+    <string name="bazarr_languages_series_note">Applies to every episode of this series.</string>
+    <string name="bazarr_no_profiles">No languages profiles set up in Bazarr yet. Add one under Settings → Languages in Bazarr.</string>
+    <string name="bazarr_no_profile">None</string>
+    <string name="bazarr_no_profile_body">Don\'t download subtitles</string>
+    <string name="bazarr_hi_short">(HI)</string>
+    <string name="bazarr_forced_short">(forced)</string>
+    <string name="bazarr_languages_saved">Languages updated</string>
+    <string name="bazarr_all_languages">All languages</string>
     <string name="bazarr_retry">retry %1$s</string>
 
     <!-- autobrr -->

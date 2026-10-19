@@ -42,7 +42,16 @@ data class SubtitleResult(
 
 data class SubHistory(val title: String, val detail: String?, val description: String?, val time: String?, val provider: String?, val language: String?, val score: String?)
 
-data class SubProvider(val name: String, val status: String, val retry: String?)
+/** An enabled subtitle provider. Bazarr reports "Good" for working ones, otherwise the reason it's throttled. */
+data class SubProvider(val name: String, val status: String, val retry: String?) {
+    val working: Boolean get() = status.isBlank() || status.equals("Good", ignoreCase = true)
+}
+
+/** One language in a languages profile. */
+data class ProfileLanguage(val code: String, val hi: Boolean, val forced: Boolean)
+
+/** A Bazarr languages profile: which subtitle languages to download for a movie or series. */
+data class LanguagesProfile(val id: Int, val name: String, val languages: List<ProfileLanguage>)
 
 /** Bazarr's own health issues ("object" and "issue"). */
 data class BazarrIssue(val obj: String, val issue: String)
@@ -138,9 +147,48 @@ class BazarrApi(private val http: Http, val server: Server) {
         )
     }
 
+    /** Every enabled provider; "retry" is "-" when there's nothing to wait for. */
     suspend fun providers(): List<SubProvider> = data(Api.json(client, Api.get(url("/providers")))).map { o ->
-        SubProvider(o.str("name").orEmpty(), o.str("status").orEmpty(), o.str("retry"))
+        SubProvider(o.str("name").orEmpty(), o.str("status").orEmpty(), o.str("retry")?.takeIf { it != "-" })
     }
+
+    /** Clears every throttled provider so Bazarr uses them again straight away. */
+    suspend fun resetProviders() = Api.send(client, Api.post(url("/providers"), FormBody.Builder().add("action", "reset").build()))
+
+    private fun yes(o: JsonObject, key: String) = o.bool(key) ?: o.str(key).equals("True", ignoreCase = true)
+
+    /** GET /system/languages/profiles returns a bare list. */
+    suspend fun profiles(): List<LanguagesProfile> = data(Api.json(client, Api.get(url("/system/languages/profiles")))).mapNotNull { o ->
+        LanguagesProfile(
+            id = o.int("profileId") ?: return@mapNotNull null,
+            name = o.str("name").orEmpty(),
+            languages = o.arr("items").objects().mapNotNull { i ->
+                ProfileLanguage(i.str("language") ?: return@mapNotNull null, yes(i, "hi"), yes(i, "forced"))
+            },
+        )
+    }
+
+    /** Language names by two-letter code, for showing what's in a profile. */
+    suspend fun languageNames(): Map<String, String> = data(Api.json(client, Api.get(url("/system/languages"))))
+        .mapNotNull { o -> o.str("code2")?.let { code -> o.str("name")?.let { code to it } } }.toMap()
+
+    /** The movie's languages profile id, or null when it has none. */
+    suspend fun movieProfile(radarrId: Int): Int? =
+        data(Api.json(client, Api.get(url("/movies?radarrid%5B%5D=$radarrId")))).firstOrNull().int("profileId")
+
+    suspend fun seriesProfile(seriesId: Int): Int? =
+        data(Api.json(client, Api.get(url("/series?seriesid%5B%5D=$seriesId")))).firstOrNull().int("profileId")
+
+    /** Sets the languages profile; null removes it ("" is Bazarr's "no profile"). Bazarr then recomputes what's missing. */
+    suspend fun setMovieProfile(radarrId: Int, profileId: Int?) = Api.send(
+        client,
+        Api.post(url("/movies"), FormBody.Builder().add("radarrid", radarrId.toString()).add("profileid", profileId?.toString() ?: "").build()),
+    )
+
+    suspend fun setSeriesProfile(seriesId: Int, profileId: Int?) = Api.send(
+        client,
+        Api.post(url("/series"), FormBody.Builder().add("seriesid", seriesId.toString()).add("profileid", profileId?.toString() ?: "").build()),
+    )
 
     suspend fun health(): List<BazarrIssue> = data(Api.json(client, Api.get(url("/system/health")))).map { o ->
         BazarrIssue(o.str("object").orEmpty(), o.str("issue").orEmpty())

@@ -10,12 +10,17 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -23,15 +28,20 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.ManageSearch
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.SubtitlesOff
+import androidx.compose.material.icons.outlined.Translate
+import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.SegmentedButton
@@ -54,11 +64,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.vknxworks.arrctrl.R
 import com.vknxworks.arrctrl.container
 import com.vknxworks.arrctrl.data.api.BazarrApi
+import com.vknxworks.arrctrl.data.api.LanguagesProfile
 import com.vknxworks.arrctrl.data.api.SubHistory
 import com.vknxworks.arrctrl.data.api.SubProvider
 import com.vknxworks.arrctrl.data.api.SubtitleResult
@@ -75,6 +87,8 @@ import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.nav.SubtitleSearchRoute
 import com.vknxworks.arrctrl.ui.servers.resultText
 import com.vknxworks.arrctrl.ui.theme.Gutter
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 private const val PAGE = 50
@@ -111,6 +125,7 @@ private fun WantedTab(server: Server, api: BazarrApi) {
     var loadingMore by remember { mutableStateOf(false) }
     var open by remember { mutableStateOf<WantedItem?>(null) }
     var confirmAll by remember { mutableStateOf(false) }
+    var languagesFor by remember { mutableStateOf<WantedItem?>(null) }
 
     suspend fun load(reset: Boolean) {
         val start = if (reset) 0 else items.orEmpty().size
@@ -211,8 +226,22 @@ private fun WantedTab(server: Server, api: BazarrApi) {
                     Icon(Icons.Outlined.ManageSearch, null)
                     Text(stringResource(R.string.bazarr_search_manual), Modifier.padding(start = 8.dp))
                 }
+                OutlinedButton(
+                    onClick = { open = null; languagesFor = w },
+                    shape = CircleShape,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.Outlined.Translate, null)
+                    Text(stringResource(R.string.bazarr_change_languages), Modifier.padding(start = 8.dp))
+                }
                 Spacer(Modifier.size(8.dp))
             }
+        }
+    }
+
+    languagesFor?.let { w ->
+        LanguagesProfileDialog(api, w.radarrId, w.seriesId, onDismiss = { languagesFor = null }) {
+            scope.launch { load(reset = true) }
         }
     }
 
@@ -270,26 +299,179 @@ private fun SubHistoryTab(server: Server, api: BazarrApi) {
 
 @Composable
 private fun ProvidersTab(server: Server, api: BazarrApi) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var items by remember { mutableStateOf<List<SubProvider>?>(null) }
     var error by remember { mutableStateOf<TestResult?>(null) }
-    LaunchedEffect(Unit) { runCatching { api.providers() }.onSuccess { items = it }.onFailure { error = it.toTestResult() } }
+    var refreshing by remember { mutableStateOf(false) }
+    var confirmReset by remember { mutableStateOf(false) }
+    suspend fun load() { runCatching { api.providers() }.onSuccess { items = it; error = null }.onFailure { error = it.toTestResult() } }
+    LaunchedEffect(Unit) { load() }
     val l = items
-    when {
-        error != null && l == null -> ServerErrorCard(server, error!!)
-        l == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
-        l.isEmpty() -> MessageView(Icons.Outlined.CheckCircle, stringResource(R.string.bazarr_providers_ok), stringResource(R.string.bazarr_providers_ok_body))
-        else -> LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp)) {
-            items(l, key = { it.name }) { p ->
-                Row(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.ErrorOutline, null, tint = MaterialTheme.colorScheme.error)
-                    Column(Modifier.weight(1f).padding(start = 12.dp)) {
-                        Text(p.name, style = MaterialTheme.typography.bodyLarge)
-                        Text(listOfNotNull(p.status, p.retry?.let { stringResource(R.string.bazarr_retry, it) }).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    PullToRefreshBox(isRefreshing = refreshing, onRefresh = { scope.launch { refreshing = true; load(); refreshing = false } }, modifier = Modifier.fillMaxSize()) {
+        when {
+            error != null && l == null -> Column { ServerErrorCard(server, error!!) }
+            l == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+            l.isEmpty() -> MessageView(Icons.Outlined.SubtitlesOff, stringResource(R.string.bazarr_no_providers))
+            else -> LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 32.dp)) {
+                error?.let { e -> item { ServerErrorCard(server, e) } }
+                val throttled = l.count { !it.working }
+                item {
+                    Row(Modifier.fillMaxWidth().padding(start = Gutter, end = 8.dp, top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            stringResource(R.string.bazarr_providers_summary, l.size - throttled, l.size),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f),
+                        )
+                        if (throttled > 0) {
+                            TextButton(onClick = { confirmReset = true }) {
+                                Icon(Icons.Outlined.RestartAlt, null, Modifier.size(18.dp))
+                                Text(stringResource(R.string.bazarr_reset_providers), Modifier.padding(start = 6.dp))
+                            }
+                        }
+                    }
+                }
+                // Throttled providers first, so problems are on top.
+                items(l.sortedBy { it.working }, key = { it.name }) { p ->
+                    Row(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        if (p.working) Icon(Icons.Outlined.CheckCircle, stringResource(R.string.bazarr_provider_ok), tint = MaterialTheme.colorScheme.primary)
+                        else Icon(Icons.Outlined.WarningAmber, stringResource(R.string.bazarr_provider_throttled), tint = MaterialTheme.colorScheme.error)
+                        Column(Modifier.weight(1f).padding(start = 12.dp)) {
+                            Text(p.name, style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                if (p.working) stringResource(R.string.bazarr_provider_ok)
+                                else listOfNotNull(p.status, p.retry?.let { stringResource(R.string.bazarr_retry, it) }).joinToString(" · "),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = if (p.working) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
+                            )
+                        }
                     }
                 }
             }
         }
     }
+    if (confirmReset) {
+        val done = stringResource(R.string.bazarr_providers_reset_done)
+        AlertDialog(
+            onDismissRequest = { confirmReset = false },
+            title = { Text(stringResource(R.string.bazarr_reset_providers_title)) },
+            text = { Text(stringResource(R.string.bazarr_reset_providers_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmReset = false
+                    scope.launch {
+                        runCatching { api.resetProviders() }
+                            .onSuccess { Toast.makeText(context, done, Toast.LENGTH_SHORT).show(); load() }
+                            .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                    }
+                }) { Text(stringResource(R.string.bazarr_reset_providers)) }
+            },
+            dismissButton = { TextButton(onClick = { confirmReset = false }) { Text(stringResource(R.string.cancel)) } },
+        )
+    }
+}
+
+/**
+ * Picks the languages profile for a movie ([radarrId]) or a whole series ([seriesId]).
+ * Bazarr downloads, and searches for, the languages in that profile.
+ */
+@Composable
+fun LanguagesProfileDialog(api: BazarrApi, radarrId: Int?, seriesId: Int?, onDismiss: () -> Unit, onChanged: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var profiles by remember { mutableStateOf<List<LanguagesProfile>?>(null) }
+    var names by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var current by remember { mutableStateOf<Int?>(null) }
+    var selected by remember { mutableStateOf<Int?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var saving by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        runCatching {
+            coroutineScope {
+                val p = async { api.profiles() }
+                val n = async { runCatching { api.languageNames() }.getOrDefault(emptyMap()) }
+                val cur = async {
+                    when {
+                        radarrId != null -> api.movieProfile(radarrId)
+                        seriesId != null -> api.seriesProfile(seriesId)
+                        else -> null
+                    }
+                }
+                Triple(p.await(), n.await(), cur.await())
+            }
+        }.onSuccess { (p, n, cur) -> profiles = p; names = n; current = cur; selected = cur }
+            .onFailure { error = it.message ?: "" }
+    }
+    val saved = stringResource(R.string.bazarr_languages_saved)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.bazarr_languages_title)) },
+        text = {
+            val p = profiles
+            when {
+                error != null -> Text(error!!, color = MaterialTheme.colorScheme.error)
+                p == null -> Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                else -> Column(Modifier.selectableGroup()) {
+                    if (radarrId == null) {
+                        Text(stringResource(R.string.bazarr_languages_series_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 8.dp))
+                    }
+                    if (p.isEmpty()) {
+                        Text(stringResource(R.string.bazarr_no_profiles), style = MaterialTheme.typography.bodyMedium)
+                    }
+                    val options: List<LanguagesProfile?> = p + listOf(null)
+                    LazyColumn(Modifier.heightIn(max = 420.dp)) {
+                        items(options.size) { i ->
+                            val o = options[i]
+                            Row(
+                                Modifier.fillMaxWidth()
+                                    .selectable(selected = selected == o?.id, role = Role.RadioButton) { selected = o?.id }
+                                    .padding(vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                RadioButton(selected = selected == o?.id, onClick = null)
+                                Column(Modifier.padding(start = 12.dp)) {
+                                    Text(o?.name ?: stringResource(R.string.bazarr_no_profile), style = MaterialTheme.typography.bodyLarge)
+                                    val detail = if (o == null) stringResource(R.string.bazarr_no_profile_body)
+                                    else o.languages.joinToString(", ") { l ->
+                                        (names[l.code] ?: l.code.uppercase()) +
+                                            (if (l.hi) " " + context.getString(R.string.bazarr_hi_short) else "") +
+                                            (if (l.forced) " " + context.getString(R.string.bazarr_forced_short) else "")
+                                    }
+                                    if (detail.isNotBlank()) Text(detail, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = profiles != null && !saving && selected != current,
+                onClick = {
+                    saving = true
+                    scope.launch {
+                        runCatching {
+                            when {
+                                radarrId != null -> api.setMovieProfile(radarrId, selected)
+                                seriesId != null -> api.setSeriesProfile(seriesId, selected)
+                                else -> Unit
+                            }
+                        }.onSuccess {
+                            Toast.makeText(context, saved, Toast.LENGTH_SHORT).show()
+                            onDismiss()
+                            onChanged()
+                        }.onFailure {
+                            saving = false
+                            Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                },
+            ) { Text(stringResource(R.string.save)) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
+    )
 }
 
 /** Manual subtitle search for one movie or episode; tap a result to download it. */
@@ -303,11 +485,20 @@ fun SubtitleSearchScreen(serverId: String, radarrId: Int?, seriesId: Int?, episo
     var error by remember { mutableStateOf<TestResult?>(null) }
     var confirm by remember { mutableStateOf<SubtitleResult?>(null) }
     var done by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var run by remember { mutableIntStateOf(0) }
+    var editLanguages by remember { mutableStateOf(false) }
+    var language by rememberSaveable { mutableStateOf<String?>(null) }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = { ScreenTopBar(title) },
+        topBar = {
+            ScreenTopBar(title) {
+                if (server != null && (radarrId != null || seriesId != null)) {
+                    IconButton(onClick = { editLanguages = true }) { Icon(Icons.Outlined.Translate, stringResource(R.string.bazarr_change_languages)) }
+                }
+            }
+        },
     ) { padding ->
         Box(Modifier.padding(padding).fillMaxSize()) {
             if (server == null) {
@@ -315,7 +506,9 @@ fun SubtitleSearchScreen(serverId: String, radarrId: Int?, seriesId: Int?, episo
                 return@Box
             }
             val api = remember(server) { c.bazarr(server) }
-            LaunchedEffect(Unit) {
+            LaunchedEffect(run) {
+                results = null
+                error = null
                 runCatching {
                     when {
                         radarrId != null -> api.movieSubtitles(radarrId)
@@ -335,7 +528,16 @@ fun SubtitleSearchScreen(serverId: String, radarrId: Int?, seriesId: Int?, episo
                 }
                 r.isEmpty() -> MessageView(Icons.Outlined.SubtitlesOff, stringResource(R.string.bazarr_no_results))
                 else -> LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 32.dp)) {
-                    items(r, key = { it.provider + "|" + it.subtitle }) { s ->
+                    val languages = r.mapNotNull { it.language }.distinct().sorted()
+                    if (languages.size > 1) {
+                        item {
+                            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                FilterChip(selected = language == null, onClick = { language = null }, label = { Text(stringResource(R.string.bazarr_all_languages)) })
+                                languages.forEach { l -> FilterChip(selected = language == l, onClick = { language = if (language == l) null else l }, label = { Text(l) }) }
+                            }
+                        }
+                    }
+                    items(r.filter { language == null || it.language == language }, key = { it.provider + "|" + it.subtitle }) { s ->
                         Column(Modifier.fillMaxWidth().clickable { confirm = s }.padding(horizontal = Gutter, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(s.releaseInfo.firstOrNull() ?: s.subtitle, style = MaterialTheme.typography.bodyMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
                             FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -350,6 +552,12 @@ fun SubtitleSearchScreen(serverId: String, radarrId: Int?, seriesId: Int?, episo
                             if (s.dontMatches.isNotEmpty()) Text(stringResource(R.string.bazarr_dont_match, s.dontMatches.joinToString(", ")), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
                         }
                     }
+                }
+            }
+            if (editLanguages) {
+                LanguagesProfileDialog(api, radarrId, if (radarrId == null) seriesId else null, onDismiss = { editLanguages = false }) {
+                    language = null
+                    run++
                 }
             }
             confirm?.let { s ->
