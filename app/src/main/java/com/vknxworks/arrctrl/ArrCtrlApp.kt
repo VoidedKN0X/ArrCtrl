@@ -8,6 +8,7 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.vknxworks.arrctrl.data.net.ServerCallFactory
 import com.vknxworks.arrctrl.data.notify.NotifySchedule
 import com.vknxworks.arrctrl.data.notify.Notifications
+import com.vknxworks.arrctrl.widget.Widgets
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -20,6 +21,13 @@ class ArrCtrlApp : Application(), SingletonImageLoader.Factory {
         super.onCreate()
         container = AppContainer(this)
         Notifications.ensureChannels(this)
+        // Widgets on the home screen: make sure their refresh is scheduled, and freshen them when the app starts.
+        container.appScope.launch {
+            if (Widgets.anyPlaced(this@ArrCtrlApp)) {
+                Widgets.schedule(this@ArrCtrlApp)
+                Widgets.refreshNow(this@ArrCtrlApp)
+            }
+        }
         // Keep background checks, ongoing updates and the UnifiedPush registration in line with the settings.
         container.appScope.launch {
             container.settings.changes

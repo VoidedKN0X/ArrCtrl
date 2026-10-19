@@ -4,6 +4,19 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.9.0 (2026-10-19)
+
+Home screen widgets and a Quick Settings tile.
+
+### New
+
+- **Upcoming widget**: movies and episodes from all your Radarr and Sonarr servers for the next two weeks, grouped under Today, Tomorrow and the date. Episodes show their number, title and air time; movies show whether it's the cinema, digital or physical release. A coloured dot shows the state: amber for upcoming, red for out but missing, grey for unmonitored. Only monitored items are shown, and downloaded ones drop off
+- **Downloads widget**: what's downloading right now, with a progress bar, percentage and time left for each, and the total qBittorrent download speed in the title. It uses the Radarr and Sonarr queues (so you see movie and episode names), or your qBittorrent torrents when there's no queue
+- Both widgets can be resized, refresh every 30 minutes, when you open ArrCtrl and with their refresh button, and show when they were last updated. While something downloads, the Downloads widget refreshes every couple of minutes. Tapping a row opens the movie, series, Calendar or Activity tab in ArrCtrl
+- Widgets follow ArrCtrl's amber colours in light and dark mode, or your wallpaper colours when "Use wallpaper colours" is on
+- **Alt. speed tile** in Quick Settings: turns qBittorrent's alternative speed limits on or off for all your qBittorrent servers at once, like the button on the Torrents tab. It shows On, Off, "On for some servers", or when a server can't be reached. With no qBittorrent server it opens ArrCtrl instead, and long-pressing it opens the Torrents tab
+- The tile updates straight away when you toggle alternative speed limits inside the app
+
 ## v0.8.2 (2026-10-19)
 
 A security and privacy update: safer handling of shared .torrent files, redirects and certificates, less on the lock screen and in screenshots, and a fix for qBittorrent API keys.

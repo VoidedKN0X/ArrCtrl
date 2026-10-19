@@ -29,7 +29,7 @@ private val Amber = Color(0xFFF5C26B)
 
 val ArrAccent = Amber
 
-private val Dark = darkColorScheme(
+internal val Dark = darkColorScheme(
     primary = Amber,
     onPrimary = Color(0xFF402D00),
     primaryContainer = Color(0xFF4F3B10),
@@ -57,7 +57,7 @@ private val Dark = darkColorScheme(
     onError = Color(0xFF3B0907),
 )
 
-private val Light = lightColorScheme(
+internal val Light = lightColorScheme(
     primary = Color(0xFF7A5800),
     onPrimary = Color.White,
     primaryContainer = Color(0xFFFFE3AE),

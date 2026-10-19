@@ -34,8 +34,8 @@ android {
         minSdk = 33
         targetSdk = 36
         // Bump both to publish a new release (see CHANGELOG.md).
-        versionCode = 11
-        versionName = "0.8.2"
+        versionCode = 12
+        versionName = "0.9.0"
 
         buildConfigField("String", "APTABASE_KEY", "\"${aptabaseKey.replace("\"", "")}\"")
         buildConfigField("String", "APTABASE_HOST", "\"$aptabaseHost\"")
@@ -143,6 +143,10 @@ dependencies {
     // Both are open source; no Firebase or Google Play Services (F-Droid safe).
     implementation(libs.androidx.work.runtime)
     implementation(libs.unifiedpush.connector)
+
+    // Home screen widgets (Upcoming, Downloads).
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
 }
 
 // The UnifiedPush connector depends on the JVM build of Tink (for Web Push decryption).
