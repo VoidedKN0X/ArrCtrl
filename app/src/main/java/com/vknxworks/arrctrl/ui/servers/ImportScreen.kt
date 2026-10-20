@@ -38,8 +38,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanOptions
 import com.vknxworks.arrctrl.R
 import com.vknxworks.arrctrl.container
 import com.vknxworks.arrctrl.data.server.ImportFormat
@@ -51,7 +49,6 @@ import com.vknxworks.arrctrl.ui.components.SecureWindow
 import com.vknxworks.arrctrl.data.net.Tls
 import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.theme.Gutter
-import androidx.activity.compose.rememberLauncherForActivityResult
 import kotlinx.coroutines.launch
 
 /** Adds several servers at once from the ArrCtrl JSON format, pasted or scanned from a QR code. */
@@ -81,9 +78,15 @@ fun ImportScreen() {
         }
     }
 
-    val scanPrompt = stringResource(R.string.import_scan_prompt)
-    val scanner = rememberLauncherForActivityResult(ScanContract()) { res ->
-        res.contents?.let(::parse)
+    var scanning by remember { mutableStateOf(false) }
+    if (scanning) {
+        QrScanDialog(
+            onResult = { code ->
+                scanning = false
+                parse(code)
+            },
+            onDismiss = { scanning = false },
+        )
     }
 
     // Names left out of the import get the service name, numbered when there's more than one.
@@ -118,15 +121,7 @@ fun ImportScreen() {
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedButton(
-                        onClick = {
-                            scanner.launch(
-                                ScanOptions()
-                                    .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-                                    .setPrompt(scanPrompt)
-                                    .setBeepEnabled(false)
-                                    .setOrientationLocked(false),
-                            )
-                        },
+                        onClick = { scanning = true },
                         shape = CircleShape,
                         modifier = Modifier.weight(1f),
                     ) {

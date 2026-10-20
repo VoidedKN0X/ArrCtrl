@@ -1,35 +1,71 @@
 package com.vknxworks.arrctrl.data.notify
 
+import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.os.Binder
+import android.os.Build
+import android.os.IBinder
 import com.vknxworks.arrctrl.container
 import kotlinx.coroutines.launch
-import org.unifiedpush.android.connector.FailedReason
-import org.unifiedpush.android.connector.PushService
-import org.unifiedpush.android.connector.data.PushEndpoint
-import org.unifiedpush.android.connector.data.PushMessage
 
 /**
- * Receives UnifiedPush events from your distributor (e.g. the ntfy app).
+ * Receives what ntfy hands over: the push address, registration errors and wake-ups.
  * A message is only a wake-up call: its content is ignored and ArrCtrl checks your servers itself,
  * so nothing in the message is trusted or shown.
+ *
+ * Exported because ntfy is another app, so every broadcast must carry the secret token of ArrCtrl's
+ * registration (and, from Android 14, come from ntfy) or it's ignored.
  */
-class PushReceiver : PushService() {
-    override fun onNewEndpoint(endpoint: PushEndpoint, instance: String) {
-        val c = applicationContext.container
-        c.appScope.launch { c.settings.update { it.copy(pushEndpoint = endpoint.url) } }
+class PushReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val token = intent.getStringExtra(UnifiedPush.EXTRA_TOKEN) ?: return
+        if (token != UnifiedPush.token(context)) return
+        if (Build.VERSION.SDK_INT >= 34) {
+            val sender = sentFromPackage
+            if (sender != null && sender != UnifiedPush.NTFY) return
+        }
+        val app = context.applicationContext
+        when (intent.action) {
+            UnifiedPush.ACTION_NEW_ENDPOINT -> {
+                val endpoint = intent.getStringExtra(UnifiedPush.EXTRA_ENDPOINT) ?: return
+                UnifiedPush.ack(app, token, intent.getStringExtra(UnifiedPush.EXTRA_ID))
+                UnifiedPush.onEndpoint(app)
+                updateSettings(app) { c -> c.settings.update { it.copy(pushEndpoint = endpoint) } }
+            }
+            UnifiedPush.ACTION_REGISTRATION_FAILED -> {
+                UnifiedPush.onLost(app, intent.getStringExtra(UnifiedPush.EXTRA_REASON) ?: "UNKNOWN")
+                updateSettings(app) { c -> c.settings.update { it.copy(pushEnabled = false, pushEndpoint = null) } }
+            }
+            UnifiedPush.ACTION_UNREGISTERED -> {
+                UnifiedPush.onLost(app, null)
+                updateSettings(app) { c -> c.settings.update { it.copy(pushEnabled = false, pushEndpoint = null) } }
+            }
+            UnifiedPush.ACTION_TEMP_UNAVAILABLE -> UnifiedPush.onTempUnavailable()
+            UnifiedPush.ACTION_MESSAGE -> {
+                UnifiedPush.onMessage()
+                NotifyChecker.markPush(app)
+                NotifySchedule.checkNow(app, push = true)
+                UnifiedPush.ack(app, token, intent.getStringExtra(UnifiedPush.EXTRA_ID))
+            }
+        }
     }
 
-    override fun onMessage(message: PushMessage, instance: String) {
-        NotifyChecker.markPush(applicationContext)
-        NotifySchedule.checkNow(applicationContext, push = true)
+    private fun updateSettings(context: Context, block: suspend (com.vknxworks.arrctrl.AppContainer) -> Unit) {
+        val pending = goAsync()
+        val c = context.container
+        c.appScope.launch {
+            try { block(c) } finally { pending.finish() }
+        }
     }
+}
 
-    override fun onRegistrationFailed(reason: FailedReason, instance: String) {
-        val c = applicationContext.container
-        c.appScope.launch { c.settings.update { it.copy(pushEnabled = false, pushEndpoint = null) } }
-    }
-
-    override fun onUnregistered(instance: String) {
-        val c = applicationContext.container
-        c.appScope.launch { c.settings.update { it.copy(pushEnabled = false, pushEndpoint = null) } }
-    }
+/**
+ * ntfy binds to this for a few seconds before it delivers a wake-up. That lifts ArrCtrl to foreground importance,
+ * so the check can start straight away with network access even while the phone is in deep sleep.
+ */
+class RaiseToForegroundService : Service() {
+    private val binder = Binder()
+    override fun onBind(intent: Intent?): IBinder = binder
 }

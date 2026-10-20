@@ -58,9 +58,9 @@ data class AppSettings(
     val notifyMuted: Set<String> = emptySet(),
     /** Ongoing notification with active downloads (off by default). */
     val notifyOngoing: Boolean = false,
-    /** Instant checks through a UnifiedPush distributor (e.g. ntfy). */
+    /** Instant checks through ntfy. */
     val pushEnabled: Boolean = false,
-    /** The UnifiedPush endpoint your servers post to; set by the distributor. */
+    /** The push address (on your ntfy server) your servers post to; given by ntfy. */
     val pushEndpoint: String? = null,
 )
 

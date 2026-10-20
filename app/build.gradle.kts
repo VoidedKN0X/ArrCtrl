@@ -22,8 +22,8 @@ android {
         minSdk = 33
         targetSdk = 36
         // Bump both to publish a new release (see CHANGELOG.md).
-        versionCode = 18
-        versionName = "1.0.4"
+        versionCode = 19
+        versionName = "1.1.0"
     }
 
     signingConfigs {
@@ -120,28 +120,16 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network)
 
-    // QR import of server settings. Pure zxing, no Google Play Services (F-Droid safe).
-    implementation(libs.zxing.embedded)
-    implementation(libs.zxing.core)
+    // QR import of server settings: the camera (CameraX) and the open-source zxing-cpp decoder, all on the phone.
+    implementation(libs.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.view)
+    implementation(libs.zxing.cpp)
 
-    // Notifications: periodic checks, and instant wake-ups through a UnifiedPush distributor such as ntfy.
-    // Both are open source; no Firebase or Google Play Services (F-Droid safe).
+    // Notifications: periodic checks, and instant wake-ups through ntfy (spoken to directly, no push library).
     implementation(libs.androidx.work.runtime)
-    implementation(libs.unifiedpush.connector)
 
     // Home screen widgets (Upcoming, Downloads).
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
-}
-
-// The UnifiedPush connector depends on the JVM build of Tink (for Web Push decryption).
-// Use the Android build instead, as the connector's docs recommend: it's smaller and ships its own shrinker rules.
-configurations.all {
-    resolutionStrategy {
-        val tink = "com.google.crypto.tink:tink-android:${libs.versions.tink.get()}"
-        force(tink)
-        dependencySubstitution {
-            substitute(module("com.google.crypto.tink:tink")).using(module(tink))
-        }
-    }
 }
