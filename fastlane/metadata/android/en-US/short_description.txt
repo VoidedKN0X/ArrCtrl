@@ -1,1 +1,0 @@
-One app for your self-hosted Radarr, Sonarr, qBittorrent and the rest
