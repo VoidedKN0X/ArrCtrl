@@ -24,6 +24,7 @@ import androidx.compose.material.icons.outlined.BatteryFull
 import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Downloading
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.NotificationsOff
 import androidx.compose.material.icons.outlined.Refresh
@@ -31,11 +32,13 @@ import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -56,6 +59,7 @@ import com.vknxworks.arrctrl.data.notify.NotifyChecker
 import com.vknxworks.arrctrl.data.notify.NotifyEvent
 import com.vknxworks.arrctrl.data.notify.NotifySchedule
 import com.vknxworks.arrctrl.data.notify.Notifications
+import com.vknxworks.arrctrl.data.notify.UnifiedPush
 import com.vknxworks.arrctrl.data.settings.AppSettings
 import com.vknxworks.arrctrl.ui.components.Group
 import com.vknxworks.arrctrl.ui.components.GroupChoice
@@ -70,12 +74,11 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.unifiedpush.android.connector.UnifiedPush
 import java.util.concurrent.TimeUnit
 
 private val INTERVALS = listOf(15, 30, 60, 180, 0)
 
-/** "Every 30 min · instant with UnifiedPush", or "Off": the summary on the Account screen. */
+/** "Every 30 min · instant with ntfy", or "Off": the summary on the Account screen. */
 @Composable
 fun notificationsSummary(s: AppSettings): String = when {
     !s.notifyEnabled -> stringResource(R.string.notify_off)
@@ -187,7 +190,7 @@ fun NotificationsScreen() {
                         s.notifyInterval,
                         Icons.Outlined.Schedule,
                     ) { v -> update { it.copy(notifyInterval = v) } }
-                    PushRows(s, ::update)
+                    PushRows(s, tick, ::update)
                     val lastCheck = remember(tick, s) { NotifyChecker.lastCheck(context) }
                     val lastPush = remember(tick, s) { NotifyChecker.lastPush(context) }
                     GroupRow(
@@ -256,38 +259,37 @@ fun NotificationsScreen() {
     }
 }
 
-/** The UnifiedPush switch and, once registered, the address to give your servers. */
+/** The ntfy switch and, once registered, the address to give your servers. */
 @Composable
-private fun PushRows(s: AppSettings, update: ((AppSettings) -> AppSettings) -> Unit) {
+private fun PushRows(s: AppSettings, tick: Int, update: ((AppSettings) -> AppSettings) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val distributors = remember(s.pushEnabled) { UnifiedPush.getDistributors(context) }
+    // Checked again whenever the screen comes back, e.g. after installing ntfy.
+    val ntfyInstalled = remember(tick, s.pushEnabled) { UnifiedPush.isNtfyInstalled(context) }
+    val ntfyUnrestricted = remember(tick) { UnifiedPush.isNtfyUnrestricted(context) }
+    val unavailable by UnifiedPush.unavailable.collectAsStateWithLifecycle()
+    val lastError = remember(tick, s.pushEnabled) { UnifiedPush.lastError(context) }
     GroupRow(
         stringResource(R.string.notify_push),
         when {
-            distributors.isEmpty() && !s.pushEnabled -> stringResource(R.string.notify_push_none)
+            !ntfyInstalled -> stringResource(R.string.notify_push_none)
+            s.pushEnabled && unavailable -> stringResource(R.string.notify_push_unavailable)
             s.pushEnabled && s.pushEndpoint == null -> stringResource(R.string.notify_push_waiting)
             s.pushEnabled -> stringResource(R.string.notify_push_on)
+            lastError != null -> stringResource(R.string.notify_push_failed, lastError)
             else -> stringResource(R.string.notify_push_body)
         },
         Icons.Outlined.Bolt,
-        enabled = distributors.isNotEmpty() || s.pushEnabled,
+        enabled = ntfyInstalled || s.pushEnabled,
         onClick = null,
         trailing = {
             Switch(
                 checked = s.pushEnabled,
-                enabled = distributors.isNotEmpty() || s.pushEnabled,
+                enabled = ntfyInstalled || s.pushEnabled,
                 onCheckedChange = { on ->
                     if (on) {
-                        // Uses the distributor you picked before, or your phone's default one (asking if there are several).
-                        UnifiedPush.tryUseCurrentOrDefaultDistributor(context) { ok ->
-                            if (ok) {
-                                update { it.copy(pushEnabled = true) }
-                                UnifiedPush.register(context, messageForDistributor = context.getString(R.string.app_name))
-                            } else {
-                                Toast.makeText(context, context.getString(R.string.notify_push_failed), Toast.LENGTH_LONG).show()
-                            }
-                        }
+                        // Registering happens as soon as the setting is saved (NotifySchedule.apply).
+                        update { it.copy(pushEnabled = true) }
                     } else {
                         UnifiedPush.unregister(context)
                         update { it.copy(pushEnabled = false, pushEndpoint = null) }
@@ -296,6 +298,30 @@ private fun PushRows(s: AppSettings, update: ((AppSettings) -> AppSettings) -> U
             )
         },
     )
+    if (!ntfyInstalled) {
+        GroupRow(
+            stringResource(R.string.notify_ntfy_missing),
+            stringResource(R.string.notify_ntfy_missing_body),
+            Icons.Outlined.ErrorOutline,
+            iconTint = MaterialTheme.colorScheme.error,
+            trailing = {
+                FilledTonalButton(onClick = {
+                    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(UnifiedPush.NTFY_DOWNLOAD))) }
+                }) { Text(stringResource(R.string.notify_ntfy_install)) }
+            },
+        )
+    } else if (s.pushEnabled && !ntfyUnrestricted) {
+        GroupRow(
+            stringResource(R.string.notify_ntfy_battery),
+            stringResource(R.string.notify_ntfy_battery_body),
+            Icons.Outlined.BatteryAlert,
+            iconTint = MaterialTheme.colorScheme.error,
+            showChevron = true,
+            onClick = {
+                runCatching { context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${UnifiedPush.NTFY}"))) }
+            },
+        )
+    }
     val endpoint = s.pushEndpoint
     if (s.pushEnabled && endpoint != null) {
         val share = stringResource(R.string.notify_push_share_title)

@@ -28,7 +28,7 @@ class ArrCtrlApp : Application(), SingletonImageLoader.Factory {
                 Widgets.refreshNow(this@ArrCtrlApp)
             }
         }
-        // Keep background checks, ongoing updates and the UnifiedPush registration in line with the settings.
+        // Keep background checks, ongoing updates and the registration with ntfy in line with the settings.
         container.appScope.launch {
             container.settings.changes
                 .map { listOf(it.notifyEnabled, it.notifyInterval, it.notifyOngoing, it.pushEnabled) to it }

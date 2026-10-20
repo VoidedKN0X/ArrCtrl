@@ -19,11 +19,11 @@ import com.vknxworks.arrctrl.data.api.QbitApi
 import com.vknxworks.arrctrl.data.api.TorrentKind
 import com.vknxworks.arrctrl.data.server.ServiceType
 import com.vknxworks.arrctrl.data.settings.AppSettings
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import org.unifiedpush.android.connector.UnifiedPush
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -119,7 +119,7 @@ object NotifySchedule {
 
     private val network = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
-    /** Applies the notification settings: periodic checks, ongoing updates and the UnifiedPush registration. */
+    /** Applies the notification settings: periodic checks, ongoing updates and the registration with ntfy. */
     fun apply(context: Context, s: AppSettings) {
         val wm = WorkManager.getInstance(context)
         if (s.notifyEnabled && s.notifyInterval > 0) {
@@ -136,9 +136,22 @@ object NotifySchedule {
             wm.cancelUniqueWork(ONGOING)
             Notifications.cancelOngoing(context)
         }
-        // Registering again at start-up is what UnifiedPush asks for: it recovers from a reinstalled distributor.
-        if (s.notifyEnabled && s.pushEnabled && UnifiedPush.getAckDistributor(context) != null) {
-            runCatching { UnifiedPush.register(context, messageForDistributor = context.getString(R.string.app_name)) }
+        // Earlier versions registered through a push library and could use other push apps. With ntfy the
+        // registration (and so the push address) is kept; with any other push app it's removed there, and ArrCtrl
+        // registers with ntfy instead if it's installed, or turns push off until it is.
+        val previous = UnifiedPush.migrateFromLibrary(context)
+        if (s.pushEnabled && previous != null && previous != UnifiedPush.NTFY) {
+            val c = context.container
+            if (UnifiedPush.isNtfyInstalled(context)) {
+                c.appScope.launch { c.settings.update { it.copy(pushEndpoint = null) } }
+            } else {
+                c.appScope.launch { c.settings.update { it.copy(pushEnabled = false, pushEndpoint = null) } }
+                return
+            }
+        }
+        // Registering again at start-up recovers from a reinstalled ntfy; with the same token ntfy keeps the address.
+        if (s.notifyEnabled && s.pushEnabled) {
+            runCatching { UnifiedPush.register(context, context.getString(R.string.app_name)) }
         }
     }
 

@@ -21,7 +21,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Subtitles** through Bazarr on every movie and episode: see what's there, get any other language, or pick one yourself
 - **Prowlarr** indexers and cross-indexer search, **Bazarr** subtitles, **autobrr** filters and releases, **Cleanuparr** stats and jobs
 - **System health** for every server in one place, with low disk space warnings
-- **Notifications** without Google services: polling, or instant push through your own ntfy server
+- **Notifications**: background checks, plus instant push through [ntfy](https://f-droid.org/packages/io.heckel.ntfy/) and your own ntfy server
 - **Widgets** for upcoming releases and active downloads, and a quick settings tile for qBittorrent's alternative speed limits
 - **Every service is optional**, and you can add more than one of each (a second Radarr for 4K, say)
 - **Import all your servers at once** by pasting one block of settings or scanning it as a QR code
@@ -38,7 +38,7 @@ Coming soon.
 
 - Android 13 or newer
 - Any of: Radarr, Sonarr, Prowlarr, Bazarr, qBittorrent, autobrr, Cleanuparr
-- **Google-free:** works without Google Play services, contains no Google libraries that contact Google, and draws emoji with your phone's own emoji font
+- **Google-free and de-Googled:** no Google Play services, Firebase or other Google services, and the app never contacts Google. It works the same on de-Googled phones (GrapheneOS, CalyxOS, /e/OS, LineageOS without Google apps).
 
 ## Install
 
@@ -103,19 +103,19 @@ Tap **Add torrent** on the Torrents tab and paste a magnet link (or several), or
 
 ### Notifications
 
-Turn them on in **Account and settings** (the button at the top right) → **Notifications**. ArrCtrl checks your servers itself and tells you about downloads, failed or stuck downloads, finished torrents, health warnings, low disk space and servers that stop answering. You choose which kinds, and which servers. Nothing goes through Google; there's no Firebase or Play Services.
+Turn them on in **Account and settings** (the button at the top right) → **Notifications**. ArrCtrl checks your servers itself and tells you about downloads, failed or stuck downloads, finished torrents, health warnings, low disk space and servers that stop answering. You choose which kinds, and which servers. Nothing goes through any outside service.
 
 There are two ways ArrCtrl finds out, and you can use both:
 
 - **Background checks** every 15 minutes to 3 hours. Nothing to set up, but Android can delay them, especially when the phone is idle.
-- **Instant, with UnifiedPush.** Your servers wake ArrCtrl the moment something happens, and ArrCtrl then checks and notifies you. The message itself is only a wake-up call: ArrCtrl ignores its content and asks your servers directly, so it doesn't matter what a service puts in it.
+- **Instant, with ntfy.** Push comes through the [ntfy app](https://f-droid.org/packages/io.heckel.ntfy/) only (no other push apps). Your servers wake ArrCtrl the moment something happens, and ArrCtrl then checks and notifies you. The message itself is only a wake-up call: ArrCtrl ignores its content and asks your servers directly, so it doesn't matter what a service puts in it. Background checks keep running alongside as a fallback.
 
 An **Active downloads** notification (what's downloading and how fast) is also available. It's off by default because it updates every minute while something downloads.
 
 #### Setting up instant notifications with ntfy
 
-1. Install the [ntfy app](https://f-droid.org/packages/io.heckel.ntfy/) and, in its settings, set your own ntfy server as the default server (any UnifiedPush distributor works; ntfy is the usual one).
-2. In ArrCtrl, turn on **Instant with UnifiedPush**. ArrCtrl shows a **push address** such as `https://ntfy.example.com/upAbC123xyz?up=1`, split into the **ntfy server** (`https://ntfy.example.com`) and **topic** (`upAbC123xyz`). Tap a row to copy it.
+1. Install the [ntfy app](https://f-droid.org/packages/io.heckel.ntfy/) and, in its settings, set your own ntfy server as the default server. If ntfy isn't installed, the Notifications screen says so and has an **Install ntfy** button.
+2. In ArrCtrl, turn on **Instant with ntfy**. ArrCtrl shows a **push address** such as `https://ntfy.example.com/upAbC123xyz?up=1`, split into the **ntfy server** (`https://ntfy.example.com`) and **topic** (`upAbC123xyz`). Tap a row to copy it.
 3. Point each service at it, below. You only need the services you want instant notifications for; the rest are still covered by background checks.
 4. Tap **Send a test wake-up**. "Last wake-up" updates when it arrives.
 
@@ -127,11 +127,11 @@ An **Active downloads** notification (what's downloading and how fast) is also a
 | **Cleanuparr** | Settings → Notifications → add → **ntfy** | Server URL: the ntfy server. Topics: the topic. |
 | **qBittorrent** | Options → Downloads → **Run external program** → *on torrent finished* | `curl -s -d done https://ntfy.example.com/upAbC123xyz` (the container or host needs `curl`). |
 
-If your ntfy server needs a login to publish, add the username and password (or access token) in the service's ntfy settings, or allow anonymous publishing to `up*` topics in ntfy's access control, which is what ntfy's UnifiedPush docs recommend.
+If your ntfy server needs a login to publish, add the username and password (or access token) in the service's ntfy settings, or allow anonymous publishing to `up*` topics in ntfy's access control, which is what ntfy's docs recommend for these app topics.
 
 #### Notifications arrive late?
 
-Android limits apps in the background to save battery. The Notifications screen shows whether ArrCtrl is restricted and lets you lift it. Some phones go further on their own: OPPO and OnePlus (ColorOS), Xiaomi, Samsung and Huawei can stop apps in the background regardless. On those, open ArrCtrl's **App settings** from the same screen and allow background activity and auto-launch. Do the same for the ntfy app, since it has to stay connected for instant notifications.
+Android limits apps in the background to save battery. The Notifications screen shows whether ArrCtrl is restricted and lets you lift it. Some phones go further on their own: OPPO and OnePlus (ColorOS), Xiaomi, Samsung and Huawei can stop apps in the background regardless. On those, open ArrCtrl's **App settings** from the same screen and allow background activity and auto-launch. Do the same for the ntfy app, since it has to stay connected for instant notifications; the Notifications screen warns when ntfy is battery-restricted.
 
 ### Widgets and the quick settings tile
 
@@ -147,7 +147,7 @@ The **Alt. speed** tile (pull down Quick Settings → edit → drag it in) turns
 **Telemetry-free.** ArrCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the servers you add.
 
 - Posters and backdrops come from your own Radarr and Sonarr servers, never straight from sites like TMDB.
-- Instant notifications come through your own UnifiedPush distributor (such as your ntfy server), and **Send a test wake-up** posts to your push address.
+- Instant notifications come through the ntfy app and your own ntfy server, and **Send a test wake-up** posts to your push address.
 - Help links in System health, and the GitHub and licence links in About, open in your browser only when you tap them.
 
 ## Build from source

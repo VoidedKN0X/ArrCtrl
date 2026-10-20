@@ -4,6 +4,23 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.1.0 (2026-10-20)
+
+### Changed
+
+- **Push notifications through ntfy only.** Instant notifications now always come through the [ntfy app](https://f-droid.org/packages/io.heckel.ntfy/), and other push apps can no longer be used. If you already used ntfy, nothing changes: your push address stays the same, so your servers don't need new settings. If you used another push app, ArrCtrl removes its registration there and, if ntfy is installed, registers with ntfy instead; your servers then need the new push address shown under **Notifications** (the README explains where each service takes it). Without ntfy, instant notifications are off until you install it. Background checks keep running either way
+- **"Instant with UnifiedPush" is now "Instant with ntfy"**, and the texts on the Notifications screen talk about ntfy instead of "distributors"
+- **ntfy isn't installed?** The Notifications screen now says so, with an **Install ntfy** button that opens ntfy on F-Droid. It checks again whenever you come back to the screen, so it updates as soon as ntfy is installed
+- **ntfy battery warning**: with instant notifications on, the Notifications screen warns when ntfy is battery-restricted (Android can then cut its connection while the phone sleeps), and tapping it opens ntfy's App info so you can set its battery usage to Unrestricted
+- **ntfy temporarily unavailable**: when ntfy reports that your ntfy server is down, the Instant with ntfy row says so. Your push address stays the same and wake-ups resume by themselves once the server is back
+- **Why push couldn't be turned on**: if ntfy refuses to register ArrCtrl, the row now shows ntfy's reason instead of turning off silently
+- **New QR scanner for Import servers.** **Scan QR** now opens ArrCtrl's own full-screen camera view instead of a separate scanner screen. It asks for the camera when it opens, reads the code on the phone with the open-source zxing-cpp decoder, and closes as soon as it has read your settings
+
+### Privacy
+
+- **De-Googled.** The push library ArrCtrl used is gone, along with the Google crypto library (Tink) it brought along, its built-in check for Google Play services and its references to Firebase. ArrCtrl now talks to ntfy directly. The old QR scanner, which was built on Google's ZXing library, is replaced too (see above). ArrCtrl contains no Google libraries or services and never contacts Google, and the app's texts no longer mention Google
+- **README**: the Google-free line now reads "Google-free and de-Googled", notifications are described as ntfy-only with background checks as a fallback, and the ntfy setup steps are updated
+
 ## v1.0.4 (2026-10-20)
 
 ### Privacy

@@ -12,10 +12,15 @@
     <!-- Lets the Notifications screen ask Android to stop delaying ArrCtrl's checks. Nothing is changed without your OK. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
-    <!-- Package visibility for the "Play in JellyCtrl" and "Open in SeerrCtrl" buttons. -->
+    <!-- Package visibility for the "Play in JellyCtrl" and "Open in SeerrCtrl" buttons, and for ntfy,
+         the only push app ArrCtrl uses. -->
     <queries>
         <package android:name="com.vknxworks.jellyctrl" />
         <package android:name="com.vknxworks.seerrctrl" />
+        <package android:name="io.heckel.ntfy" />
+        <intent>
+            <action android:name="org.unifiedpush.android.distributor.REGISTER" />
+        </intent>
     </queries>
 
     <application
@@ -72,12 +77,26 @@
             </intent-filter>
         </activity>
 
-        <!-- UnifiedPush: wake-ups from your distributor (e.g. ntfy). Not exported; the connector library relays to it. -->
-        <service
+        <!-- Wake-ups from ntfy. Exported because ntfy is another app; every broadcast must carry the secret
+             token of ArrCtrl's registration or it's ignored. -->
+        <receiver
             android:name=".data.notify.PushReceiver"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
-                <action android:name="org.unifiedpush.android.connector.PUSH_EVENT" />
+                <action android:name="org.unifiedpush.android.connector.MESSAGE" />
+                <action android:name="org.unifiedpush.android.connector.UNREGISTERED" />
+                <action android:name="org.unifiedpush.android.connector.NEW_ENDPOINT" />
+                <action android:name="org.unifiedpush.android.connector.REGISTRATION_FAILED" />
+                <action android:name="org.unifiedpush.android.connector.TEMP_UNAVAILABLE" />
+            </intent-filter>
+        </receiver>
+        <!-- ntfy binds to this for a few seconds before a wake-up, so ArrCtrl can check your servers at once. -->
+        <service
+            android:name=".data.notify.RaiseToForegroundService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="org.unifiedpush.android.connector.RAISE_TO_FOREGROUND" />
             </intent-filter>
         </service>
 
@@ -120,13 +139,8 @@
                 android:value="true" />
         </service>
 
-        <!-- QR scanner from zxing-android-embedded: follow the phone's rotation instead of forcing landscape. -->
-        <activity
-            android:name="com.journeyapps.barcodescanner.CaptureActivity"
-            android:screenOrientation="fullSensor"
-            tools:replace="screenOrientation" />
-        <!-- Google-free: don't let androidx.emoji2 ask Google Play services for a downloadable emoji
-             font at start-up. Emoji are drawn with the phone's own emoji font instead. -->
+        <!-- Don't let androidx.emoji2 look up a downloadable emoji font at start-up: emoji are drawn with the
+             phone's own emoji font, and nothing is fetched. -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
