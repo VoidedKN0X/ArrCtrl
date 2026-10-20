@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Server addresses are typed by the user, so cleartext can't be limited to fixed domains here.
      Radarr, Sonarr, qBittorrent and friends usually run over plain HTTP on a home network, so it
-     stays possible at the platform level; the app only talks to addresses the user entered, plus
-     (only if the user opts in to usage stats) https://telemetry.vkhub.org, over HTTPS with system CAs.
+     stays possible at the platform level; the app only talks to addresses the user entered.
      User-installed CAs are trusted so servers behind a private CA / reverse proxy work.
      Self-signed certificates are handled per server in code (fingerprint pinning), never globally. -->
 <network-security-config>

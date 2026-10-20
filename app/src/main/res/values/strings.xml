@@ -72,16 +72,6 @@
     <string name="dynamic_colour">Use wallpaper colours</string>
     <string name="dynamic_colour_subtitle">Replaces ArrCtrl\'s amber with colours from your wallpaper</string>
 
-    <!-- Usage stats -->
-    <string name="usage_stats">Usage stats</string>
-    <string name="usage_stats_switch">Share anonymous usage stats</string>
-    <string name="usage_stats_switch_subtitle">Helps decide what to improve next</string>
-    <string name="usage_stats_description">Which screens you open, which services you use to add, search for or grab things, the app version, Android version, phone model and language. Never your server addresses, API keys, usernames, or which movies, series, releases or torrents. Sent to VKNXWorks\' own server, not to any analytics company.</string>
-    <string name="usage_stats_prompt_title">Help improve ArrCtrl?</string>
-    <string name="usage_stats_prompt_body">Share anonymous usage stats so I can see which features people use and which Android versions to support.\n\n%1$s\n\nYou can change this any time in Settings.</string>
-    <string name="usage_stats_share">Share stats</string>
-    <string name="usage_stats_decline">No thanks</string>
-
     <!-- Buttons and common words -->
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>

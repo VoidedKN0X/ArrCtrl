@@ -222,7 +222,7 @@ fun SeasonScreen(serverId: String, seriesId: Int, season: Int) {
             title = { Text(stringResource(R.string.season_search_title, seasonName(season))) },
             text = { Text(stringResource(R.string.season_search_body)) },
             confirmButton = {
-                TextButton(onClick = { confirmSearch = false; act(R.string.movie_search_started) { api.searchSeason(seriesId, season); c.telemetry.action("search", "sonarr") } }) {
+                TextButton(onClick = { confirmSearch = false; act(R.string.movie_search_started) { api.searchSeason(seriesId, season) } }) {
                     Text(stringResource(R.string.season_search))
                 }
             },
@@ -361,7 +361,7 @@ private fun EpisodeSheet(
 
             Spacer(Modifier.size(4.dp))
             FilledTonalButton(
-                onClick = { act(R.string.movie_search_started) { api.searchEpisodes(listOf(e.id)); context.container.telemetry.action("search", "sonarr") } },
+                onClick = { act(R.string.movie_search_started) { api.searchEpisodes(listOf(e.id)) } },
                 shape = CircleShape,
                 modifier = Modifier.fillMaxWidth(),
             ) {

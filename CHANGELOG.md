@@ -4,11 +4,15 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
-## Unreleased
+## v1.0.4 (2026-10-20)
+
+### Privacy
+
+- **No more usage stats: ArrCtrl is now telemetry-free.** The optional anonymous usage stats are gone completely, along with the Usage stats setting and the one-time question. The app no longer contacts VKNXWorks' stats server at all, and the settings it used are deleted from your phone when you update. ArrCtrl now only talks to the servers you add (and your own push distributor, if you use instant notifications)
 
 ### Changed
 
-- **README**: a Screenshots section (screenshots are coming soon), and a link preview image (`.github/assets/social-preview.png`) with ArrCtrl's icon, name and summary, for when the repo is shared on Reddit, Discord or elsewhere
+- **README**: a Screenshots section (screenshots are coming soon), and a link preview image (`.github/assets/social-preview.png`) with ArrCtrl's icon, name and summary, for when the repo is shared on Reddit, Discord or elsewhere. It also gets a "Telemetry-free" badge and tag, and a Privacy section that lists exactly what ArrCtrl connects to, in place of the old Usage stats section
 
 ## v1.0.3 (2026-10-19)
 

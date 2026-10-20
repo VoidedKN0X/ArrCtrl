@@ -2,7 +2,7 @@
 
 **One app for your whole self-hosted download stack.**
 
-[![Latest release](https://img.shields.io/github/v/release/VoidedKN0X/ArrCtrl?label=download)](https://github.com/VoidedKN0X/ArrCtrl/releases/latest) ![Android 13+](https://img.shields.io/badge/Android-13%2B-3DDC84?logo=android&logoColor=white) [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE) [![Sponsor](https://img.shields.io/badge/sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/VoidedKN0X)
+[![Latest release](https://img.shields.io/github/v/release/VoidedKN0X/ArrCtrl?label=download)](https://github.com/VoidedKN0X/ArrCtrl/releases/latest) ![Android 13+](https://img.shields.io/badge/Android-13%2B-3DDC84?logo=android&logoColor=white) [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE) ![Telemetry-free](https://img.shields.io/badge/telemetry-none-brightgreen) [![Sponsor](https://img.shields.io/badge/sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/VoidedKN0X)
 
 ArrCtrl is an Android app for [Radarr](https://radarr.video/), [Sonarr](https://sonarr.tv/), [Prowlarr](https://prowlarr.com/), [Bazarr](https://www.bazarr.media/), [qBittorrent](https://www.qbittorrent.org/), [autobrr](https://autobrr.com/) and [Cleanuparr](https://github.com/Cleanuparr/Cleanuparr), in the spirit of nzb360 and LunaSea.
 
@@ -142,17 +142,13 @@ Long-press your home screen → Widgets → ArrCtrl. Both refresh every 30 minut
 
 The **Alt. speed** tile (pull down Quick Settings → edit → drag it in) turns qBittorrent's alternative speed limits on or off for all your qBittorrent servers, like the button on the Torrents tab. Long-press it to open the Torrents tab.
 
-## Usage stats
+## Privacy
 
-ArrCtrl can share anonymous usage stats, **only if you say yes**. It asks once after you add your first server, and you can change it any time in **Account and settings** (the button at the top right) → **Settings** → **Usage stats**.
+**Telemetry-free.** ArrCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the servers you add.
 
-- **Shared:** which screens you open (the kind of screen, such as "Movie", "Activity" or "Prowlarr", never which movie, series, torrent or server), when you add, search for or grab something and with which service (Radarr, Sonarr, Prowlarr or qBittorrent, never what it was), the app version, Android version, phone model, language, phone or tablet, your theme, and whether notifications are on.
-- **Never shared:** your server addresses, API keys, usernames or passwords, which movies, series, releases or torrents, what you search for, or any ID that stays the same between sessions.
-- **Where:** VKNXWorks' own self-hosted [Aptabase](https://aptabase.com) server. Nothing goes to Google or analytics companies. Like any website, the server sees your IP address; Aptabase uses it only to work out the country and doesn't store it.
-
-Builds from source don't include the stats key, so they can't send anything and the setting is hidden. The code is in [`Telemetry.kt`](app/src/main/java/com/vknxworks/arrctrl/data/telemetry/Telemetry.kt).
-
-Apart from these opt-in stats, ArrCtrl only talks to the servers you add. Posters and backdrops come from your own Radarr and Sonarr servers, never straight from sites like TMDB. Instant notifications come through your own UnifiedPush distributor (such as your ntfy server), and **Send a test wake-up** posts to your push address. Help links in System health open in your browser only when you tap them.
+- Posters and backdrops come from your own Radarr and Sonarr servers, never straight from sites like TMDB.
+- Instant notifications come through your own UnifiedPush distributor (such as your ntfy server), and **Send a test wake-up** posts to your push address.
+- Help links in System health, and the GitHub and licence links in About, open in your browser only when you tap them.
 
 ## Build from source
 

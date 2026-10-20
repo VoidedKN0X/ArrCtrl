@@ -182,7 +182,7 @@ fun MovieScreen(serverId: String, movieId: Int) {
                 Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                Action(Icons.Outlined.Search, stringResource(R.string.movie_search)) { act(R.string.movie_search_started) { api.search(listOf(mv.id)); c.telemetry.action("search", "radarr") } }
+                Action(Icons.Outlined.Search, stringResource(R.string.movie_search)) { act(R.string.movie_search_started) { api.search(listOf(mv.id)) } }
                 Action(Icons.Outlined.ManageSearch, stringResource(R.string.movie_interactive)) {
                     nav.navigate(MovieReleasesRoute(server.id, mv.id, mv.title))
                 }
