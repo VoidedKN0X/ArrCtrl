@@ -14,7 +14,6 @@ import com.vknxworks.arrctrl.data.server.Server
 import com.vknxworks.arrctrl.data.server.ServerStatus
 import com.vknxworks.arrctrl.data.server.ServerStore
 import com.vknxworks.arrctrl.data.settings.SettingsRepository
-import com.vknxworks.arrctrl.data.telemetry.Telemetry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -25,7 +24,6 @@ class AppContainer(val context: Context) {
     val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     val settings = SettingsRepository(context, appScope)
-    val telemetry = Telemetry(context, settings, appScope)
     val http = Http()
     val servers = ServerStore(context, appScope)
     val status = ServerStatus(http, appScope)

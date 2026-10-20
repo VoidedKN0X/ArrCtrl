@@ -198,7 +198,7 @@ fun SeriesDetailScreen(serverId: String, seriesId: Int) {
                 Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                ActionButton(Icons.Outlined.Search, stringResource(R.string.series_search_all)) { act(R.string.movie_search_started) { api.searchSeries(s.id); c.telemetry.action("search", "sonarr") } }
+                ActionButton(Icons.Outlined.Search, stringResource(R.string.series_search_all)) { act(R.string.movie_search_started) { api.searchSeries(s.id) } }
                 ActionButton(Icons.Outlined.Refresh, stringResource(R.string.movie_refresh)) { act(R.string.movie_refresh_started) { api.refresh(s.id) } }
                 if (s.episodeFileCount > 0) ActionButton(Icons.Outlined.DriveFileRenameOutline, stringResource(R.string.movie_rename)) { renaming = true }
                 if (s.tmdbId != null && CtrlApps.installed(context, CtrlApps.SEERRCTRL)) {

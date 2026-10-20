@@ -415,7 +415,7 @@ private fun BulkDialog(action: SelectionAction, model: MoviesModel, onDismiss: (
                             when (action) {
                                 SelectionAction.MONITOR -> api.editor(ids, monitored = true)
                                 SelectionAction.UNMONITOR -> api.editor(ids, monitored = false)
-                                else -> { api.search(ids); c.telemetry.action("search", "radarr") }
+                                else -> api.search(ids)
                             }
                         }
                     }) { Text(stringResource(R.string.ok)) }

@@ -229,7 +229,6 @@ private fun AddMovieSheet(api: RadarrApi, m: LookupMovie, onDismiss: () -> Unit,
                     scope.launch {
                         runCatching { api.add(m, p, f, monitor, availability, searchNow, chosenTags.toList()) }
                             .onSuccess {
-                                context.container.telemetry.action("add", "radarr")
                                 Toast.makeText(context, addedText, Toast.LENGTH_SHORT).show()
                                 onAdded(it?.id)
                             }
