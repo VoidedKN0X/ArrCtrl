@@ -4,6 +4,17 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.2.4 (2026-10-21)
+
+### Fixed
+
+- **Fingerprint unlock works again**: ArrCtrl didn't ask Android for permission to use the fingerprint sensor, so the phone always answered that no fingerprint was available and **Unlock with fingerprint** in the app lock settings could never be turned on. ArrCtrl now has that permission, so you can turn fingerprint unlock on (strong biometrics only, as before). The PIN keeps working as it did.
+
+### Security
+
+- **The alternative speed tile asks you to unlock the phone first**: tapping the qBittorrent alternative speed limits tile in Quick Settings on the phone's lock screen used to switch the limits on your servers straight away, so anyone holding your locked phone could do it. Now Android asks you to unlock the phone first and the tile switches them after that, like the tiles in the other Ctrl apps.
+- **Sharing a torrent file to ArrCtrl only accepts files from other apps**: a specially written address (with a user number in front of ArrCtrl's own name, like `content://0@…`) could get past the check that keeps ArrCtrl from reading its own private files when another app "shares" them. The check now looks past that number, so only files offered by another app are accepted.
+
 ## v1.2.3 (2026-10-21)
 
 ### Changed

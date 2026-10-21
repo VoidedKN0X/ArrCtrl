@@ -143,7 +143,7 @@ Android limits apps in the background to save battery. The Notifications screen 
 
 Long-press your home screen → Widgets → ArrCtrl. Both refresh every 30 minutes, when you open ArrCtrl and when you tap the refresh button; Downloads also refreshes every couple of minutes while something is downloading. Tap a row to open it in ArrCtrl. They follow ArrCtrl's colours, or your wallpaper's when "Use wallpaper colours" is on.
 
-The **Alt. speed** tile (pull down Quick Settings → edit → drag it in) turns qBittorrent's alternative speed limits on or off for all your qBittorrent servers, like the button on the Torrents tab. Long-press it to open the Torrents tab.
+The **Alt. speed** tile (pull down Quick Settings → edit → drag it in) turns qBittorrent's alternative speed limits on or off for all your qBittorrent servers, like the button on the Torrents tab. On the phone's lock screen it asks you to unlock the phone first. Long-press it to open the Torrents tab.
 
 ## App lock
 
