@@ -58,12 +58,14 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
 
 ## Getting started
 
-1. Tap the button at the top right of any tab, then **Add a server**.
+1. Tap your profile picture at the top right of any tab, then **Add a server** on the **You** page.
 2. Pick the service and enter its address, e.g. `http://192.168.1.10:7878` or `https://radarr.example.com`. Add the path too if it runs under one behind a reverse proxy (`https://example.com/radarr`).
 3. Enter the API key (in the web UI under Settings → General → Security for Radarr, Sonarr, Prowlarr and Bazarr). For qBittorrent use your Web UI username and password, or an API key on qBittorrent 5.2 or newer.
 4. Tap **Test**, then **Save**. If the server uses a self-signed certificate, tap **Review certificate**, check the fingerprint and trust it. ArrCtrl then accepts that exact certificate from that server only.
 
 Every service is optional, and you can add more than one of each.
+
+Your servers, **Settings** and **About** are all on the **You** page behind your profile picture. The **More** tab only holds the extra tools (Prowlarr, Bazarr, autobrr, Cleanuparr and System health).
 
 ### Import all servers at once
 
@@ -104,7 +106,7 @@ Tap **Add torrent** on the Torrents tab and paste a magnet link (or several), or
 
 ### Notifications
 
-Turn them on in **Account and settings** (the button at the top right) → **Notifications**. ArrCtrl checks your servers itself and tells you about downloads, failed or stuck downloads, finished torrents, health warnings, low disk space and servers that stop answering. You choose which kinds, and which servers. Nothing goes through any outside service.
+Turn them on: tap your profile picture › **Settings › Notifications**. ArrCtrl checks your servers itself and tells you about downloads, failed or stuck downloads, finished torrents, health warnings, low disk space and servers that stop answering. You choose which kinds, and which servers. Nothing goes through any outside service.
 
 There are two ways ArrCtrl finds out, and you can use both:
 
@@ -145,7 +147,7 @@ The **Alt. speed** tile (pull down Quick Settings → edit → drag it in) turns
 
 ## App lock
 
-Turn it on under **Account > Settings > Privacy and security > App lock**. It's off until you turn it on.
+Turn it on: tap your profile picture › **Settings › Privacy and security › App lock**. It's off until you turn it on.
 
 - **Its own app PIN** of at least 6 digits, separate from your phone's screen lock. Very obvious PINs such as 111111 or 123456 are refused.
 - **Unlock with fingerprint** (optional) only accepts strong biometrics, such as the fingerprint sensor, checked by the phone's secure hardware. Face unlock that only uses the camera isn't accepted. The PIN is still needed after the phone restarts and at least every 72 hours, and adding a new fingerprint to the phone turns fingerprint unlock off until you turn it on again.
@@ -186,7 +188,7 @@ Or open the folder in Android Studio and press **Run** with your phone connected
 
 ## Support the project
 
-ArrCtrl is free and open source. If it's useful to you, you can support development on [GitHub Sponsors](https://github.com/sponsors/VoidedKN0X). In the app, the About section at the bottom of the Account and settings page (tap your profile picture) has **Support ArrCtrl** and **Report a bug**, which opens the [issue tracker](https://github.com/VoidedKN0X/ArrCtrl/issues). Starring the repo helps too.
+ArrCtrl is free and open source. If it's useful to you, you can support development on [GitHub Sponsors](https://github.com/sponsors/VoidedKN0X). In the app, the About section at the bottom of the **You** page (tap your profile picture) has **Support ArrCtrl** and **Report a bug**, which opens the [issue tracker](https://github.com/VoidedKN0X/ArrCtrl/issues). Starring the repo helps too.
 
 ## The Ctrl series
 

@@ -4,6 +4,14 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.2.2 (2026-10-21)
+
+### Changed
+
+- **Settings moved to your profile picture**, the same as in every Ctrl app: the round button at the top right of every tab is now a profile picture (the series' person placeholder, since ArrCtrl has no account of its own) instead of a sliders icon. It still opens the page with your servers, **Settings** and **About**, which is now called **You** (before: "Account and settings") and starts with a card showing ArrCtrl and how many servers you've added. Nothing else moved: there was already no other way into Settings, and the More tab keeps its tools.
+- The **Add a server** buttons on the empty Activity and Calendar tabs open the You page, as before.
+- **README**: Getting started, notifications, the app lock and Support now say "tap your profile picture › …" and name the **You** page.
+
 ## v1.2.1 (2026-10-21)
 
 ### Changed

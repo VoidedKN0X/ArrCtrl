@@ -50,7 +50,7 @@ import com.vknxworks.arrctrl.data.server.ServiceType
 import com.vknxworks.arrctrl.ui.components.LocalBottomClearance
 import com.vknxworks.arrctrl.ui.components.MessageView
 import com.vknxworks.arrctrl.ui.components.TabTitle
-import com.vknxworks.arrctrl.ui.nav.AccountRoute
+import com.vknxworks.arrctrl.ui.nav.YouRoute
 import com.vknxworks.arrctrl.ui.nav.AddTorrentRoute
 import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.servers.resultText
@@ -78,7 +78,7 @@ fun ActivityScreen() {
                 stringResource(R.string.empty_activity_body),
                 Modifier.padding(bottom = LocalBottomClearance.current),
                 actionLabel = stringResource(R.string.add_server),
-                onAction = { nav.navigate(AccountRoute) },
+                onAction = { nav.navigate(YouRoute) },
             )
         }
         return

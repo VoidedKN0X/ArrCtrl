@@ -22,6 +22,8 @@ import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.CleaningServices
@@ -91,26 +93,34 @@ private const val ISSUES_URL = "https://github.com/VoidedKN0X/ArrCtrl/issues"
 private const val SPONSORS_URL = "https://github.com/sponsors/VoidedKN0X"
 private const val LICENCE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
 
-/** Opened from the profile picture: servers, settings and about. */
+/** The You page, opened from the profile picture: servers, settings and About. */
 @Composable
-fun AccountScreen() {
+fun YouScreen() {
     val nav = LocalNavigator.current
     val uri = LocalUriHandler.current
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = { ScreenTopBar(stringResource(R.string.account_and_settings)) },
+        topBar = { ScreenTopBar(stringResource(R.string.you_title)) },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
-            Column(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            val servers by LocalContext.current.container.servers.servers.collectAsStateWithLifecycle()
+            Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
-                    Modifier.size(88.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
+                    Modifier.size(96.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Filled.Tune, null, Modifier.size(40.dp), tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Filled.AccountCircle, null, Modifier.size(56.dp), tint = MaterialTheme.colorScheme.primary)
                 }
-                Spacer(Modifier.height(12.dp))
-                Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium)
+                Spacer(Modifier.height(14.dp))
+                Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
+                Text(
+                    if (servers.isEmpty()) stringResource(R.string.you_no_servers)
+                    else pluralStringResource(R.plurals.you_servers, servers.size, servers.size),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             }
 
             ServersSection()
