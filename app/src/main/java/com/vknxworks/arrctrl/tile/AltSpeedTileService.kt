@@ -99,6 +99,11 @@ class AltSpeedTileService : TileService() {
 
     override fun onClick() {
         super.onClick()
+        // Never change the speed limits from the phone's lock screen: unlock the phone first.
+        if (isLocked) unlockAndRun { toggle() } else toggle()
+    }
+
+    private fun toggle() {
         job?.cancel()
         job = scope.launch {
             // The app lock sealed the logins and ArrCtrl is locked: open it, to its lock screen.

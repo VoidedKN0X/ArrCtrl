@@ -79,7 +79,10 @@ private const val MAX_TORRENT_BYTES = 10L * 1024 * 1024
  */
 fun isForeignContentUri(context: Context, uri: Uri): Boolean {
     if (uri.scheme?.lowercase() != ContentResolver.SCHEME_CONTENT) return false
-    val authority = uri.authority?.takeIf { it.isNotBlank() } ?: return false
+    // "content://0@<authority>" still reaches <authority> (the number is a user id), so look past it.
+    val authority = uri.authority?.substringAfterLast('@')?.takeIf { it.isNotBlank() } ?: return false
+    if (authority.startsWith(context.packageName)) return false
+    // Whatever its name, a provider that belongs to this app is never "another app's".
     val owner = runCatching {
         context.packageManager.resolveContentProvider(authority, PackageManager.ComponentInfoFlags.of(0))?.packageName
     }.getOrNull()
