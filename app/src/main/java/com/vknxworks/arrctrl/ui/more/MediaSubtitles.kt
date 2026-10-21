@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.more
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -105,7 +106,7 @@ object BazarrLink {
 }
 
 private fun subLabel(name: String, hi: Boolean, forced: Boolean, hiText: String, forcedText: String) =
-    name + (if (hi) " $hiText" else "") + (if (forced) " $forcedText" else "")
+    listOfNotNull(name, hiText.takeIf { hi }, forcedText.takeIf { forced }).joinToString(" ")
 
 /** "Subtitles" block on a movie page; hidden when no Bazarr has the movie. */
 @Composable
@@ -169,7 +170,7 @@ fun SeriesSubtitlesGroup(seriesId: Int, tvdbId: Int?, title: String) {
             scope.launch {
                 runCatching { api.searchSeries(seriesId) }
                     .onSuccess { Toast.makeText(context, started, Toast.LENGTH_SHORT).show() }
-                    .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                    .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
             }
         })
     }
@@ -243,7 +244,7 @@ fun MediaSubtitlesScreen(bazarrId: String, radarrId: Int?, seriesId: Int?, episo
                 scope.launch {
                     runCatching { block() }
                         .onSuccess { Toast.makeText(context, done, Toast.LENGTH_LONG).show(); load() }
-                        .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                        .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                 }
             }
             fun searchLanguage(code: String, name: String, hi: Boolean, forced: Boolean) = exec(context.getString(R.string.subs_searching_language, name)) {
@@ -347,6 +348,7 @@ fun MediaSubtitlesScreen(bazarrId: String, radarrId: Int?, seriesId: Int?, episo
 /** Pick any language Bazarr knows, optionally hearing impaired or forced. */
 @Composable
 private fun LanguagePickerDialog(api: BazarrApi, onDismiss: () -> Unit, onPick: (BazarrLanguage, Boolean, Boolean) -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     var all by remember { mutableStateOf<List<BazarrLanguage>?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var showAll by remember { mutableStateOf(false) }
@@ -354,7 +356,7 @@ private fun LanguagePickerDialog(api: BazarrApi, onDismiss: () -> Unit, onPick: 
     var picked by remember { mutableStateOf<BazarrLanguage?>(null) }
     var hi by remember { mutableStateOf(false) }
     var forced by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { runCatching { api.languages() }.onSuccess { all = it }.onFailure { error = it.message ?: "" } }
+    LaunchedEffect(Unit) { runCatching { api.languages() }.onSuccess { all = it }.onFailure { error = failureText(context, it) } }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.subs_add_language)) },

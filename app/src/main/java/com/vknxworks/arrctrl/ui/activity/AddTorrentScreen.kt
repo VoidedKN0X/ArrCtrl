@@ -1,6 +1,8 @@
 package com.vknxworks.arrctrl.ui.activity
 
 import com.vknxworks.arrctrl.ui.lock.AppLock
+import com.vknxworks.arrctrl.ui.servers.failureText
+import com.vknxworks.arrctrl.ui.servers.ShownException
 import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
@@ -93,7 +95,7 @@ private fun readCapped(input: java.io.InputStream, limit: Long, tooBig: String):
         val n = input.read(buf)
         if (n < 0) break
         total += n
-        if (total > limit) throw IllegalStateException(tooBig)
+        if (total > limit) throw ShownException(tooBig)
         out.write(buf, 0, n)
     }
     return out.toByteArray()
@@ -186,7 +188,7 @@ fun AddTorrentScreen(initialLink: String?, initialFile: String?) {
                     Toast.makeText(context, addedText, Toast.LENGTH_SHORT).show()
                     nav.back()
                 }
-                .onFailure { Toast.makeText(context, it.message ?: it::class.simpleName.orEmpty(), Toast.LENGTH_LONG).show() }
+                .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
         }
     }
 

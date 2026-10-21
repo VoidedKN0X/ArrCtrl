@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.more
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -144,7 +145,7 @@ private fun IndexersTab(server: Server, api: ProwlarrApi) {
                             scope.launch {
                                 runCatching { api.setEnabled(i, on) }
                                     .onSuccess { load() }
-                                    .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                                    .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                             }
                         })
                     }
@@ -167,6 +168,7 @@ private fun privacyLabel(p: String): String = stringResource(
 
 @Composable
 private fun IndexerSheet(api: ProwlarrApi, i: Indexer, onDismiss: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val scope = rememberCoroutineScope()
     var testing by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<String?>(null) }
@@ -180,7 +182,7 @@ private fun IndexerSheet(api: ProwlarrApi, i: Indexer, onDismiss: () -> Unit) {
                 onClick = {
                     testing = true; result = null
                     scope.launch {
-                        result = runCatching { api.test(i) ?: passed }.getOrElse { it.message ?: "" }
+                        result = runCatching { api.test(i) ?: passed }.getOrElse { failureText(context, it) }
                         testing = false
                     }
                 },
@@ -273,7 +275,7 @@ private fun SearchTab(server: Server, api: ProwlarrApi) {
                     scope.launch {
                         runCatching { api.grab(s) }
                             .onSuccess { sent = sent + s.guid; Toast.makeText(context, sentText, Toast.LENGTH_SHORT).show() }
-                            .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                            .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                     }
                 }) { Text(stringResource(R.string.prowlarr_grab)) }
             },

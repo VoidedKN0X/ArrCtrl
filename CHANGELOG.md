@@ -4,6 +4,21 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.2.3 (2026-10-21)
+
+### Changed
+
+- **Use wallpaper colours** is the new name of the Dynamic colour switch in Settings › Appearance, with "Replaces the default colours with ones from your wallpaper" underneath, the same wording as in every Ctrl app
+- All text is now in one place, ready for translations: release ages (like "3h" or "5d"), the IMDb, TMDB and Rotten Tomatoes ratings, "Title (year)", download and upload speeds, counts on the filter chips and the ntfy test message moved there too
+- Dates on the Upcoming widget follow your phone's language and date format (for example "Friday 24 Oct" or "Freitag, 24. Okt.") instead of always using the English word order
+
+### Fixed
+
+- **Clear error messages everywhere**: when an action failed (grabbing a release, adding a movie or series, a torrent action, searching, Bazarr and Prowlarr actions and more), the message could be a raw technical error, or empty. It now uses the same clear wording as the connection test, such as "The API key was refused", "Server not found" or "The server didn't answer in time"
+- Trying to change something while ArrCtrl is locked with sealed logins now says "ArrCtrl is locked. Unlock it and try again." instead of a technical error
+- A file or link qBittorrent refuses now says "qBittorrent didn't accept this as a torrent", and a change that the server redirected to another address says that nothing was sent there
+- A failed fingerprint prompt could show a technical error message instead of "Couldn't unlock with your fingerprint"
+
 ## v1.2.2 (2026-10-21)
 
 ### Changed

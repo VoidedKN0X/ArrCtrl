@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.activity
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -106,7 +107,7 @@ fun ManualImportScreen(serverId: String, downloadId: String, title: String) {
                 }
                 .onFailure {
                     importing = false
-                    Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show()
                 }
         }
     }
@@ -213,8 +214,9 @@ private fun ImportRow(f: ImportFile, sonarr: Boolean, checked: Boolean, onCheck:
 /** Radarr: pick which movie a file belongs to. */
 @Composable
 private fun MovieMapper(api: ArrApi, f: ImportFile, onDismiss: () -> Unit, onPicked: (ImportFile) -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     LibraryPicker(api, onDismiss) { m ->
-        onPicked(f.copy(movieId = m.id, movieTitle = m.year?.let { "${m.title} ($it)" } ?: m.title))
+        onPicked(f.copy(movieId = m.id, movieTitle = m.year?.let { context.getString(R.string.title_year, m.title, it) } ?: m.title))
     }
 }
 
@@ -268,7 +270,7 @@ private fun LibraryPicker(api: ArrApi, onDismiss: () -> Unit, onPick: (LibraryEn
                     LazyColumn(Modifier.fillMaxWidth().heightIn(max = 480.dp)) {
                         items(shown, key = { it.id }) { e ->
                             Text(
-                                e.year?.let { "${e.title} ($it)" } ?: e.title,
+                                e.year?.let { stringResource(R.string.title_year, e.title, it) } ?: e.title,
                                 style = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier.fillMaxWidth().clickable { onPick(e) }.padding(horizontal = 24.dp, vertical = 14.dp),
                             )

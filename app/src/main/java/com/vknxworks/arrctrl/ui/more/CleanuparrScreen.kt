@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.more
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -209,7 +210,7 @@ fun CleanuparrScreen() = ToolScaffold(stringResource(R.string.service_cleanuparr
                     scope.launch {
                         runCatching { api.trigger(j.jobType) }
                             .onSuccess { Toast.makeText(context, started, Toast.LENGTH_SHORT).show(); load() }
-                            .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                            .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                     }
                 }) { Text(stringResource(R.string.cleanuparr_run_now)) }
             },

@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.series
 
 import android.text.format.DateUtils
+import com.vknxworks.arrctrl.ui.servers.failureText
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -172,7 +173,7 @@ fun SeriesDetailScreen(serverId: String, seriesId: Int) {
         scope.launch {
             runCatching { block() }
                 .onSuccess { Toast.makeText(context, msg, Toast.LENGTH_SHORT).show(); reload++ }
-                .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
         }
     }
 
@@ -328,7 +329,7 @@ fun SeriesDetailScreen(serverId: String, seriesId: Int) {
                     scope.launch {
                         runCatching { api.delete(s.id, files, exclude) }
                             .onSuccess { Toast.makeText(context, deleted, Toast.LENGTH_SHORT).show(); nav.back() }
-                            .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                            .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                     }
                 }) { Text(stringResource(R.string.torrent_delete), color = MaterialTheme.colorScheme.error) }
             },
@@ -456,7 +457,7 @@ private fun SeriesRenameDialog(api: SonarrApi, s: Series, onDismiss: () -> Unit,
                     scope.launch {
                         runCatching { api.rename(s.id, list.map { it.episodeFileId }) }
                             .onSuccess { Toast.makeText(context, started, Toast.LENGTH_SHORT).show(); onDone() }
-                            .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                            .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                     }
                 }) { Text(stringResource(R.string.movie_rename)) }
             }

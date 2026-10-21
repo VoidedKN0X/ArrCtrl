@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.activity
 
 import android.content.Context
+import com.vknxworks.arrctrl.ui.servers.failureText
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -132,7 +133,7 @@ class TorrentActions(private val t: Torrent, private val context: Context, priva
                 .onFailure { e ->
                     val msg = if (e is com.vknxworks.arrctrl.data.api.ApiException && e.code == 409) {
                         context.getString(R.string.torrent_queueing_off)
-                    } else e.message ?: e::class.simpleName.orEmpty()
+                    } else failureText(context, e)
                     Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
                 }
         }
@@ -295,7 +296,7 @@ private fun rememberlessRun(context: Context, scope: CoroutineScope, then: () ->
             .onFailure { e ->
                 val msg = if (e is com.vknxworks.arrctrl.data.api.ApiException && e.code == 409) {
                     context.getString(R.string.torrent_queueing_off)
-                } else e.message ?: e::class.simpleName.orEmpty()
+                } else failureText(context, e)
                 Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
             }
     }

@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.series
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -163,7 +164,7 @@ fun AddSeriesScreen(serverId: String) {
                                 .padding(horizontal = Gutter, vertical = 10.dp),
                             verticalArrangement = Arrangement.spacedBy(3.dp),
                         ) {
-                            Text(s.year?.let { "${s.title} ($it)" } ?: s.title, style = MaterialTheme.typography.titleSmall)
+                            Text(s.year?.let { stringResource(R.string.title_year, s.title, it) } ?: s.title, style = MaterialTheme.typography.titleSmall)
                             val meta = listOfNotNull(
                                 s.network,
                                 s.seasonCount.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.season_count, it, it) },
@@ -214,12 +215,12 @@ private fun AddSeriesSheet(api: SonarrApi, s: LookupSeries, onDismiss: () -> Uni
     val addedText = stringResource(R.string.series_added)
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
-            Text(s.year?.let { "${s.title} ($it)" } ?: s.title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
+            Text(s.year?.let { context.getString(R.string.title_year, s.title, it) } ?: s.title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
             Group {
                 GroupChoice(stringResource(R.string.movie_quality_profile), profiles.map { it.id to it.name }, profileId, Icons.Outlined.HighQuality) { profileId = it }
                 GroupChoice(
                     stringResource(R.string.movie_root_folder),
-                    folders.map { f -> f.path to (f.freeSpace?.let { "${f.path} · " + context.getString(R.string.free_space, Format.bytes(it)) } ?: f.path) },
+                    folders.map { f -> f.path to (f.freeSpace?.let { context.getString(R.string.dot_pair, f.path, context.getString(R.string.free_space, Format.bytes(it))) } ?: f.path) },
                     folder,
                     Icons.Outlined.Folder,
                 ) { folder = it }
@@ -250,7 +251,7 @@ private fun AddSeriesSheet(api: SonarrApi, s: LookupSeries, onDismiss: () -> Uni
                                 }
                                 .onFailure {
                                     adding = false
-                                    Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show()
                                 }
                         }
                     }

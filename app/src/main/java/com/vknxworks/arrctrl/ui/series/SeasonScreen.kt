@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.series
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -127,7 +128,7 @@ fun SeasonScreen(serverId: String, seriesId: Int, season: Int) {
         scope.launch {
             runCatching { block() }
                 .onSuccess { Toast.makeText(context, msg, Toast.LENGTH_SHORT).show(); reload++ }
-                .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
         }
     }
 
@@ -313,7 +314,7 @@ private fun EpisodeSheet(
         scope.launch {
             runCatching { block() }
                 .onSuccess { Toast.makeText(context, msg, Toast.LENGTH_SHORT).show(); onChanged(); if (close) onDismiss() }
-                .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
         }
     }
 

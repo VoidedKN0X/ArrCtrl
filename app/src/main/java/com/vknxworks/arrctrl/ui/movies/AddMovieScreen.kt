@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.movies
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -146,7 +147,7 @@ fun AddMovieScreen(serverId: String) {
                             verticalArrangement = Arrangement.spacedBy(3.dp),
                         ) {
                             Text(
-                                m.year?.let { "${m.title} ($it)" } ?: m.title,
+                                m.year?.let { stringResource(R.string.title_year, m.title, it) } ?: m.title,
                                 style = MaterialTheme.typography.titleSmall,
                             )
                             val meta = listOfNotNull(
@@ -197,7 +198,7 @@ private fun AddMovieSheet(api: RadarrApi, m: LookupMovie, onDismiss: () -> Unit,
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
             Text(
-                m.year?.let { "${m.title} ($it)" } ?: m.title,
+                m.year?.let { context.getString(R.string.title_year, m.title, it) } ?: m.title,
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
             )
@@ -205,7 +206,7 @@ private fun AddMovieSheet(api: RadarrApi, m: LookupMovie, onDismiss: () -> Unit,
                 GroupChoice(stringResource(R.string.movie_quality_profile), profiles.map { it.id to it.name }, profileId, Icons.Outlined.HighQuality) { profileId = it }
                 GroupChoice(
                     stringResource(R.string.movie_root_folder),
-                    folders.map { f -> f.path to (f.freeSpace?.let { "${f.path} · " + context.getString(R.string.free_space, Format.bytes(it)) } ?: f.path) },
+                    folders.map { f -> f.path to (f.freeSpace?.let { context.getString(R.string.dot_pair, f.path, context.getString(R.string.free_space, Format.bytes(it))) } ?: f.path) },
                     folder,
                     Icons.Outlined.Folder,
                 ) { folder = it }
@@ -234,7 +235,7 @@ private fun AddMovieSheet(api: RadarrApi, m: LookupMovie, onDismiss: () -> Unit,
                             }
                             .onFailure {
                                 adding = false
-                                Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show()
                             }
                     }
                     }
