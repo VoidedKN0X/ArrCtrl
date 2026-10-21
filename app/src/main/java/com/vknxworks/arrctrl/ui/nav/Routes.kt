@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object MoreRoute
 
 // Pushed screens
-@Serializable data object AccountRoute
+@Serializable data object YouRoute
 @Serializable data object SettingsRoute
 @Serializable data object NotificationsRoute
 

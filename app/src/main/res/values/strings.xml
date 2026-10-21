@@ -5,7 +5,12 @@
     <!-- Common -->
     <string name="back">Back</string>
     <string name="selected">Selected</string>
-    <string name="account_and_settings">Account and settings</string>
+    <string name="you_title">You</string>
+    <string name="you_no_servers">No servers yet</string>
+    <plurals name="you_servers">
+        <item quantity="one">%1$d server</item>
+        <item quantity="other">%1$d servers</item>
+    </plurals>
     <string name="not_set_up">Not set up</string>
 
     <!-- Tabs -->

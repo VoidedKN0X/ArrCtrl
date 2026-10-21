@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
@@ -51,7 +52,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.vknxworks.arrctrl.R
-import com.vknxworks.arrctrl.ui.nav.AccountRoute
+import com.vknxworks.arrctrl.ui.nav.YouRoute
 import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.theme.Gutter
 
@@ -95,16 +96,16 @@ fun TabTitle(
     }
 }
 
-/** The profile picture; tapping it opens account and settings (there is no "You" tab). */
+/** The profile picture; tapping it opens the You page with servers, settings and About (there is no settings tab). */
 @Composable
 fun ProfileButton() {
     val nav = LocalNavigator.current
-    IconButton(onClick = { nav.navigate(AccountRoute) }) {
+    IconButton(onClick = { nav.navigate(YouRoute) }) {
         Box(
             Modifier.size(34.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(Icons.Filled.Tune, stringResource(R.string.account_and_settings), Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+            Icon(Icons.Filled.AccountCircle, stringResource(R.string.you_title), tint = MaterialTheme.colorScheme.primary)
         }
     }
 }

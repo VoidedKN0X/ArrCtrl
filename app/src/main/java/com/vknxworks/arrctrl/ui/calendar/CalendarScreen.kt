@@ -70,7 +70,7 @@ import com.vknxworks.arrctrl.ui.components.LocalBottomClearance
 import com.vknxworks.arrctrl.ui.components.MessageView
 import com.vknxworks.arrctrl.ui.components.ServerErrorCard
 import com.vknxworks.arrctrl.ui.components.TabTitle
-import com.vknxworks.arrctrl.ui.nav.AccountRoute
+import com.vknxworks.arrctrl.ui.nav.YouRoute
 import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.nav.MovieRoute
 import com.vknxworks.arrctrl.ui.nav.SeasonRoute
@@ -114,7 +114,7 @@ fun CalendarScreen() {
                 stringResource(R.string.empty_calendar_body),
                 Modifier.padding(bottom = LocalBottomClearance.current),
                 actionLabel = stringResource(R.string.add_server),
-                onAction = { nav.navigate(AccountRoute) },
+                onAction = { nav.navigate(YouRoute) },
             )
         }
         return

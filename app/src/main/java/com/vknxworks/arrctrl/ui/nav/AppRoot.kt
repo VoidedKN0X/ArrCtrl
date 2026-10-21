@@ -62,7 +62,7 @@ import com.vknxworks.arrctrl.ui.components.LocalBottomClearance
 import com.vknxworks.arrctrl.ui.components.LocalHazeState
 import com.vknxworks.arrctrl.ui.servers.ImportScreen
 import com.vknxworks.arrctrl.ui.servers.ServerEditScreen
-import com.vknxworks.arrctrl.ui.settings.AccountScreen
+import com.vknxworks.arrctrl.ui.settings.YouScreen
 import com.vknxworks.arrctrl.ui.settings.NotificationsScreen
 import com.vknxworks.arrctrl.ui.settings.SettingsScreen
 import com.vknxworks.arrctrl.ui.activity.ActivityScreen
@@ -229,7 +229,7 @@ private fun AppNavHost(navController: NavHostController) {
         composable<ActivityRoute> { ActivityScreen() }
         composable<MoreRoute> { MoreScreen() }
 
-        composable<AccountRoute> { AccountScreen() }
+        composable<YouRoute> { YouScreen() }
         composable<SettingsRoute> { SettingsScreen() }
         composable<ServerEditRoute> {
             val r = it.toRoute<ServerEditRoute>()
