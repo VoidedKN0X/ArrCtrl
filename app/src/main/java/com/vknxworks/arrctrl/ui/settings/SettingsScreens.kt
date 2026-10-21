@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.settings
 
+import com.vknxworks.arrctrl.ui.lock.AppLock
 import com.vknxworks.arrctrl.ui.nav.NotificationsRoute
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.foundation.background
@@ -26,7 +27,18 @@ import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Movie
-import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.outlined.Fingerprint
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Password
+import androidx.compose.material.icons.outlined.Timer
+import androidx.compose.material.icons.outlined.VisibilityOff
+import android.widget.Toast
+import com.vknxworks.arrctrl.data.lock.LockVault
+import com.vknxworks.arrctrl.data.settings.LockTimeout
+import com.vknxworks.arrctrl.ui.lock.PinRequest
+import com.vknxworks.arrctrl.ui.lock.findActivity
 import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
@@ -121,10 +133,10 @@ fun AccountScreen() {
             }
 
             Group(stringResource(R.string.group_about)) {
-                GroupRow(stringResource(R.string.support_title), stringResource(R.string.support_subtitle), Icons.Filled.Favorite, showChevron = true, onClick = { uri.openUri(SPONSORS_URL) })
-                GroupRow(stringResource(R.string.bugs_title), stringResource(R.string.bugs_subtitle), Icons.Filled.BugReport, showChevron = true, onClick = { uri.openUri(ISSUES_URL) })
-                GroupRow(stringResource(R.string.source_title), stringResource(R.string.source_subtitle), Icons.Filled.Code, showChevron = true, onClick = { uri.openUri(REPO_URL) })
-                GroupRow(stringResource(R.string.licence_title), stringResource(R.string.licence_subtitle), Icons.Filled.Gavel, showChevron = true, onClick = { uri.openUri(LICENCE_URL) })
+                GroupRow(stringResource(R.string.support_title), stringResource(R.string.support_subtitle), Icons.Filled.Favorite, showChevron = true, onClick = { AppLock.expectReturn(); uri.openUri(SPONSORS_URL) })
+                GroupRow(stringResource(R.string.bugs_title), stringResource(R.string.bugs_subtitle), Icons.Filled.BugReport, showChevron = true, onClick = { AppLock.expectReturn(); uri.openUri(ISSUES_URL) })
+                GroupRow(stringResource(R.string.source_title), stringResource(R.string.source_subtitle), Icons.Filled.Code, showChevron = true, onClick = { AppLock.expectReturn(); uri.openUri(REPO_URL) })
+                GroupRow(stringResource(R.string.licence_title), stringResource(R.string.licence_subtitle), Icons.Filled.Gavel, showChevron = true, onClick = { AppLock.expectReturn(); uri.openUri(LICENCE_URL) })
             }
 
             Text(
@@ -208,14 +220,85 @@ fun SettingsScreen() {
                     stringResource(R.string.theme),
                     ThemeChoice.entries.map { it to stringResource(it.label) },
                     s.theme,
-                    Icons.Outlined.Palette,
+                    Icons.Filled.DarkMode,
                 ) { v -> update { it.copy(theme = v) } }
                 GroupSwitch(
                     stringResource(R.string.dynamic_colour),
                     stringResource(R.string.dynamic_colour_subtitle),
                     checked = s.dynamicColor,
+                    icon = Icons.Filled.Palette,
                 ) { v -> update { it.copy(dynamicColor = v) } }
             }
+            PrivacyAndSecurityGroup(s)
         }
+    }
+}
+
+/** Privacy and security: the shared Ctrl series app lock, then hiding ArrCtrl in screenshots. */
+@Composable
+private fun PrivacyAndSecurityGroup(s: AppSettings) {
+    val context = LocalContext.current
+    val c = context.container
+    val bioAvailable = remember { AppLock.biometricAvailable(context) }
+    val lockOn = c.vault.enabled
+    val background = s.notifyEnabled || s.pushEnabled
+    Group(
+        stringResource(R.string.group_privacy),
+        footer = stringResource(if (lockOn && background) R.string.app_lock_footer_background else R.string.app_lock_footer),
+    ) {
+        GroupSwitch(
+            stringResource(R.string.app_lock),
+            stringResource(R.string.app_lock_subtitle),
+            checked = lockOn,
+            icon = Icons.Outlined.Lock,
+        ) { on -> AppLock.request = if (on) PinRequest.ENABLE else PinRequest.DISABLE }
+        if (lockOn) {
+            GroupRow(
+                stringResource(R.string.lock_change_pin),
+                stringResource(R.string.lock_change_pin_subtitle, LockVault.PIN_MIN),
+                icon = Icons.Outlined.Password,
+                showChevron = true,
+                onClick = { AppLock.request = PinRequest.CHANGE },
+            )
+            GroupSwitch(
+                stringResource(R.string.lock_fingerprint),
+                stringResource(if (bioAvailable || c.vault.biometricEnabled) R.string.lock_fingerprint_subtitle else R.string.lock_fingerprint_unavailable),
+                checked = c.vault.biometricEnabled,
+                icon = Icons.Outlined.Fingerprint,
+            ) { on ->
+                if (!on) {
+                    c.vault.disableBiometric()
+                } else if (bioAvailable) {
+                    val activity = context.findActivity()
+                    val cipher = c.vault.biometricEnrolCipher()
+                    if (activity == null || cipher == null) {
+                        Toast.makeText(context, context.getString(R.string.lock_fingerprint_setup_failed), Toast.LENGTH_SHORT).show()
+                    } else {
+                        AppLock.biometricPrompt(
+                            activity,
+                            context.getString(R.string.lock_fingerprint_enable_title),
+                            context.getString(R.string.lock_fingerprint_enable_subtitle),
+                            cipher,
+                        ) { unlocked ->
+                            if (!c.vault.finishBiometricEnrol(unlocked)) {
+                                Toast.makeText(context, context.getString(R.string.lock_fingerprint_setup_failed), Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+            }
+            GroupChoice(
+                stringResource(R.string.lock_again),
+                LockTimeout.entries.map { it to stringResource(it.label) },
+                s.lockTimeout,
+                Icons.Outlined.Timer,
+            ) { t -> c.appScope.launch { c.settings.update { it.copy(lockTimeout = t) } } }
+        }
+        GroupSwitch(
+            stringResource(R.string.hide_content),
+            stringResource(R.string.hide_content_subtitle),
+            checked = s.hideContent,
+            icon = Icons.Outlined.VisibilityOff,
+        ) { on -> c.appScope.launch { c.settings.update { it.copy(hideContent = on) } } }
     }
 }

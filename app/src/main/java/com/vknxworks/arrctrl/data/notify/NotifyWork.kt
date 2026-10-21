@@ -31,6 +31,8 @@ import kotlin.coroutines.cancellation.CancellationException
 class CheckWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val c = applicationContext.container
+        // Sealed with the app lock and ArrCtrl is locked: nothing can sign in until it's unlocked.
+        if (c.backgroundBlocked()) return Result.success()
         // A push usually arrives the moment Radarr or Sonarr acts; give it a moment to write its history.
         if (inputData.getBoolean(KEY_PUSH, false)) delay(3_000)
         try {
@@ -54,7 +56,7 @@ class OngoingWorker(context: Context, params: WorkerParameters) : CoroutineWorke
     override suspend fun doWork(): Result {
         val c = applicationContext.container
         val s = c.settings.current()
-        if (!s.notifyEnabled || !s.notifyOngoing) {
+        if (!s.notifyEnabled || !s.notifyOngoing || c.backgroundBlocked()) {
             Notifications.cancelOngoing(applicationContext)
             return Result.success()
         }

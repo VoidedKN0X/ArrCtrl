@@ -4,6 +4,34 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.2.0 (2026-10-21)
+
+The app lock: the same one as in every other Ctrl app, with its own PIN, optional fingerprint unlock and your API keys and passwords sealed while ArrCtrl is locked.
+
+### New
+
+- **App lock** (**Account › Settings › Privacy and security › App lock**, off until you turn it on). ArrCtrl asks for its own app PIN when you open it. The PIN needs at least 6 digits and is separate from your phone's; very obvious ones like 111111 or 123456 are refused. You choose it twice when turning the lock on
+- **Unlock with fingerprint** (optional): only strong biometrics such as your fingerprint, not face unlock that only uses the camera, which a photo can sometimes fool. The PIN is still needed after the phone restarts and at least every 72 hours, the same as Android does for your screen lock
+- **Lock again**: as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Picking a `.torrent` file, opening JellyCtrl or SeerrCtrl, a help link, ntfy, the share sheet or Android's notification and battery settings from ArrCtrl doesn't count as leaving, unless you stay away longer than 5 minutes
+- **Change app PIN** asks for your current PIN first, and turning the app lock off asks for the PIN too
+- **Forgot PIN?** on the lock screen removes your servers with their API keys and passwords, and what the widgets and notifications remembered, so you can add them again. Nothing changes on your servers
+- **Hide in screenshots and recent apps** (Settings › Privacy and security, off by default): blocks screenshots and screen recordings everywhere in ArrCtrl. The server and import screens still always block them, and ArrCtrl's preview in recent apps stays blank as before
+
+### Changed
+
+- **Settings** now has a **Privacy and security** group under Appearance, the same as in the other Ctrl apps, and the Settings row on the Account page says "Appearance, privacy and app lock"
+- **"Use wallpaper colours" is now "Dynamic colour"** ("Use colours from your wallpaper"), and the Theme and Dynamic colour rows have icons, like in the other Ctrl apps
+- **Notifications with the app lock on:** background checks and instant notifications need to sign in while ArrCtrl is locked, so with notifications on your API keys and passwords stay encrypted with the Android Keystore only, as without the app lock, and notifications, widgets and the Alt. speed tile keep working. The Privacy and security group says so while it applies. Turn notifications off to keep the keys sealed with your PIN too
+- **Widgets and the tile while locked (notifications off):** the widgets keep showing what they last loaded, and the Alt. speed tile shows "ArrCtrl is locked" and opens ArrCtrl when tapped. Both refresh again once you unlock
+- **README**: new App lock section, and AdCtrl and MemoCtrl added to the Ctrl series table
+
+### Security
+
+- **Your API keys and passwords are sealed while ArrCtrl is locked** (with notifications off). They're also encrypted with a key that only exists in memory while ArrCtrl is unlocked and is wiped the moment it locks, together with qBittorrent's sign-in sessions. A locked ArrCtrl, or a copy of its files, can't sign in to your servers. While locked, none of ArrCtrl's screens are kept, so nothing can be read from them
+- **The PIN can't be guessed off the phone.** It's never stored. It's stretched with 600,000 rounds of PBKDF2 and mixed with a secret held in the phone's secure hardware (StrongBox where available), so copying ArrCtrl's files to a computer isn't enough to try PINs there
+- **Wrong PINs lock the screen**: after 5 tries you wait 30 seconds, doubling with every further 5 wrong tries up to 15 minutes. Restarting the app or the phone, or changing the clock, doesn't reset the wait
+- **Fingerprint unlock can't be faked**: the fingerprint has to unlock a key in the phone's secure hardware, so a tampered "success" on a rooted phone doesn't open the app. Adding a new fingerprint turns fingerprint unlock off until you turn it on again with your PIN
+
 ## v1.1.1 (2026-10-20)
 
 ### Changed

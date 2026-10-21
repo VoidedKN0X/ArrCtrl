@@ -28,7 +28,8 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Play in JellyCtrl** and **Open in SeerrCtrl** buttons when those apps are installed (for now they open the app)
 - **Light, dark or pure black**, in ArrCtrl's amber or your wallpaper colours
 - **Self-signed certificates** trusted per server, by fingerprint
-- **API keys and passwords are encrypted** on your phone with the Android Keystore; the server and import screens block screenshots, and ArrCtrl's preview is blank in recent apps
+- **App lock** with its own PIN and optional fingerprint unlock; your API keys and passwords stay encrypted while the app is locked
+- **API keys and passwords are encrypted** on your phone with the Android Keystore; the server and import screens block screenshots, and ArrCtrl's preview is blank in recent apps. **Hide in screenshots and recent apps** blocks screenshots everywhere in the app
 
 ## Screenshots
 
@@ -142,6 +143,19 @@ Long-press your home screen → Widgets → ArrCtrl. Both refresh every 30 minut
 
 The **Alt. speed** tile (pull down Quick Settings → edit → drag it in) turns qBittorrent's alternative speed limits on or off for all your qBittorrent servers, like the button on the Torrents tab. Long-press it to open the Torrents tab.
 
+## App lock
+
+Turn it on under **Account › Settings › Privacy and security › App lock** (it's off until you do).
+
+- **Its own PIN**, at least 6 digits and separate from your phone's; very obvious ones like 111111 or 123456 are refused. The PIN is never stored: it's stretched with 600,000 rounds of PBKDF2 and mixed with a secret held in the phone's secure hardware, so copying ArrCtrl's files off the phone isn't enough to guess it.
+- **Unlock with fingerprint** (optional): only strong biometrics such as your fingerprint, checked by the phone's secure hardware. Adding a new fingerprint turns it off until you turn it on again with your PIN. The PIN is still needed after the phone restarts and at least every 72 hours.
+- **Wrong PINs make you wait**: 30 seconds after 5 tries, doubling up to 15 minutes. Restarting the app or the phone, or changing the clock, doesn't skip the wait.
+- **Lock again**: as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Trips ArrCtrl starts itself (a file picker, your browser, the share sheet, Android settings) don't count as leaving, unless you stay away longer than 5 minutes.
+- **Your API keys and passwords are sealed while locked** (unless notifications are on, see below). They're encrypted with a key that only exists in memory while ArrCtrl is unlocked and is wiped the moment it locks, so a locked ArrCtrl, or a copy of its files, can't sign in to your servers. While ArrCtrl is locked, nothing of it is shown, not even in recent apps.
+- **Notifications and the app lock:** background checks and instant notifications need to sign in while ArrCtrl is locked. With notifications on, your API keys and passwords stay encrypted with the Android Keystore only, as without the app lock, and notifications, widgets and the tile keep working. Turn notifications off to keep them sealed with your PIN too; widgets then keep showing what they last loaded and the tile opens ArrCtrl, until you unlock.
+- **Forgot your PIN?** The lock screen can remove your servers with their API keys and passwords so you can add them again. Nothing changes on your servers.
+- **Change app PIN** asks for your current PIN first, and so does turning the lock off.
+
 ## Privacy
 
 **Telemetry-free.** ArrCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the servers you add.
@@ -178,6 +192,7 @@ Native Android apps for self-hosted services and everyday tools, all with the sa
 
 | App | What it's for |
 | --- | --- |
+| [AdCtrl](https://github.com/VoidedKN0X/AdCtrl) | Control your AdGuard Home DNS server |
 | **ArrCtrl** (this app) | Radarr, Sonarr, Prowlarr, Bazarr, qBittorrent, autobrr and Cleanuparr in one app |
 | [BeamCtrl](https://github.com/VoidedKN0X/BeamCtrl) | TV remote for phones with an IR blaster |
 | [CraftyCtrl](https://github.com/VoidedKN0X/CraftyCtrl) | Manage Minecraft servers on Crafty Controller |
@@ -186,6 +201,7 @@ Native Android apps for self-hosted services and everyday tools, all with the sa
 | [FrigateCtrl](https://github.com/VoidedKN0X/FrigateCtrl) | Watch and review your Frigate NVR cameras |
 | [ImmichCtrl](https://github.com/VoidedKN0X/ImmichCtrl) | Photos and backup for your Immich server |
 | [JellyCtrl](https://github.com/VoidedKN0X/JellyCtrl) | Movies, shows, music and Live TV from Jellyfin |
+| [MemoCtrl](https://github.com/VoidedKN0X/MemoCtrl) | Notes on your Memos server |
 | [NaviCtrl](https://github.com/VoidedKN0X/NaviCtrl) | Music player for Navidrome servers |
 | [PaperCtrl](https://github.com/VoidedKN0X/PaperCtrl) | Scan and browse documents on Paperless-ngx |
 | [PrintCtrl](https://github.com/VoidedKN0X/PrintCtrl) | Bambu Lab printers through Bambuddy, and Spoolman spools |

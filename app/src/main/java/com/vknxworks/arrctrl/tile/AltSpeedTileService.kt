@@ -87,6 +87,10 @@ class AltSpeedTileService : TileService() {
         super.onStartListening()
         job?.cancel()
         job = scope.launch {
+            if (applicationContext.container.backgroundBlocked()) {
+                renderLocked()
+                return@launch
+            }
             val servers = qbits()
             render(servers, null)
             render(servers, states(servers))
@@ -97,6 +101,11 @@ class AltSpeedTileService : TileService() {
         super.onClick()
         job?.cancel()
         job = scope.launch {
+            // The app lock sealed the logins and ArrCtrl is locked: open it, to its lock screen.
+            if (applicationContext.container.backgroundBlocked()) {
+                openApp()
+                return@launch
+            }
             val servers = qbits()
             if (servers.isEmpty()) {
                 openApp()
@@ -119,7 +128,15 @@ class AltSpeedTileService : TileService() {
         }
     }
 
-    /** No qBittorrent server yet: open ArrCtrl so one can be added. */
+    private fun renderLocked() {
+        val tile = qsTile ?: return
+        tile.label = getString(R.string.tile_alt_speed)
+        tile.state = Tile.STATE_INACTIVE
+        tile.subtitle = getString(R.string.tile_locked)
+        tile.updateTile()
+    }
+
+    /** No qBittorrent server yet, or ArrCtrl is locked: open ArrCtrl. */
     private fun openApp() {
         val intent = Intent(this, MainActivity::class.java)
             .setAction(Intent.ACTION_VIEW)

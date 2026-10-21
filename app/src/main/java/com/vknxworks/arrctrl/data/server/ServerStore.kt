@@ -3,19 +3,24 @@ package com.vknxworks.arrctrl.data.server
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.vknxworks.arrctrl.data.lock.LockVault
 import com.vknxworks.arrctrl.data.settings.appDataStore
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 
-/** On-disk form of a [Server]. API key and password are AES-GCM encrypted with a Keystore key. */
+/**
+ * On-disk form of a [Server]. API key and password are AES-GCM encrypted with a Keystore key, and with
+ * the app lock on (and notifications off) also sealed with the lock's vault key first.
+ */
 @Serializable
 private data class StoredServer(
     val id: String,
@@ -28,15 +33,56 @@ private data class StoredServer(
     val certSha256: String = "",
 )
 
-/** All configured servers, in the order they were added. */
-class ServerStore(private val context: Context, scope: CoroutineScope) {
+/**
+ * All configured servers, in the order they were added. While the app lock is locked, sealed API keys
+ * and passwords read as empty: they can only be decrypted again after unlocking.
+ */
+class ServerStore(private val context: Context, scope: CoroutineScope, private val vault: LockVault) {
     private val key = stringPreferencesKey("servers_v1")
     private val json = Json { ignoreUnknownKeys = true; explicitNulls = false }
     private val serializer = ListSerializer(StoredServer.serializer())
 
-    val servers: StateFlow<List<Server>> = context.appDataStore.data
-        .map { decode(it[key]) }
-        .stateIn(scope, SharingStarted.Eagerly, emptyList())
+    /** Whether secrets are sealed with the app lock's vault key when they're saved (set by AppContainer). */
+    @Volatile
+    var sealPolicy: suspend () -> Boolean = { false }
+
+    @Volatile private var lastRaw: String? = null
+    private val _servers = MutableStateFlow<List<Server>>(emptyList())
+    val servers: StateFlow<List<Server>> = _servers.asStateFlow()
+
+    init {
+        scope.launch {
+            context.appDataStore.data.map { it[key] }.distinctUntilChanged().collect { raw ->
+                lastRaw = raw
+                _servers.value = decode(raw)
+            }
+        }
+    }
+
+    /** Decodes the servers again: after unlocking (sealed secrets can be read) or locking (they can't). */
+    fun reload() {
+        _servers.value = decode(lastRaw)
+    }
+
+    /** Whether any saved secret is sealed with the app lock, so it can't be read while locked. */
+    suspend fun anySealed(): Boolean {
+        val raw = context.appDataStore.data.first()[key] ?: return false
+        return hasSealed(raw)
+    }
+
+    private fun hasSealed(raw: String): Boolean =
+        runCatching { json.decodeFromString(serializer, raw) }.getOrDefault(emptyList())
+            .any { s -> listOf(s.apiKeyEnc, s.passwordEnc).any { LockVault.isSealed(KeystoreCrypto.decrypt(it)) } }
+
+    /** Seals or unseals every saved secret to match [sealPolicy]. Only while unlocked. */
+    suspend fun applySealing() = edit { it }
+
+    /** Removes every server and its secrets ("Forgot PIN?"). */
+    suspend fun removeAll() {
+        context.appDataStore.edit { it.remove(key) }
+        lastRaw = null
+        _servers.value = emptyList()
+    }
 
     /** Reads the stored list directly; for background work, where [servers] may not have loaded yet. */
     suspend fun current(): List<Server> = decode(context.appDataStore.data.first()[key])
@@ -67,9 +113,12 @@ class ServerStore(private val context: Context, scope: CoroutineScope) {
     }
 
     private suspend fun edit(transform: (List<Server>) -> List<Server>) {
+        val seal = sealPolicy()
         context.appDataStore.edit { p ->
+            // Saving while locked would write the sealed secrets back empty.
+            check(vault.isOpen || p[key]?.let(::hasSealed) != true) { "ArrCtrl is locked" }
             val next = transform(decode(p[key]))
-            p[key] = encode(next)
+            p[key] = encode(next, seal)
         }
     }
 
@@ -83,15 +132,15 @@ class ServerStore(private val context: Context, scope: CoroutineScope) {
                 type = type,
                 name = s.name,
                 url = s.url,
-                apiKey = KeystoreCrypto.decrypt(s.apiKeyEnc),
+                apiKey = open(KeystoreCrypto.decrypt(s.apiKeyEnc)),
                 username = s.username,
-                password = KeystoreCrypto.decrypt(s.passwordEnc),
+                password = open(KeystoreCrypto.decrypt(s.passwordEnc)),
                 certSha256 = s.certSha256,
             )
         }
     }
 
-    private fun encode(list: List<Server>): String = json.encodeToString(
+    private fun encode(list: List<Server>, seal: Boolean): String = json.encodeToString(
         serializer,
         list.map { s ->
             StoredServer(
@@ -99,11 +148,16 @@ class ServerStore(private val context: Context, scope: CoroutineScope) {
                 type = s.type.id,
                 name = s.name,
                 url = s.url,
-                apiKeyEnc = KeystoreCrypto.encrypt(s.apiKey),
+                apiKeyEnc = KeystoreCrypto.encrypt(sealIf(s.apiKey, seal)),
                 username = s.username,
-                passwordEnc = KeystoreCrypto.encrypt(s.password),
+                passwordEnc = KeystoreCrypto.encrypt(sealIf(s.password, seal)),
                 certSha256 = s.certSha256,
             )
         },
     )
+
+    /** Empty while the secret is sealed and the app is locked. */
+    private fun open(plain: String): String = if (LockVault.isSealed(plain)) vault.open(plain).orEmpty() else plain
+
+    private fun sealIf(plain: String, on: Boolean): String = if (plain.isNotEmpty() && on) vault.seal(plain) ?: plain else plain
 }

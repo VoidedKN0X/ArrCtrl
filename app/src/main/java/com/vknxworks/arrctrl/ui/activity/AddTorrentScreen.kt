@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import com.vknxworks.arrctrl.ui.lock.AppLock
 import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
@@ -209,7 +210,7 @@ fun AddTorrentScreen(initialLink: String?, initialFile: String?) {
                         modifier = Modifier.fillMaxWidth().heightIn(min = 96.dp),
                     )
                     OutlinedButton(
-                        onClick = { picker.launch(arrayOf("application/x-bittorrent", "application/octet-stream")) },
+                        onClick = { AppLock.expectReturn(); picker.launch(arrayOf("application/x-bittorrent", "application/octet-stream")) },
                         shape = CircleShape,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
