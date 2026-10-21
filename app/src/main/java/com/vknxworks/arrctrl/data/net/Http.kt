@@ -36,6 +36,9 @@ class Http {
     /** Client for a draft (connection test before saving): a fresh session every time. */
     fun draftClient(server: Server): OkHttpClient = build(server, SessionJar(server.httpUrl))
 
+    /** Forgets every qBittorrent session (the app locked, or every server was removed). */
+    fun forgetAll() = jars.clear()
+
     /** Forgets a server's qBittorrent session, e.g. after its password changed or it was removed. */
     fun forget(server: Server) {
         jars.keys.filter { it.startsWith(server.id + "|") }.forEach { jars.remove(it) }

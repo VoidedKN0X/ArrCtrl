@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.common
 
+import com.vknxworks.arrctrl.ui.lock.AppLock
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -39,10 +40,10 @@ object CtrlApps {
         if (link != null) {
             val view = Intent(Intent.ACTION_VIEW, link).setPackage(pkg).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             if (view.resolveActivity(context.packageManager) != null) {
-                return runCatching { context.startActivity(view) }.isSuccess
+                return runCatching { AppLock.expectReturn(); context.startActivity(view) }.isSuccess
             }
         }
         val launch = context.packageManager.getLaunchIntentForPackage(pkg)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) ?: return false
-        return runCatching { context.startActivity(launch) }.isSuccess
+        return runCatching { AppLock.expectReturn(); context.startActivity(launch) }.isSuccess
     }
 }

@@ -168,7 +168,8 @@ class WidgetWorker(context: Context, params: WorkerParameters) : CoroutineWorker
             Widgets.cancelPeriodic(ctx)
             return Result.success()
         }
-        val snapshot = try {
+        // With the app lock sealing the API keys and ArrCtrl locked, the widgets keep their last data.
+        val snapshot = if (ctx.container.backgroundBlocked()) null else try {
             WidgetStore.fetch(ctx)
         } catch (e: CancellationException) {
             throw e

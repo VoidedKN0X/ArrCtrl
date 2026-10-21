@@ -291,21 +291,26 @@ fun MessageView(
 // ---------- Privacy ----------
 
 /**
+ * Screens that always get FLAG_SECURE, whatever "Hide in screenshots and recent apps" says (MainActivity
+ * applies it). A count rather than a flag, so two such screens overlapping during a transition can't
+ * clear it early.
+ */
+object ScreenPrivacy {
+    var forced by androidx.compose.runtime.mutableIntStateOf(0)
+        private set
+
+    internal fun acquire() { forced++ }
+    internal fun release() { forced = (forced - 1).coerceAtLeast(0) }
+}
+
+/**
  * Blocks screenshots, screen recording and casting while it's on screen. For screens that show API keys,
  * passwords or pasted server settings.
  */
 @Composable
 fun SecureWindow() {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    androidx.compose.runtime.DisposableEffect(context) {
-        val window = context.findActivity()?.window
-        window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
-        onDispose { window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE) }
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        ScreenPrivacy.acquire()
+        onDispose { ScreenPrivacy.release() }
     }
-}
-
-private tailrec fun android.content.Context.findActivity(): android.app.Activity? = when (this) {
-    is android.app.Activity -> this
-    is android.content.ContextWrapper -> baseContext.findActivity()
-    else -> null
 }

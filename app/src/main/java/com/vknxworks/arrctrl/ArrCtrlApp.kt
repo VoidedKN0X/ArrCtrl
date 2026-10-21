@@ -1,6 +1,10 @@
 package com.vknxworks.arrctrl
 
 import android.app.Application
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
+import com.vknxworks.arrctrl.ui.lock.AppLock
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
@@ -21,6 +25,16 @@ class ArrCtrlApp : Application(), SingletonImageLoader.Factory {
         super.onCreate()
         container = AppContainer(this)
         Notifications.ensureChannels(this)
+        // The app lock: locks after the chosen time away ("Lock again").
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                AppLock.onForeground(container.vault.enabled, container.settings.settings.value.lockTimeout.millis)
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                AppLock.onBackground(container.vault.enabled, container.settings.settings.value.lockTimeout.millis)
+            }
+        })
         // Widgets on the home screen: make sure their refresh is scheduled, and freshen them when the app starts.
         container.appScope.launch {
             if (Widgets.anyPlaced(this@ArrCtrlApp)) {

@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.more
 
+import com.vknxworks.arrctrl.ui.lock.AppLock
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.clickable
@@ -216,7 +217,7 @@ fun HealthScreen() {
                                     Modifier.fillMaxWidth().then(
                                         // Only real web links: the address comes from the server, so no other schemes or apps.
                                         if (p.wikiUrl != null && Regex("^https?://", RegexOption.IGNORE_CASE).containsMatchIn(p.wikiUrl)) Modifier.clickable {
-                                            runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(p.wikiUrl)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+                                            runCatching { AppLock.expectReturn(); context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(p.wikiUrl)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
                                         } else Modifier,
                                     ),
                                     verticalAlignment = Alignment.Top,

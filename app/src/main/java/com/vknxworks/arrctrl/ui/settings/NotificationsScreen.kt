@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.settings
 
+import com.vknxworks.arrctrl.ui.lock.AppLock
 import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -176,7 +177,7 @@ fun NotificationsScreen() {
                         iconTint = MaterialTheme.colorScheme.error,
                         showChevron = true,
                         onClick = {
-                            context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName))
+                            AppLock.expectReturn(); context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName))
                         },
                     )
                 }
@@ -240,6 +241,7 @@ fun NotificationsScreen() {
                         showChevron = !battery,
                         onClick = if (battery) null else ({
                             val ask = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:${context.packageName}"))
+                            AppLock.expectReturn()
                             runCatching { context.startActivity(ask) }
                                 .onFailure { runCatching { context.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) } }
                         }),
@@ -250,7 +252,7 @@ fun NotificationsScreen() {
                         Icons.Outlined.Settings,
                         showChevron = true,
                         onClick = {
-                            context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}")))
+                            AppLock.expectReturn(); context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}")))
                         },
                     )
                 }
@@ -306,7 +308,7 @@ private fun PushRows(s: AppSettings, tick: Int, update: ((AppSettings) -> AppSet
             iconTint = MaterialTheme.colorScheme.error,
             trailing = {
                 FilledTonalButton(onClick = {
-                    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(UnifiedPush.NTFY_DOWNLOAD))) }
+                    runCatching { AppLock.expectReturn(); context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(UnifiedPush.NTFY_DOWNLOAD))) }
                 }) { Text(stringResource(R.string.notify_ntfy_install)) }
             },
         )
@@ -318,7 +320,7 @@ private fun PushRows(s: AppSettings, tick: Int, update: ((AppSettings) -> AppSet
             iconTint = MaterialTheme.colorScheme.error,
             showChevron = true,
             onClick = {
-                runCatching { context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${UnifiedPush.NTFY}"))) }
+                runCatching { AppLock.expectReturn(); context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${UnifiedPush.NTFY}"))) }
             },
         )
     }
@@ -332,7 +334,7 @@ private fun PushRows(s: AppSettings, tick: Int, update: ((AppSettings) -> AppSet
             onClick = { copy(context, "ArrCtrl", endpoint) },
             trailing = {
                 IconButton(onClick = {
-                    context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, endpoint), share))
+                    AppLock.expectReturn(); context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, endpoint), share))
                 }) { Icon(Icons.Outlined.Share, share) }
             },
         )

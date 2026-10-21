@@ -28,6 +28,16 @@ enum class ThemeChoice(@StringRes val label: Int) {
     BLACK(R.string.theme_black),
 }
 
+/** How long ArrCtrl can be in the background before the app lock asks again (-1: only after a restart). */
+enum class LockTimeout(@StringRes val label: Int, val millis: Long) {
+    IMMEDIATELY(R.string.lock_again_immediately, 0L),
+    MINUTE_1(R.string.lock_again_1m, 60_000L),
+    MINUTES_5(R.string.lock_again_5m, 5 * 60_000L),
+    MINUTES_15(R.string.lock_again_15m, 15 * 60_000L),
+    HOUR_1(R.string.lock_again_1h, 60 * 60_000L),
+    RESTART(R.string.lock_again_restart, -1L),
+}
+
 data class AppSettings(
     val theme: ThemeChoice = ThemeChoice.SYSTEM,
     /** Wallpaper (Material You) colours instead of ArrCtrl's amber. */
@@ -62,6 +72,10 @@ data class AppSettings(
     val pushEnabled: Boolean = false,
     /** The push address (on your ntfy server) your servers post to; given by ntfy. */
     val pushEndpoint: String? = null,
+    /** App lock: when it asks again after ArrCtrl was in the background. */
+    val lockTimeout: LockTimeout = LockTimeout.IMMEDIATELY,
+    /** FLAG_SECURE on the whole app: blank screenshots, screen recordings and Recents card. */
+    val hideContent: Boolean = false,
 )
 
 /** Events notified out of the box; see NotifyEvent. */
@@ -88,6 +102,8 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         val notifyOngoing = booleanPreferencesKey("notify_ongoing")
         val push = booleanPreferencesKey("push_enabled")
         val pushEndpoint = stringPreferencesKey("push_endpoint")
+        val lockTimeout = stringPreferencesKey("lock_timeout")
+        val hideContent = booleanPreferencesKey("hide_content")
     }
 
     init {
@@ -126,6 +142,8 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         notifyOngoing = this[K.notifyOngoing] ?: false,
         pushEnabled = this[K.push] ?: false,
         pushEndpoint = this[K.pushEndpoint],
+        lockTimeout = enumOr(this[K.lockTimeout], LockTimeout.IMMEDIATELY),
+        hideContent = this[K.hideContent] ?: false,
     )
 
     /** Every stored change, without the placeholder value [settings] starts with. */
@@ -156,6 +174,8 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             p[K.notifyOngoing] = s.notifyOngoing
             p[K.push] = s.pushEnabled
             if (s.pushEndpoint != null) p[K.pushEndpoint] = s.pushEndpoint else p.remove(K.pushEndpoint)
+            p[K.lockTimeout] = s.lockTimeout.name
+            p[K.hideContent] = s.hideContent
         }
     }
 
