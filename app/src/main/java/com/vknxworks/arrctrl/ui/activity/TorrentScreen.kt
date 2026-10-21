@@ -169,8 +169,12 @@ fun TorrentScreen(serverId: String, hash: String) {
                     style = MaterialTheme.typography.labelLarge,
                 )
                 Text(
-                    "↓ ${Format.speed(cur.dlSpeed)}  ↑ ${Format.speed(cur.upSpeed)}  " +
+                    stringResource(
+                        R.string.torrent_speeds_and,
+                        Format.speed(cur.dlSpeed),
+                        Format.speed(cur.upSpeed),
                         stringResource(R.string.torrent_ratio_peers, Format.ratio(cur.ratio), cur.seeds, cur.seedsTotal, cur.peers, cur.peersTotal),
+                    ),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -326,7 +330,7 @@ private fun PeersTab(peers: List<Peer>?) {
                     )
                 }
                 Text(
-                    "↓ ${Format.speed(p.dlSpeed)}\n↑ ${Format.speed(p.upSpeed)}",
+                    stringResource(R.string.torrent_speeds_lines, Format.speed(p.dlSpeed), Format.speed(p.upSpeed)),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

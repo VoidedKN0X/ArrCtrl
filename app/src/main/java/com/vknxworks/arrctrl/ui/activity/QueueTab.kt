@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.activity
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -220,7 +221,7 @@ private fun QueueSheet(q: QueueItem, model: ActivityModel, onDismiss: () -> Unit
                                 onDismiss()
                                 runCatching { model.refreshQueue() }
                             }
-                            .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                            .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                     }
                 }) { Text(stringResource(R.string.remove)) }
             },

@@ -71,7 +71,7 @@ private class AuthInterceptor(private val server: Server) : Interceptor {
         val base = server.httpUrl ?: return chain.proceed(req)
         if (!sameServer(base, req.url)) {
             if (req.method != "GET" && req.method != "HEAD") {
-                throw IOException("The server redirected to another address; nothing was sent there")
+                throw RedirectBlockedException()
             }
             return chain.proceed(req)
         }
@@ -110,3 +110,6 @@ private class SessionJar(private val base: HttpUrl?) : CookieJar {
         return cookies.values.filter { it.matches(url) }
     }
 }
+
+/** A change was redirected to another address; it was stopped before anything was sent there. */
+class RedirectBlockedException : IOException("redirect to another host blocked")

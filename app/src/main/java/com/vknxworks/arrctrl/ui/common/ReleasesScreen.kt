@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.common
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -67,13 +68,14 @@ private enum class ReleaseSort(val label: Int) {
 }
 
 /** "3h", "5d", "2y": a release's age at a glance. */
+@Composable
 fun releaseAge(hours: Double?): String? {
     val h = hours ?: return null
     return when {
-        h < 1 -> "<1h"
-        h < 48 -> "${h.toInt()}h"
-        h < 24 * 365 -> "${(h / 24).toInt()}d"
-        else -> "${(h / (24 * 365)).toInt()}y"
+        h < 1 -> stringResource(R.string.age_under_hour)
+        h < 48 -> stringResource(R.string.age_hours, h.toInt())
+        h < 24 * 365 -> stringResource(R.string.age_days, (h / 24).toInt())
+        else -> stringResource(R.string.age_years, (h / (24 * 365)).toInt())
     }
 }
 
@@ -107,7 +109,7 @@ fun ReleasesScreen(title: String, type: ServiceType, load: suspend () -> List<Re
                     grabbed = grabbed + r.guid
                     Toast.makeText(context, sentText, Toast.LENGTH_SHORT).show()
                 }
-                .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
         }
     }
 

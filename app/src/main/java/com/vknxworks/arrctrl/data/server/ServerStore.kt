@@ -116,7 +116,7 @@ class ServerStore(private val context: Context, scope: CoroutineScope, private v
         val seal = sealPolicy()
         context.appDataStore.edit { p ->
             // Saving while locked would write the sealed secrets back empty.
-            check(vault.isOpen || p[key]?.let(::hasSealed) != true) { "ArrCtrl is locked" }
+            if (!vault.isOpen && p[key]?.let(::hasSealed) == true) throw LockedException()
             val next = transform(decode(p[key]))
             p[key] = encode(next, seal)
         }
@@ -161,3 +161,6 @@ class ServerStore(private val context: Context, scope: CoroutineScope, private v
 
     private fun sealIf(plain: String, on: Boolean): String = if (plain.isNotEmpty() && on) vault.seal(plain) ?: plain else plain
 }
+
+/** Saving was refused because the secrets are sealed and ArrCtrl is locked (it would write them back empty). */
+class LockedException : IllegalStateException("locked")

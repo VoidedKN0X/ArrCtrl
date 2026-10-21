@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.series
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
@@ -378,7 +379,7 @@ private fun SelectionActionDialog(action: SelectionAction, model: SeriesModel, o
         scope.launch {
             runCatching { block() }
                 .onSuccess { onDone(doneText) }
-                .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show(); onDismiss() }
+                .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show(); onDismiss() }
         }
     }
 

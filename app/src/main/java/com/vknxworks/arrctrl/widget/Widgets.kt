@@ -128,7 +128,7 @@ private fun dayLabel(context: Context, iso: String): String {
     return when (day) {
         today -> context.getString(R.string.calendar_today)
         today.plusDays(1) -> context.getString(R.string.calendar_tomorrow)
-        else -> day.format(DateTimeFormatter.ofPattern("EEEE d MMM"))
+        else -> day.format(DateTimeFormatter.ofPattern(android.text.format.DateFormat.getBestDateTimePattern(java.util.Locale.getDefault(), "EEEEdMMM")))
     }
 }
 

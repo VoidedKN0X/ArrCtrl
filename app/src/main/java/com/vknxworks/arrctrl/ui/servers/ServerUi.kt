@@ -2,6 +2,10 @@ package com.vknxworks.arrctrl.ui.servers
 
 import androidx.compose.ui.platform.LocalContext
 import android.content.Context
+import com.vknxworks.arrctrl.data.api.ApiException
+import com.vknxworks.arrctrl.data.api.toTestResult
+import com.vknxworks.arrctrl.data.net.RedirectBlockedException
+import com.vknxworks.arrctrl.data.server.LockedException
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -78,6 +82,25 @@ fun resultText(context: Context, result: TestResult, type: ServiceType): String 
         TestResult.Timeout -> context.getString(R.string.test_timeout)
         is TestResult.Unreachable -> context.getString(R.string.test_unreachable)
         is TestResult.HttpError -> context.getString(R.string.test_http_error, result.code)
+    }
+}
+
+/** An error whose message is already user-facing text from strings.xml (shown as is). */
+class ShownException(message: String) : Exception(message)
+
+/**
+ * A failed action as a short message for a toast or an error line, in the same words as the
+ * connection test. Never shows raw exception text.
+ */
+fun failureText(context: Context, e: Throwable): String {
+    val chain = generateSequence(e) { it.cause?.takeIf { c -> c !== it } }
+    return when {
+        e is ShownException -> e.message.orEmpty()
+        chain.any { it is LockedException } -> context.getString(R.string.error_locked)
+        chain.any { it is RedirectBlockedException } -> context.getString(R.string.error_redirect_blocked)
+        e is ApiException && e.code == 415 -> context.getString(R.string.error_not_torrent)
+        // The service type only matters for a successful test, never for a failure.
+        else -> resultText(context, e.toTestResult(), ServiceType.RADARR)
     }
 }
 

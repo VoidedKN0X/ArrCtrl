@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.more
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -188,7 +189,7 @@ private fun WantedTab(server: Server, api: BazarrApi) {
         scope.launch {
             runCatching { block() }
                 .onSuccess { Toast.makeText(context, started, Toast.LENGTH_SHORT).show() }
-                .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
         }
     }
 
@@ -363,7 +364,7 @@ private fun ProvidersTab(server: Server, api: BazarrApi) {
                     scope.launch {
                         runCatching { api.resetProviders() }
                             .onSuccess { Toast.makeText(context, done, Toast.LENGTH_SHORT).show(); load() }
-                            .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                            .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                     }
                 }) { Text(stringResource(R.string.bazarr_reset_providers)) }
             },
@@ -401,7 +402,7 @@ fun LanguagesProfileDialog(api: BazarrApi, radarrId: Int?, seriesId: Int?, onDis
                 Triple(p.await(), n.await(), cur.await())
             }
         }.onSuccess { (p, n, cur) -> profiles = p; names = n; current = cur; selected = cur }
-            .onFailure { error = it.message ?: "" }
+            .onFailure { error = failureText(context, it) }
     }
     val saved = stringResource(R.string.bazarr_languages_saved)
     AlertDialog(
@@ -464,7 +465,7 @@ fun LanguagesProfileDialog(api: BazarrApi, radarrId: Int?, seriesId: Int?, onDis
                             onChanged()
                         }.onFailure {
                             saving = false
-                            Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show()
                         }
                     }
                 },
@@ -578,7 +579,7 @@ fun SubtitleSearchScreen(serverId: String, radarrId: Int?, seriesId: Int?, episo
                                     }
                                 }
                                     .onSuccess { done = done + s.subtitle; Toast.makeText(context, ok, Toast.LENGTH_SHORT).show() }
-                                    .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                                    .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                             }
                         }) { Text(stringResource(R.string.bazarr_download)) }
                     },

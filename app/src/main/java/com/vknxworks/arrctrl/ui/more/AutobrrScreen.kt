@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.more
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -198,7 +199,7 @@ private fun FiltersTab(server: Server, api: AutobrrApi) {
                         scope.launch {
                             runCatching { api.setFilterEnabled(f.id, on) }
                                 .onSuccess { load() }
-                                .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                                .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                         }
                     })
                 }

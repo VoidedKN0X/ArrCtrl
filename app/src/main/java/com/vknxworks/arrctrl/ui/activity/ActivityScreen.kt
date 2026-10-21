@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.activity
 
 import android.widget.Toast
+import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -131,7 +132,7 @@ fun ActivityScreen() {
                         scope.launch {
                             runCatching { model.toggleAltSpeed() }
                                 .onSuccess { Toast.makeText(context, if (altOn) toastOff else toastOn, Toast.LENGTH_SHORT).show() }
-                                .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_SHORT).show() }
+                                .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_SHORT).show() }
                         }
                     }) {
                         Icon(
@@ -164,7 +165,7 @@ fun ActivityScreen() {
                             onClick = { tabName = t.name },
                             shape = SegmentedButtonDefaults.itemShape(i, tabs.size),
                             icon = {},
-                        ) { Text(if (count != null && count > 0) "$label $count" else label, maxLines = 1) }
+                        ) { Text(if (count != null && count > 0) stringResource(R.string.label_count, label, count) else label, maxLines = 1) }
                     }
                 }
             }

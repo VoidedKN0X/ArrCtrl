@@ -348,7 +348,7 @@ private fun PushRows(s: AppSettings, tick: Int, update: ((AppSettings) -> AppSet
                 val ok = withContext(Dispatchers.IO) {
                     runCatching {
                         val client = OkHttpClient.Builder().callTimeout(15, TimeUnit.SECONDS).build()
-                        client.newCall(Request.Builder().url(endpoint).post("ArrCtrl test".toRequestBody("text/plain".toMediaType())).build()).execute().use { it.isSuccessful }
+                        client.newCall(Request.Builder().url(endpoint).post(context.getString(R.string.notify_push_test_message).toRequestBody("text/plain".toMediaType())).build()).execute().use { it.isSuccessful }
                     }.getOrDefault(false)
                 }
                 Toast.makeText(context, context.getString(if (ok) R.string.notify_push_test_sent else R.string.notify_push_test_failed), Toast.LENGTH_LONG).show()

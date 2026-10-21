@@ -1,6 +1,7 @@
 package com.vknxworks.arrctrl.ui.movies
 
 import android.text.format.DateUtils
+import com.vknxworks.arrctrl.ui.servers.failureText
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -149,7 +150,7 @@ fun MovieScreen(serverId: String, movieId: Int) {
         scope.launch {
             runCatching { block() }
                 .onSuccess { Toast.makeText(context, msg, Toast.LENGTH_SHORT).show(); reload++ }
-                .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
         }
     }
 
@@ -317,7 +318,7 @@ fun MovieScreen(serverId: String, movieId: Int) {
                     scope.launch {
                         runCatching { api.delete(mv.id, files, exclude) }
                             .onSuccess { Toast.makeText(context, deleted, Toast.LENGTH_SHORT).show(); nav.back() }
-                            .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                            .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                     }
                 }) { Text(stringResource(R.string.torrent_delete), color = MaterialTheme.colorScheme.error) }
             },
@@ -399,9 +400,9 @@ private fun Header(m: Movie, api: RadarrApi) {
                 Text(m.genres.take(3).joinToString(", "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             val ratings = listOfNotNull(
-                m.imdbRating?.let { "IMDb " + String.format(java.util.Locale.getDefault(), "%.1f", it) },
-                m.tmdbRating?.let { "TMDB " + String.format(java.util.Locale.getDefault(), "%.1f", it) },
-                m.rottenTomatoes?.let { "RT ${it.toInt()}%" },
+                m.imdbRating?.let { stringResource(R.string.rating_imdb, it) },
+                m.tmdbRating?.let { stringResource(R.string.rating_tmdb, it) },
+                m.rottenTomatoes?.let { stringResource(R.string.rating_rt, it.toInt()) },
             )
             if (ratings.isNotEmpty()) Text(ratings.joinToString("  "), style = MaterialTheme.typography.labelMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -489,7 +490,7 @@ private fun RenameDialog(api: RadarrApi, m: Movie, onDismiss: () -> Unit, onDone
                     scope.launch {
                         runCatching { api.rename(m.id, list.map { it.movieFileId }) }
                             .onSuccess { Toast.makeText(context, started, Toast.LENGTH_SHORT).show(); onDone() }
-                            .onFailure { Toast.makeText(context, it.message ?: "", Toast.LENGTH_LONG).show() }
+                            .onFailure { Toast.makeText(context, failureText(context, it), Toast.LENGTH_LONG).show() }
                     }
                 }) { Text(stringResource(R.string.movie_rename)) }
             }

@@ -77,7 +77,7 @@ fun TorrentsTab(model: ActivityModel) {
                     FilterChip(
                         selected = f == filter,
                         onClick = { filterName = f.name },
-                        label = { Text("${stringResource(f.label)} $count") },
+                        label = { Text(stringResource(R.string.label_count, stringResource(f.label), count)) },
                     )
                 }
             }
@@ -171,8 +171,12 @@ private fun TorrentRow(t: Torrent, showServer: Boolean, onClick: () -> Unit, onL
         )
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                "↓ ${Format.speed(t.dlSpeed)}  ↑ ${Format.speed(t.upSpeed)}  " +
+                stringResource(
+                    R.string.torrent_speeds_and,
+                    Format.speed(t.dlSpeed),
+                    Format.speed(t.upSpeed),
                     stringResource(R.string.torrent_ratio_peers, Format.ratio(t.ratio), t.seeds, t.seedsTotal, t.peers, t.peersTotal),
+                ),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,

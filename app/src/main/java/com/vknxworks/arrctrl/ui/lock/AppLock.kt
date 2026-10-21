@@ -194,7 +194,7 @@ object AppLock {
             )
         } catch (e: Exception) {
             authenticating = false
-            onError(e.message ?: activity.getString(R.string.lock_fingerprint_failed))
+            onError(activity.getString(R.string.lock_fingerprint_failed))
         }
     }
 }
