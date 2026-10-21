@@ -29,7 +29,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Light, dark or pure black**, in ArrCtrl's amber or your wallpaper colours
 - **Self-signed certificates** trusted per server, by fingerprint
 - **App lock** with its own PIN and optional fingerprint unlock; your API keys and passwords stay encrypted while the app is locked
-- **API keys and passwords are encrypted** on your phone with the Android Keystore; the server and import screens block screenshots, and ArrCtrl's preview is blank in recent apps. **Hide in screenshots and recent apps** blocks screenshots everywhere in the app
+- **API keys and passwords are encrypted** on your phone with the Android Keystore, and the server and import screens always block screenshots. Optional **Hide in screenshots** and **Hide in recent apps** switches cover the rest of the app
 
 ## Screenshots
 
@@ -145,16 +145,18 @@ The **Alt. speed** tile (pull down Quick Settings → edit → drag it in) turns
 
 ## App lock
 
-Turn it on under **Account › Settings › Privacy and security › App lock** (it's off until you do).
+Turn it on under **Account > Settings > Privacy and security > App lock**. It's off until you turn it on.
 
-- **Its own PIN**, at least 6 digits and separate from your phone's; very obvious ones like 111111 or 123456 are refused. The PIN is never stored: it's stretched with 600,000 rounds of PBKDF2 and mixed with a secret held in the phone's secure hardware, so copying ArrCtrl's files off the phone isn't enough to guess it.
-- **Unlock with fingerprint** (optional): only strong biometrics such as your fingerprint, checked by the phone's secure hardware. Adding a new fingerprint turns it off until you turn it on again with your PIN. The PIN is still needed after the phone restarts and at least every 72 hours.
-- **Wrong PINs make you wait**: 30 seconds after 5 tries, doubling up to 15 minutes. Restarting the app or the phone, or changing the clock, doesn't skip the wait.
-- **Lock again**: as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Trips ArrCtrl starts itself (a file picker, your browser, the share sheet, Android settings) don't count as leaving, unless you stay away longer than 5 minutes.
-- **Your API keys and passwords are sealed while locked** (unless notifications are on, see below). They're encrypted with a key that only exists in memory while ArrCtrl is unlocked and is wiped the moment it locks, so a locked ArrCtrl, or a copy of its files, can't sign in to your servers. While ArrCtrl is locked, nothing of it is shown, not even in recent apps.
-- **Notifications and the app lock:** background checks and instant notifications need to sign in while ArrCtrl is locked. With notifications on, your API keys and passwords stay encrypted with the Android Keystore only, as without the app lock, and notifications, widgets and the tile keep working. Turn notifications off to keep them sealed with your PIN too; widgets then keep showing what they last loaded and the tile opens ArrCtrl, until you unlock.
-- **Forgot your PIN?** The lock screen can remove your servers with their API keys and passwords so you can add them again. Nothing changes on your servers.
-- **Change app PIN** asks for your current PIN first, and so does turning the lock off.
+- **Its own app PIN** of at least 6 digits, separate from your phone's screen lock. Very obvious PINs such as 111111 or 123456 are refused.
+- **Unlock with fingerprint** (optional) only accepts strong biometrics, such as the fingerprint sensor, checked by the phone's secure hardware. Face unlock that only uses the camera isn't accepted. The PIN is still needed after the phone restarts and at least every 72 hours, and adding a new fingerprint to the phone turns fingerprint unlock off until you turn it on again.
+- **Your API keys and passwords are encrypted with the PIN while ArrCtrl is locked** (unless notifications are on, see below). The key only exists in memory while the app is unlocked and is wiped the moment it locks, together with qBittorrent's sign-in sessions. The PIN itself is never stored: it's stretched with 600,000 rounds of PBKDF2 and mixed with a key held in the phone's secure hardware, so a copy of the app's files isn't enough to guess it on a computer.
+- **Wrong PINs:** after 5 tries you wait 30 seconds, doubling up to 15 minutes. Restarting the app or the phone, or changing the clock, doesn't skip the wait.
+- **Lock again:** as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Picking a `.torrent` file, opening JellyCtrl or SeerrCtrl, a help link, ntfy, the share sheet and Android's notification and battery settings don't count as leaving, unless you stay away for more than 5 minutes.
+- **Change app PIN** asks for your current PIN first, and turning the app lock off asks for the PIN too.
+- **Forgot your PIN?** It can't be recovered, because it encrypts your API keys and passwords. The lock screen offers to remove your servers with their API keys and passwords, and what the widgets and notifications remembered, so you can add them again; nothing changes on your servers.
+- **Notifications and the app lock:** background checks and instant notifications need to sign in while ArrCtrl is locked. With notifications on, your API keys and passwords stay encrypted with the Android Keystore only, as without the app lock, and notifications, widgets and the Alt. speed tile keep working. Turn notifications off to keep them encrypted with your PIN too; widgets then keep showing what they last loaded and the tile opens ArrCtrl, until you unlock.
+
+**Hide in screenshots** and **Hide in recent apps** (the last two switches in the same section, also without the app lock, both off by default): the first keeps ArrCtrl out of screenshots and screen recordings (and blanks its recent-apps preview), the second shows a blank card for ArrCtrl in the recent-apps view while screenshots still work. With the app lock on, the recent-apps view always shows a blank card. The server and import screens, the lock screen and the PIN screens are always kept out of screenshots.
 
 ## Privacy
 

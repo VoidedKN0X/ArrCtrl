@@ -4,6 +4,15 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.2.1 (2026-10-21)
+
+### Changed
+
+- **Hide in screenshots** and **Hide in recent apps** are now two separate switches in Settings › Privacy and security, both off by default, the same in every Ctrl app. **Hide in screenshots** keeps ArrCtrl out of screenshots and screen recordings (and blanks its preview in recent apps); **Hide in recent apps** only shows a blank card in the recent apps view, so screenshots still work. Until now ArrCtrl's preview in recent apps was always blank: it now shows the app unless you turn on **Hide in recent apps** (or the app lock). If you turned on the single switch in 1.2.0, both new switches start on
+- **Always protected, whatever the switches say:** the server and import screens (API keys, passwords and pasted server settings), the lock screen and the PIN screens are never in screenshots or screen recordings, and with the app lock on the recent apps view always shows a blank card
+- **Notifications moved into Settings**, between Appearance and Privacy and security, the same order as in the other Ctrl apps. The Account page keeps the Settings row
+- **README**: the App lock section uses the same wording as the other Ctrl apps and describes the two switches
+
 ## v1.2.0 (2026-10-21)
 
 The app lock: the same one as in every other Ctrl app, with its own PIN, optional fingerprint unlock and your API keys and passwords sealed while ArrCtrl is locked.

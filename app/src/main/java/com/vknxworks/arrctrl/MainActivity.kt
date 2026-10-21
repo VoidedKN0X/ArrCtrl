@@ -15,6 +15,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import com.vknxworks.arrctrl.ui.components.ScreenPrivacy
 import com.vknxworks.arrctrl.ui.lock.AppLockGate
+import com.vknxworks.arrctrl.ui.lock.lockCovering
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.arrctrl.data.notify.Notifications
@@ -27,7 +28,7 @@ import com.vknxworks.arrctrl.ui.theme.ArrCtrlTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Keep server names, downloads and API key screens out of the recent-apps thumbnails.
+        // A blank Recents card until the settings have been read ("Hide in recent apps" below).
         setRecentsScreenshotEnabled(false)
         enableEdgeToEdge()
         if (savedInstanceState == null) handleIntent(intent)
@@ -46,12 +47,16 @@ class MainActivity : ComponentActivity() {
                 enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
                 onDispose { }
             }
-            // FLAG_SECURE follows "Hide in screenshots and recent apps", and is always on while an API key,
-            // password or pasted server settings are on screen.
-            val secure = settings.hideContent || ScreenPrivacy.forced > 0
-            LaunchedEffect(secure) {
+            // "Hide in screenshots": FLAG_SECURE (also blanks the Recents preview). Always on, whatever the
+            // switch says, while an API key, password or pasted server settings, the lock screen or a PIN screen are on screen.
+            val secure = settings.hideScreenshots || ScreenPrivacy.forced > 0 || lockCovering(c.vault)
+            // "Hide in recent apps": a blank Recents card; screenshots still work. Always with the app lock on,
+            // so Recents never shows what's behind the lock.
+            val blankRecents = settings.hideRecents || c.vault.enabled
+            LaunchedEffect(secure, blankRecents) {
                 if (secure) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
                 else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                setRecentsScreenshotEnabled(!blankRecents)
             }
             ArrCtrlTheme(settings.theme, settings.dynamicColor) {
                 // Nothing of the app is shown (or kept on screen) while the app lock is locked.
