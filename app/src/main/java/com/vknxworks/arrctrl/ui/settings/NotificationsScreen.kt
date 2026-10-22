@@ -1,7 +1,6 @@
 package com.vknxworks.arrctrl.ui.settings
 
 import com.vknxworks.arrctrl.ui.lock.AppLock
-import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -11,8 +10,6 @@ import android.os.PowerManager
 import android.provider.Settings
 import android.text.format.DateUtils
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,11 +38,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -67,6 +66,7 @@ import com.vknxworks.arrctrl.ui.components.GroupChoice
 import com.vknxworks.arrctrl.ui.components.GroupRow
 import com.vknxworks.arrctrl.ui.components.GroupSwitch
 import com.vknxworks.arrctrl.ui.components.ScreenTopBar
+import com.vknxworks.arrctrl.ui.components.rememberNotificationAccess
 import com.vknxworks.arrctrl.ui.servers.icon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -81,8 +81,9 @@ private val INTERVALS = listOf(15, 30, 60, 180, 0)
 
 /** "Every 30 min · instant with ntfy", or "Off": the summary on the Account screen. */
 @Composable
-fun notificationsSummary(s: AppSettings): String = when {
+fun notificationsSummary(s: AppSettings, allowed: Boolean = true): String = when {
     !s.notifyEnabled -> stringResource(R.string.notify_off)
+    !allowed -> stringResource(R.string.notify_summary_blocked)
     else -> listOfNotNull(
         if (s.notifyInterval > 0) intervalLabel(s.notifyInterval) else null,
         if (s.pushEnabled && s.pushEndpoint != null) stringResource(R.string.notify_summary_push) else null,
@@ -130,11 +131,12 @@ fun NotificationsScreen() {
     val servers by c.servers.servers.collectAsStateWithLifecycle()
     fun update(t: (AppSettings) -> AppSettings) { scope.launch { c.settings.update(t) } }
 
-    var allowed by remember { mutableStateOf(Notifications.allowed(context)) }
+    // Re-checked after the permission dialog and whenever the screen comes back (from Android's settings).
+    val access = rememberNotificationAccess()
+    val allowed = access.canPost
     var battery by remember { mutableStateOf(ignoringBattery(context)) }
     var tick by remember { mutableIntStateOf(0) }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        allowed = Notifications.allowed(context)
         battery = ignoringBattery(context)
         tick++
     }
@@ -145,9 +147,13 @@ fun NotificationsScreen() {
         update { it.copy(notifyEnabled = true) }
         NotifySchedule.checkNow(context, push = false)
     }
-    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        allowed = Notifications.allowed(context)
-        if (granted) turnOn()
+    // Turned on while blocked: switch on for real once notifications are allowed (in the dialog or in Android's settings).
+    var turningOn by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(allowed, turningOn) {
+        if (turningOn && allowed) {
+            turningOn = false
+            if (!s.notifyEnabled) turnOn()
+        }
     }
 
     Scaffold(
@@ -160,12 +166,13 @@ fun NotificationsScreen() {
                 GroupSwitch(
                     stringResource(R.string.notifications),
                     if (s.notifyEnabled && !allowed) stringResource(R.string.notify_blocked) else notificationsSummary(s),
-                    s.notifyEnabled,
-                    if (s.notifyEnabled) Icons.Outlined.Notifications else Icons.Outlined.NotificationsOff,
+                    // Never shown on while Android blocks the notifications.
+                    s.notifyEnabled && allowed,
+                    if (s.notifyEnabled && allowed) Icons.Outlined.Notifications else Icons.Outlined.NotificationsOff,
                 ) { on ->
                     when {
-                        !on -> update { it.copy(notifyEnabled = false) }
-                        !allowed -> permission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        !on -> { turningOn = false; update { it.copy(notifyEnabled = false) } }
+                        !allowed -> { turningOn = true; access.fix() }
                         else -> turnOn()
                     }
                 }
@@ -176,14 +183,13 @@ fun NotificationsScreen() {
                         Icons.Outlined.Settings,
                         iconTint = MaterialTheme.colorScheme.error,
                         showChevron = true,
-                        onClick = {
-                            AppLock.expectReturn(); context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName))
-                        },
+                        onClick = { access.fix() },
                     )
                 }
             }
 
-            if (s.notifyEnabled) {
+            // The details only show while notifications can really reach you.
+            if (s.notifyEnabled && allowed) {
                 Group(stringResource(R.string.notify_how), footer = stringResource(R.string.notify_how_footer)) {
                     GroupChoice(
                         stringResource(R.string.notify_interval),

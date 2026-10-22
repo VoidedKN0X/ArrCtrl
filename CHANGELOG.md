@@ -4,6 +4,19 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.2.6 (2026-10-22)
+
+### Fixed
+
+- **ArrCtrl now really asks to show notifications**: on Android 13 and later an app can only show notifications after you allow it. If notifications were on in ArrCtrl but Android's question had been missed or answered with no, the checks kept running and every notification (grabbed, imported, failed, needs attention, torrent done, health, disk space, server offline, download progress) was silently dropped. With notifications on, ArrCtrl now asks once by itself as soon as it's unlocked, and never again after that, so it doesn't nag on every start.
+- **Turning notifications on always works**: once you'd said no twice, Android stops showing its question, and the **Notifications** switch did nothing at all when you tried to turn it on. It now opens ArrCtrl's notification settings in Android instead, and notifications switch on by themselves as soon as you allow them there and come back. The same happens if ArrCtrl's notifications are turned off in Android's settings.
+- **Allow notifications asks first**: the **Allow notifications** row now shows Android's question when it still can, and only opens Android's notification settings when it can't. Coming back from there doesn't trigger the app lock.
+
+### Changed
+
+- **The Notifications switch shows the truth**: while Android blocks ArrCtrl's notifications, the switch shows as off with "Turned on, but Android is blocking ArrCtrl's notifications" under it, and the check interval, ntfy, events, servers, download progress and battery options are hidden until notifications are allowed again. Your choices are kept and come back as soon as you allow notifications.
+- **Settings shows when notifications are blocked**: the **Notifications** row in Settings reads "Blocked by Android: tap to allow" instead of your check interval while notifications are on but can't be shown.
+
 ## v1.2.5 (2026-10-21)
 
 ### Fixed

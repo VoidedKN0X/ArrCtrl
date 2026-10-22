@@ -60,6 +60,8 @@ import androidx.navigation.toRoute
 import com.vknxworks.arrctrl.R
 import com.vknxworks.arrctrl.ui.components.LocalBottomClearance
 import com.vknxworks.arrctrl.ui.components.LocalHazeState
+import com.vknxworks.arrctrl.ui.components.rememberNotificationAccess
+import com.vknxworks.arrctrl.ui.lock.lockCovering
 import com.vknxworks.arrctrl.ui.servers.ImportScreen
 import com.vknxworks.arrctrl.ui.servers.ServerEditScreen
 import com.vknxworks.arrctrl.ui.settings.YouScreen
@@ -127,6 +129,16 @@ private fun MainScaffold() {
     }
 
     val c = LocalContext.current.container
+
+    // Android 13+ drops notifications until they're allowed: with notifications on, ask once, as soon
+    // as ArrCtrl is unlocked. After that, the Notifications screen shows it and offers the fix.
+    val appSettings by c.settings.settings.collectAsStateWithLifecycle()
+    val notificationAccess = rememberNotificationAccess()
+    val covered = lockCovering(c.vault)
+    LaunchedEffect(covered, appSettings.notifyEnabled, notificationAccess.granted) {
+        if (!covered && appSettings.notifyEnabled) notificationAccess.askOnce()
+    }
+
     val incoming by c.pendingTorrent.collectAsStateWithLifecycle()
     LaunchedEffect(incoming) {
         val t = incoming ?: return@LaunchedEffect

@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.settings
 
+import com.vknxworks.arrctrl.ui.components.rememberNotificationAccess
 import com.vknxworks.arrctrl.ui.lock.AppLock
 import com.vknxworks.arrctrl.ui.nav.NotificationsRoute
 import androidx.compose.material.icons.outlined.Notifications
@@ -234,9 +235,10 @@ fun SettingsScreen() {
             }
             Group(stringResource(R.string.notifications)) {
                 val nav = LocalNavigator.current
+                val notificationAccess = rememberNotificationAccess()
                 GroupRow(
                     stringResource(R.string.notifications),
-                    notificationsSummary(s),
+                    notificationsSummary(s, notificationAccess.canPost),
                     Icons.Outlined.Notifications,
                     showChevron = true,
                     onClick = { nav.navigate(NotificationsRoute) },

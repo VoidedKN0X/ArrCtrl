@@ -761,6 +761,7 @@
     <string name="copied">Copied</string>
     <string name="notify_off">Off</string>
     <string name="notify_on">On</string>
+    <string name="notify_summary_blocked">Blocked by Android: tap to allow</string>
     <string name="notify_summary_push">instant with ntfy</string>
     <string name="notify_interval_never">Never (only when woken by push)</string>
     <string name="notify_interval_minutes">Every %1$d minutes</string>
@@ -771,7 +772,7 @@
     <string name="notify_intro">ArrCtrl checks your servers itself and tells you what\'s new. Nothing goes through any outside service.</string>
     <string name="notify_blocked">Turned on, but Android is blocking ArrCtrl\'s notifications</string>
     <string name="notify_open_system">Allow notifications</string>
-    <string name="notify_open_system_body">Open Android\'s notification settings for ArrCtrl</string>
+    <string name="notify_open_system_body">Asks Android again, or opens its notification settings for ArrCtrl when it won\'t ask any more</string>
     <string name="notify_how">How ArrCtrl finds out</string>
     <string name="notify_how_footer">Background checks can be delayed by Android, especially to save battery. With ntfy, your servers wake ArrCtrl the moment something happens; ArrCtrl then checks and notifies you. The README explains how to point each service at the address below.</string>
     <string name="notify_interval">Check in the background</string>
