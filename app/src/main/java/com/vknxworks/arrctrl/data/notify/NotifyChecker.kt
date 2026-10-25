@@ -96,7 +96,7 @@ class NotifyChecker(private val c: AppContainer) {
 
         try {
             when (s.type) {
-                ServiceType.RADARR, ServiceType.SONARR -> {
+                ServiceType.RADARR, ServiceType.SONARR, ServiceType.LIDARR -> {
                     val arr = c.arr(s)
                     val (items, _) = arr.history(1, 50)
                     val newest = items.maxOfOrNull { it.id } ?: seen.lastHistoryId
@@ -118,7 +118,7 @@ class NotifyChecker(private val c: AppContainer) {
                         )
                         val text = listOfNotNull(if (event == NotifyEvent.FAILED) hi.reason else null, hi.quality, hi.release.takeIf { event != NotifyEvent.IMPORTED }, s.name)
                             .joinToString(" · ")
-                        val kind = if (s.type == ServiceType.SONARR) "series" else "movie"
+                        val kind = when (s.type) { ServiceType.SONARR -> "series"; ServiceType.LIDARR -> "artist"; else -> "movie" }
                         alerts += Alert(event, "${s.id}:${hi.id}", title, text, hi.mediaId?.let { "$kind/${s.id}/$it" } ?: "activity")
                     }
                     val warnings = arr.queue().filter { it.hasWarning }

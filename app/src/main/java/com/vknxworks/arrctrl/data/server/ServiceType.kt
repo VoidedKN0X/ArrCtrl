@@ -13,7 +13,7 @@ enum class AuthKind {
 }
 
 /**
- * The seven services ArrCtrl talks to. [apiBase] is appended to the server address
+ * The eight services ArrCtrl talks to. [apiBase] is appended to the server address
  * (which may itself carry a reverse-proxy path, e.g. https://example.com/radarr).
  */
 enum class ServiceType(
@@ -28,12 +28,16 @@ enum class ServiceType(
 ) {
     RADARR("radarr", R.string.service_radarr, R.string.service_radarr_role, R.string.key_help_arr, "/api/v3", "X-Api-Key", AuthKind.API_KEY, 7878),
     SONARR("sonarr", R.string.service_sonarr, R.string.service_sonarr_role, R.string.key_help_arr, "/api/v3", "X-Api-Key", AuthKind.API_KEY, 8989),
+    LIDARR("lidarr", R.string.service_lidarr, R.string.service_lidarr_role, R.string.key_help_arr, "/api/v1", "X-Api-Key", AuthKind.API_KEY, 8686),
     QBITTORRENT("qbittorrent", R.string.service_qbittorrent, R.string.service_qbittorrent_role, R.string.key_help_qbittorrent, "/api/v2", "Authorization", AuthKind.QBITTORRENT, 8080),
     PROWLARR("prowlarr", R.string.service_prowlarr, R.string.service_prowlarr_role, R.string.key_help_arr, "/api/v1", "X-Api-Key", AuthKind.API_KEY, 9696),
     BAZARR("bazarr", R.string.service_bazarr, R.string.service_bazarr_role, R.string.key_help_bazarr, "/api", "X-API-KEY", AuthKind.API_KEY, 6767),
     AUTOBRR("autobrr", R.string.service_autobrr, R.string.service_autobrr_role, R.string.key_help_autobrr, "/api", "X-API-Token", AuthKind.API_KEY, 7474),
     CLEANUPARR("cleanuparr", R.string.service_cleanuparr, R.string.service_cleanuparr_role, R.string.key_help_cleanuparr, "/api", "X-Api-Key", AuthKind.API_KEY, 11011),
     ;
+
+    /** Radarr, Sonarr and Lidarr: a download queue, history and calendar (the shared *arr API). */
+    val isMediaArr: Boolean get() = this == RADARR || this == SONARR || this == LIDARR
 
     /** The header value carrying [key]: qBittorrent wants "Bearer <key>", the others the bare key. */
     fun authValue(key: String): String = if (auth == AuthKind.QBITTORRENT) "Bearer $key" else key

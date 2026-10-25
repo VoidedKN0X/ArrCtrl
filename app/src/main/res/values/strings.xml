@@ -49,9 +49,9 @@
     <string name="empty_series_title">No Sonarr server yet</string>
     <string name="empty_series_body">Add your Sonarr server to see your series here.</string>
     <string name="empty_calendar_title">Nothing to show yet</string>
-    <string name="empty_calendar_body">Add Radarr or Sonarr to see upcoming movies and episodes here.</string>
+    <string name="empty_calendar_body">Add Radarr, Sonarr or Lidarr to see upcoming movies, episodes and albums here.</string>
     <string name="empty_activity_title">No downloads to show</string>
-    <string name="empty_activity_body">Add Radarr, Sonarr or qBittorrent to see your queue and torrents here.</string>
+    <string name="empty_activity_body">Add Radarr, Sonarr, Lidarr or qBittorrent to see your queue and torrents here.</string>
     <string name="more_tools">Tools</string>
     <string name="more_footer">Tools without a server offer to add one.</string>
 
@@ -201,7 +201,7 @@
 
     <!-- Queue -->
     <string name="queue_empty_title">Nothing in the queue</string>
-    <string name="queue_empty_body">Downloads that Radarr and Sonarr are tracking show up here.</string>
+    <string name="queue_empty_body">Downloads that Radarr, Sonarr and Lidarr are tracking show up here.</string>
     <string name="queue_needs_attention">Needs attention</string>
     <string name="queue_downloading">Downloading</string>
     <string name="queue_queued">Queued</string>
@@ -822,11 +822,11 @@
     <string name="notify_and_more">+%1$d more</string>
     <string name="notify_summary_title">%1$s: %2$d</string>
     <string name="notify_ev_grabbed">Grabbed</string>
-    <string name="notify_ev_grabbed_body">Radarr or Sonarr sent a release to the download client</string>
+    <string name="notify_ev_grabbed_body">Radarr, Sonarr or Lidarr sent a release to the download client</string>
     <string name="notify_ev_imported">Downloaded</string>
-    <string name="notify_ev_imported_body">A movie or episode finished and was imported into your library</string>
+    <string name="notify_ev_imported_body">A movie, episode or album finished and was imported into your library</string>
     <string name="notify_ev_failed">Download failed</string>
-    <string name="notify_ev_failed_body">A download failed; Radarr or Sonarr may look for another release</string>
+    <string name="notify_ev_failed_body">A download failed; Radarr, Sonarr or Lidarr may look for another release</string>
     <string name="notify_ev_attention">Needs attention</string>
     <string name="notify_ev_attention_body">A download is stuck, for example it can\'t be imported automatically</string>
     <string name="notify_ev_torrent">Torrent finished</string>
@@ -863,8 +863,8 @@
     <string name="widget_downloads_description">What\'s downloading right now, with progress</string>
     <string name="widget_refresh">Refresh</string>
     <string name="widget_loading">Loading…</string>
-    <string name="widget_no_calendar">Add a Radarr or Sonarr server in ArrCtrl</string>
-    <string name="widget_no_downloads_server">Add Radarr, Sonarr or qBittorrent in ArrCtrl</string>
+    <string name="widget_no_calendar">Add a Radarr, Sonarr or Lidarr server in ArrCtrl</string>
+    <string name="widget_no_downloads_server">Add Radarr, Sonarr, Lidarr or qBittorrent in ArrCtrl</string>
     <string name="widget_nothing_upcoming">Nothing in the next %1$d days</string>
     <string name="widget_nothing_downloading">Nothing downloading</string>
     <string name="tile_alt_speed">Alt. speed</string>
@@ -956,7 +956,7 @@
     <string name="wanted_role">Missing and cutoff unmet, with search</string>
     <string name="wanted_missing">Missing</string>
     <string name="wanted_cutoff">Cutoff unmet</string>
-    <string name="wanted_no_server">No Radarr or Sonarr server yet</string>
+    <string name="wanted_no_server">No Radarr, Sonarr or Lidarr server yet</string>
     <string name="wanted_missing_empty">Nothing missing</string>
     <string name="wanted_cutoff_empty">Everything meets its cutoff</string>
     <string name="wanted_empty_body">Only monitored items are listed.</string>
@@ -1000,4 +1000,62 @@
     <string name="link_not_in_radarr">Not in any of your Radarr servers yet.</string>
     <string name="link_not_in_sonarr">Not in any of your Sonarr servers yet.</string>
     <string name="link_add_to">Add it to</string>
+    <!-- Lidarr (1.6.0) -->
+    <string name="service_lidarr">Lidarr</string>
+    <string name="service_lidarr_role">Music</string>
+    <string name="music">Music</string>
+    <string name="music_role">Your Lidarr artists and albums</string>
+    <string name="empty_music_title">No Lidarr server yet</string>
+    <string name="empty_music_body">Add your Lidarr server to see your artists and albums here.</string>
+    <string name="artists_none">No artists yet</string>
+    <string name="artists_search_hint">Search artists</string>
+    <plurals name="album_count">
+        <item quantity="one">%1$d album</item>
+        <item quantity="other">%1$d albums</item>
+    </plurals>
+    <string name="artist_add">Add artist</string>
+    <string name="artist_add_hint">Artist name</string>
+    <string name="artist_add_intro">Find an artist</string>
+    <string name="artist_add_intro_body">Search by name, or by MusicBrainz id: lidarr:&lt;id&gt; or mbid:&lt;id&gt;. Results don\'t have pictures until the artist is in Lidarr.</string>
+    <string name="artist_add_button">Add to Lidarr</string>
+    <string name="artist_added">Added to Lidarr</string>
+    <string name="artist_metadata_profile">Metadata profile</string>
+    <string name="artist_monitor_all">All albums</string>
+    <string name="artist_monitor_future">Future albums</string>
+    <string name="artist_monitor_missing">Missing albums</string>
+    <string name="artist_monitor_existing">Existing albums</string>
+    <string name="artist_monitor_first">First album</string>
+    <string name="artist_monitor_latest">Latest album</string>
+    <string name="artist_monitor_none">None</string>
+    <string name="artist_new_items">Monitor new albums</string>
+    <string name="artist_new_items_all">All new albums</string>
+    <string name="artist_new_items_new">Only albums newer than the latest</string>
+    <string name="artist_new_items_none">None</string>
+    <string name="artist_search_on_add">Search for missing albums</string>
+    <string name="artist_search_on_add_help">Start searching as soon as the artist is added</string>
+    <string name="artist_gone">This artist is no longer in Lidarr.</string>
+    <string name="artist_next_album">Next: %1$s, %2$s</string>
+    <string name="artist_search_all">Search monitored</string>
+    <string name="artist_monitored_on">Lidarr looks for this artist\'s monitored albums</string>
+    <string name="artist_monitored_off">Lidarr doesn\'t look for anything from this artist</string>
+    <string name="artist_size">Size on disk</string>
+    <string name="artist_delete_files">Also delete the artist\'s folder and files</string>
+    <string name="artist_deleted">Artist deleted</string>
+    <string name="albums">Albums</string>
+    <string name="albums_none">No albums</string>
+    <string name="albums_none_body">The metadata profile may leave out this artist\'s releases. Try Refresh.</string>
+    <string name="albums_show_all">Show all albums</string>
+    <string name="albums_show_monitored">Show only monitored albums</string>
+    <plurals name="albums_unmonitored">
+        <item quantity="one">%1$d more album that isn\'t monitored</item>
+        <item quantity="other">%1$d more albums that aren\'t monitored</item>
+    </plurals>
+    <string name="album_monitor">Monitor album</string>
+    <string name="album_unmonitor">Stop monitoring album</string>
+    <string name="album_monitored_on">Lidarr looks for this album</string>
+    <string name="album_monitored_off">Lidarr doesn\'t look for this album</string>
+    <string name="album_search">Search</string>
+    <string name="album_search_help">Ask your indexers for this album now</string>
+    <string name="album_tracks">%1$d/%2$d tracks</string>
+    <string name="calendar_album">Album</string>
 </resources>

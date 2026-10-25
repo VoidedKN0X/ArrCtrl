@@ -49,7 +49,7 @@ data class QueueItem(
 
     /** Waiting to be imported but stuck: the case manual import is for. */
     val canManualImport: Boolean
-        get() = !downloadId.isNullOrBlank() && (trackedState == "importBlocked" || trackedState == "importPending" ||
+        get() = server.type != ServiceType.LIDARR && !downloadId.isNullOrBlank() && (trackedState == "importBlocked" || trackedState == "importPending" ||
             (status == "completed" && trackedStatus != "ok"))
 }
 
@@ -97,15 +97,20 @@ data class EpisodeEntry(val id: Int, val season: Int, val number: Int, val title
 
 // ---------- Client ----------
 
-/** Radarr and Sonarr v3 API, for the parts both share plus their differences. */
+/** Radarr and Sonarr v3 and Lidarr v1 API, for the parts they share (queue, history, manual import) plus their differences. */
 class ArrApi(private val http: Http, val server: Server) {
     private val client get() = http.client(server)
     private val isSonarr get() = server.type == ServiceType.SONARR
+    private val isLidarr get() = server.type == ServiceType.LIDARR
 
     private fun url(path: String) = server.api(path)
 
     suspend fun queue(): List<QueueItem> {
-        val include = if (isSonarr) "includeSeries=true&includeEpisode=true" else "includeMovie=true"
+        val include = when {
+            isLidarr -> "includeArtist=true&includeAlbum=true"
+            isSonarr -> "includeSeries=true&includeEpisode=true"
+            else -> "includeMovie=true"
+        }
         val body = Api.json(client, Api.get(url("/queue?page=1&pageSize=200&$include"))) as? JsonObject
         return body.arr("records").objects().mapNotNull(::queueItem)
     }
@@ -113,7 +118,9 @@ class ArrApi(private val http: Http, val server: Server) {
     private fun queueItem(o: JsonObject): QueueItem? {
         val id = o.int("id") ?: return null
         val release = o.str("title").orEmpty()
-        val (title, detail) = if (isSonarr) {
+        val (title, detail) = if (isLidarr) {
+            (o.obj("artist").str("artistName") ?: release) to o.obj("album").str("title")
+        } else if (isSonarr) {
             val series = o.obj("series")
             val ep = o.obj("episode")
             val code = Format.episode(ep.int("seasonNumber") ?: o.int("seasonNumber"), ep.int("episodeNumber"))
@@ -158,11 +165,18 @@ class ArrApi(private val http: Http, val server: Server) {
     }
 
     suspend fun history(page: Int, pageSize: Int = 50): Pair<List<HistoryItem>, Int> {
-        val include = if (isSonarr) "includeSeries=true&includeEpisode=true" else "includeMovie=true"
+        val include = when {
+            // Lidarr logs every imported track; only whole-download events are asked for (see lidarrKind).
+            isLidarr -> "includeArtist=true&includeAlbum=true" + LIDARR_EVENTS.joinToString("") { "&eventType=$it" }
+            isSonarr -> "includeSeries=true&includeEpisode=true"
+            else -> "includeMovie=true"
+        }
         val body = Api.json(client, Api.get(url("/history?page=$page&pageSize=$pageSize&sortKey=date&sortDirection=descending&$include"))) as? JsonObject
         val items = body.arr("records").objects().mapNotNull { o ->
             val id = o.int("id") ?: return@mapNotNull null
-            val (title, detail) = if (isSonarr) {
+            val (title, detail) = if (isLidarr) {
+                (o.obj("artist").str("artistName") ?: o.str("sourceTitle").orEmpty()) to o.obj("album").str("title")
+            } else if (isSonarr) {
                 val ep = o.obj("episode")
                 (o.obj("series").str("title") ?: o.str("sourceTitle").orEmpty()) to
                     listOfNotNull(Format.episode(ep.int("seasonNumber"), ep.int("episodeNumber")), ep.str("title")).joinToString(" · ").ifBlank { null }
@@ -174,14 +188,18 @@ class ArrApi(private val http: Http, val server: Server) {
             HistoryItem(
                 server = server,
                 id = id,
-                kind = kind(o.str("eventType")),
+                kind = if (isLidarr) lidarrKind(o.str("eventType")) else kind(o.str("eventType")),
                 title = title,
                 detail = detail,
                 release = o.str("sourceTitle"),
                 quality = o.obj("quality").obj("quality").str("name"),
                 date = Format.instant(o.str("date")),
                 reason = data.str("message") ?: data.str("reason"),
-                mediaId = if (isSonarr) o.int("seriesId") else o.int("movieId"),
+                mediaId = when {
+                    isLidarr -> o.int("artistId")
+                    isSonarr -> o.int("seriesId")
+                    else -> o.int("movieId")
+                },
             )
         }
         return items to (body.int("totalRecords") ?: items.size)
@@ -195,6 +213,12 @@ class ArrApi(private val http: Http, val server: Server) {
         "movieFileRenamed", "episodeFileRenamed" -> HistoryKind.RENAMED
         "downloadIgnored" -> HistoryKind.IGNORED
         else -> HistoryKind.OTHER
+    }
+
+    private companion object {
+        /** Lidarr EntityHistoryEventType: grabbed, artistFolderImported, downloadFailed, trackFileDeleted,
+         *  trackFileRenamed, albumImportIncomplete, downloadImported, downloadIgnored (not per-track imports or retags). */
+        val LIDARR_EVENTS = listOf(1, 2, 4, 5, 6, 7, 8, 10)
     }
 
     // ---------- Manual import ----------

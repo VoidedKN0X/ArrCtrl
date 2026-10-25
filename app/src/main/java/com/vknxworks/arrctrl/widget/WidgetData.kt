@@ -95,7 +95,7 @@ object WidgetStore {
         val upcoming = async {
             CalendarLoader(c).load(servers, today, today.plusDays(DAYS.toLong()), monitoredOnly = true)
         }
-        val queues = servers.filter { it.type == ServiceType.RADARR || it.type == ServiceType.SONARR }.map { s ->
+        val queues = servers.filter { it.type.isMediaArr }.map { s ->
             async { s to runCatching { c.arr(s).queue() } }
         }
         val torrents = servers.filter { it.type == ServiceType.QBITTORRENT }.map { s ->
@@ -128,6 +128,7 @@ object WidgetStore {
                     open = when {
                         e.movieId != null -> "movie/${e.server.id}/${e.movieId}"
                         e.seriesId != null -> "series/${e.server.id}/${e.seriesId}"
+                        e.artistId != null -> "artist/${e.server.id}/${e.artistId}"
                         else -> "calendar"
                     },
                 )
@@ -151,8 +152,8 @@ object WidgetStore {
             upcoming = up,
             downloads = dl.take(20),
             speed = t.sumOf { it.second.getOrNull()?.second ?: 0L },
-            noCalendarServers = servers.none { it.type == ServiceType.RADARR || it.type == ServiceType.SONARR },
-            noDownloadServers = servers.none { it.type == ServiceType.RADARR || it.type == ServiceType.SONARR || it.type == ServiceType.QBITTORRENT },
+            noCalendarServers = servers.none { it.type.isMediaArr },
+            noDownloadServers = servers.none { it.type.isMediaArr || it.type == ServiceType.QBITTORRENT },
             failures = calErrors.size + t.count { it.second.isFailure } +
                 q.count { (s, r) -> r.isFailure && s !in calErrors.keys },
         )

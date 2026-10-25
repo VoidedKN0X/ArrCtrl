@@ -4,6 +4,22 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.6.0 (2026-10-25)
+
+Lidarr support: your music library, next to your movies and series.
+
+### New
+
+- **Lidarr** is a new server type. Add it like the others (tap your profile picture → **Add a server** → Lidarr, default port 8686, API key from Settings → General → Security) or with `"type": "lidarr"` in a server import. The connection test checks that it really is Lidarr.
+- **Music** (More → Library → **Music**): appears only once you have a Lidarr server, so nothing changes for anyone without one and the bottom bar stays the same. It lists your artists with their picture, number of albums, tracks you have out of the tracks Lidarr expects, size on disk and a progress bar, plus **Downloading** and **Unmonitored** badges. Search by name, filter by All / Monitored / Unmonitored / Missing / Downloading, pull down to refresh, and switch servers with the chips when you have more than one Lidarr.
+- **Artist page**: artwork, type, genres, status and the next album with its release date. **Search monitored** (Lidarr's ArtistSearch), **Refresh** and **Delete** (optionally with the files and an import list exclusion). The **Albums** list shows each monitored album with its cover, year, type and tracks, newest first; **Show all albums** adds the rest. Tap the bookmark to monitor or stop monitoring an album; tap an album for its details, **Search** (AlbumSearch) and the monitored switch. **Settings** on the page change monitoring, **Monitor new albums** (all, only newer than the latest, none), quality profile, metadata profile and tags. The artist's history (grabbed, imported, failed, deleted, renamed) is at the bottom.
+- **Add artist** (the + on Music): search by name or by MusicBrainz id (`lidarr:<id>` or `mbid:<id>`), then choose the quality profile, metadata profile, root folder (with free space), which albums to monitor (all, future, missing, existing, first, latest or none), whether to monitor new albums, tags, and whether to search for missing albums straight away. Artists already in Lidarr open their page instead.
+- **Calendar**: album releases from Lidarr show up next to movies and episodes, with an album icon and the artist and album name, coloured by status (downloaded, missing, upcoming, unmonitored). A **Music** filter chip appears when you have a Lidarr server. Tapping an album opens its artist. The Upcoming widget includes albums too.
+- **Activity**: Lidarr's downloads are in the **Queue** (artist and album, progress, status, remove with blocklist options) and its events in **History**. Only whole-album events are listed (grabbed, imported, failed, incomplete import, deleted, renamed, ignored), not every single imported track. Manual import isn't offered for Lidarr downloads; use Lidarr's web UI for those. The ongoing download notification includes Lidarr downloads.
+- **Wanted** includes Lidarr: missing albums and albums below their cutoff, with search for one album, a selection (AlbumSearch) or everything (MissingAlbumSearch / CutoffUnmetAlbumSearch). Music has a Wanted button that opens it on that Lidarr server.
+- **Notifications** for Lidarr: grabbed, imported and failed downloads, downloads that need attention, health warnings, low disk space and Lidarr going offline, through the same background checks and ntfy wake-ups as Radarr and Sonarr. Tapping one opens the artist. For instant notifications add ntfy in Lidarr under Settings → Connect, like Radarr and Sonarr.
+- **System health** includes Lidarr's health checks and disks.
+
 ## v1.5.0 (2026-10-25)
 
 Wanted lists for Radarr and Sonarr, more qBittorrent controls, and links from JellyCtrl and SeerrCtrl that open a movie or series in ArrCtrl.

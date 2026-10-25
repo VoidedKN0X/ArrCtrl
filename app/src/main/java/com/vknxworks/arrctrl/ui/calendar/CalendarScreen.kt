@@ -31,6 +31,7 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.EventBusy
 import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.Album
 import androidx.compose.material.icons.outlined.Today
 import androidx.compose.material.icons.outlined.Tv
 import androidx.compose.material.icons.outlined.ViewAgenda
@@ -74,6 +75,7 @@ import com.vknxworks.arrctrl.ui.components.TabTitle
 import com.vknxworks.arrctrl.ui.nav.YouRoute
 import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.nav.MovieRoute
+import com.vknxworks.arrctrl.ui.nav.ArtistRoute
 import com.vknxworks.arrctrl.ui.nav.SeasonRoute
 import com.vknxworks.arrctrl.ui.theme.Gutter
 import kotlinx.coroutines.launch
@@ -86,7 +88,7 @@ import java.time.format.TextStyle
 import java.time.temporal.WeekFields
 import java.util.Locale
 
-private enum class KindFilter(val label: Int) { ALL(R.string.calendar_both), MOVIES(R.string.tab_movies), SERIES(R.string.tab_series) }
+private enum class KindFilter(val label: Int) { ALL(R.string.calendar_both), MOVIES(R.string.tab_movies), SERIES(R.string.tab_series), MUSIC(R.string.music) }
 
 /** Days the agenda shows at first, and how many more each "Show more" adds. */
 private const val AGENDA_STEP = 28L
@@ -104,7 +106,7 @@ fun CalendarScreen() {
     val c = LocalContext.current.container
     val nav = LocalNavigator.current
     val servers by c.servers.servers.collectAsStateWithLifecycle()
-    val hasAny = servers.any { it.type == ServiceType.RADARR || it.type == ServiceType.SONARR }
+    val hasAny = servers.any { it.type.isMediaArr }
 
     if (!hasAny) {
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
@@ -124,7 +126,9 @@ fun CalendarScreen() {
     val model: CalendarModel = viewModel { CalendarModel(c) }
     val settings by c.settings.settings.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    val hasLidarr = servers.any { it.type == ServiceType.LIDARR }
     val kind = runCatching { KindFilter.valueOf(settings.calendarKind) }.getOrDefault(KindFilter.ALL)
+        .let { if (it == KindFilter.MUSIC && !hasLidarr) KindFilter.ALL else it }
     val monitoredOnly = settings.calendarMonitoredOnly
     val month = settings.calendarMonth
 
@@ -156,15 +160,17 @@ fun CalendarScreen() {
             KindFilter.ALL -> true
             KindFilter.MOVIES -> it.kind == EntryKind.MOVIE
             KindFilter.SERIES -> it.kind == EntryKind.EPISODE
+            KindFilter.MUSIC -> it.kind == EntryKind.ALBUM
         }
     }
-    val multiServer = servers.count { it.type == ServiceType.RADARR || it.type == ServiceType.SONARR } > 2 ||
+    val multiServer = servers.count { it.type.isMediaArr } > 2 || servers.count { it.type == ServiceType.LIDARR } > 1 ||
         servers.count { it.type == ServiceType.RADARR } > 1 || servers.count { it.type == ServiceType.SONARR } > 1
 
     fun open(e: CalendarEntry) {
         when (e.kind) {
             EntryKind.MOVIE -> e.movieId?.let { nav.navigate(MovieRoute(e.server.id, it)) }
             EntryKind.EPISODE -> if (e.seriesId != null && e.season != null) nav.navigate(SeasonRoute(e.server.id, e.seriesId, e.season))
+            EntryKind.ALBUM -> e.artistId?.let { nav.navigate(ArtistRoute(e.server.id, it)) }
         }
     }
 
@@ -185,7 +191,8 @@ fun CalendarScreen() {
             Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            KindFilter.entries.forEach { k ->
+            // "Music" only with a Lidarr server; "Both" then means everything.
+            KindFilter.entries.filter { it != KindFilter.MUSIC || hasLidarr }.forEach { k ->
                 CtrlFilterChip(
                     selected = k == kind,
                     onClick = { scope.launch { c.settings.update { it.copy(calendarKind = k.name) } } },
@@ -329,6 +336,7 @@ private fun EntryRow(e: CalendarEntry, multiServer: Boolean, onClick: () -> Unit
             Text(
                 when (e.kind) {
                     EntryKind.EPISODE -> e.at.atZone(ZoneId.systemDefault()).format(CalendarModel.TIME)
+                    EntryKind.ALBUM -> stringResource(R.string.calendar_album)
                     EntryKind.MOVIE -> stringResource(
                         when (e.release) {
                             MovieRelease.CINEMA -> R.string.calendar_cinema
@@ -345,7 +353,11 @@ private fun EntryRow(e: CalendarEntry, multiServer: Boolean, onClick: () -> Unit
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    if (e.kind == EntryKind.MOVIE) Icons.Outlined.Movie else Icons.Outlined.Tv,
+                    when (e.kind) {
+                        EntryKind.MOVIE -> Icons.Outlined.Movie
+                        EntryKind.ALBUM -> Icons.Outlined.Album
+                        EntryKind.EPISODE -> Icons.Outlined.Tv
+                    },
                     null,
                     Modifier.size(14.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,

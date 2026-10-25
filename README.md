@@ -4,7 +4,7 @@
 
 [![Latest release](https://img.shields.io/github/v/release/VoidedKN0X/ArrCtrl?label=download)](https://github.com/VoidedKN0X/ArrCtrl/releases/latest) ![Android 13+](https://img.shields.io/badge/Android-13%2B-3DDC84?logo=android&logoColor=white) [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE) ![Telemetry-free](https://img.shields.io/badge/telemetry-none-brightgreen) [![Sponsor](https://img.shields.io/badge/sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/VoidedKN0X)
 
-ArrCtrl is an Android app for [Radarr](https://radarr.video/), [Sonarr](https://sonarr.tv/), [Prowlarr](https://prowlarr.com/), [Bazarr](https://www.bazarr.media/), [qBittorrent](https://www.qbittorrent.org/), [autobrr](https://autobrr.com/) and [Cleanuparr](https://github.com/Cleanuparr/Cleanuparr), in the spirit of nzb360 and LunaSea.
+ArrCtrl is an Android app for [Radarr](https://radarr.video/), [Sonarr](https://sonarr.tv/), [Lidarr](https://lidarr.audio/), [Prowlarr](https://prowlarr.com/), [Bazarr](https://www.bazarr.media/), [qBittorrent](https://www.qbittorrent.org/), [autobrr](https://autobrr.com/) and [Cleanuparr](https://github.com/Cleanuparr/Cleanuparr), in the spirit of nzb360 and LunaSea.
 
 Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
@@ -15,9 +15,10 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 ## Features
 
 - **Movies and Series**: your Radarr and Sonarr libraries with automatic and interactive search, monitoring, quality profiles, renaming and bulk edits
-- **Wanted**: Radarr and Sonarr's missing and cutoff-unmet lists, with search for one item, a selection or everything
-- **Calendar** with upcoming movies and episodes from both
-- **Activity**: the Radarr and Sonarr queues with manual import, your qBittorrent torrents with full controls, and the Radarr and Sonarr history
+- **Music**: your Lidarr artists and albums, with add, search, monitoring and profiles (shown only when you have a Lidarr server)
+- **Wanted**: Radarr, Sonarr and Lidarr's missing and cutoff-unmet lists, with search for one item, a selection or everything
+- **Calendar** with upcoming movies, episodes and album releases
+- **Activity**: the Radarr, Sonarr and Lidarr queues (with manual import for Radarr and Sonarr), your qBittorrent torrents with full controls, and their history
 - **qBittorrent extras**: move a torrent's files (set location, with recent folders), per-torrent share limits, and the global normal and alternative speed limits
 - **Add torrents** from magnet links and `.torrent` files, straight from the share sheet
 - **Subtitles** through Bazarr on every movie and episode: see what's there, get any other language, or pick one yourself
@@ -40,7 +41,7 @@ Coming soon.
 ## Requirements
 
 - Android 13 or newer, on a 64-bit ARM phone (nearly every phone from the last several years)
-- Any of: Radarr, Sonarr, Prowlarr, Bazarr, qBittorrent, autobrr, Cleanuparr
+- Any of: Radarr, Sonarr, Lidarr, Prowlarr, Bazarr, qBittorrent, autobrr, Cleanuparr
 - **Google-free and de-Googled:** no Google Play services, Firebase or other Google services, and the app never contacts Google. It works the same on de-Googled phones (GrapheneOS, CalyxOS, /e/OS, LineageOS without Google apps).
 
 ## Install
@@ -62,16 +63,16 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
 
 1. Tap your profile picture at the top right of any tab, then **Add a server** on the **You** page.
 2. Pick the service and enter its address, e.g. `http://192.168.1.10:7878` or `https://radarr.example.com`. Add the path too if it runs under one behind a reverse proxy (`https://example.com/radarr`).
-3. Enter the API key (in the web UI under Settings → General → Security for Radarr, Sonarr, Prowlarr and Bazarr). For qBittorrent use your Web UI username and password, or an API key on qBittorrent 5.2 or newer.
+3. Enter the API key (in the web UI under Settings → General → Security for Radarr, Sonarr, Lidarr, Prowlarr and Bazarr). For qBittorrent use your Web UI username and password, or an API key on qBittorrent 5.2 or newer.
 4. Tap **Test**, then **Save**. If the server uses a self-signed certificate, tap **Review certificate**, check the fingerprint and trust it. ArrCtrl then accepts that exact certificate from that server only.
 
 Every service is optional, and you can add more than one of each.
 
-Your servers, **Settings** and **About** are all on the **You** page behind your profile picture. The **More** tab holds **Wanted** and the extra tools (Prowlarr, Bazarr, autobrr, Cleanuparr and System health).
+Your servers, **Settings** and **About** are all on the **You** page behind your profile picture. The **More** tab holds **Wanted**, **Music** (with a Lidarr server) and the extra tools (Prowlarr, Bazarr, autobrr, Cleanuparr and System health).
 
 ### Import all servers at once
 
-Instead of typing seven API keys on your phone, put them in one JSON block and either paste it (**Import servers** → **Paste**) or turn it into a QR code and scan it (**Scan QR**).
+Instead of typing eight API keys on your phone, put them in one JSON block and either paste it (**Import servers** → **Paste**) or turn it into a QR code and scan it (**Scan QR**).
 
 ```json
 {
@@ -80,6 +81,7 @@ Instead of typing seven API keys on your phone, put them in one JSON block and e
     { "type": "radarr",      "url": "http://192.168.1.10:7878", "apiKey": "…" },
     { "type": "radarr",      "name": "Radarr 4K", "url": "http://192.168.1.10:7879", "apiKey": "…" },
     { "type": "sonarr",      "url": "https://sonarr.example.com", "apiKey": "…" },
+    { "type": "lidarr",      "url": "http://192.168.1.10:8686", "apiKey": "…" },
     { "type": "prowlarr",    "url": "http://192.168.1.10:9696", "apiKey": "…" },
     { "type": "bazarr",      "url": "http://192.168.1.10:6767", "apiKey": "…" },
     { "type": "qbittorrent", "url": "http://192.168.1.10:8080", "username": "admin", "password": "…" },
@@ -91,7 +93,7 @@ Instead of typing seven API keys on your phone, put them in one JSON block and e
 
 | Field | Needed | What it is |
 | --- | --- | --- |
-| `type` | yes | `radarr`, `sonarr`, `prowlarr`, `bazarr`, `qbittorrent`, `autobrr` or `cleanuparr` |
+| `type` | yes | `radarr`, `sonarr`, `lidarr`, `prowlarr`, `bazarr`, `qbittorrent`, `autobrr` or `cleanuparr` |
 | `url` | yes | The server address. Without `http://` or `https://`, IP addresses and local names get `http://`, anything else `https://` |
 | `apiKey` | yes, except qBittorrent | The service's API key. For qBittorrent, an API key replaces username and password |
 | `username`, `password` | qBittorrent only | Your qBittorrent Web UI login, when not using an API key |
@@ -135,7 +137,7 @@ An **Active downloads** notification (what's downloading and how fast) is also a
 
 | Service | Where | What to enter |
 |---|---|---|
-| **Radarr**, **Sonarr**, **Prowlarr** | Settings → Connect → **+** → **ntfy** | Server URL: the ntfy server. Topics: the topic. Tick the events you care about (On Grab, On Import, On Health Issue, and so on) and **Test**. |
+| **Radarr**, **Sonarr**, **Lidarr**, **Prowlarr** | Settings → Connect → **+** → **ntfy** | Server URL: the ntfy server. Topics: the topic. Tick the events you care about (On Grab, On Import, On Health Issue, and so on) and **Test**. |
 | **Bazarr** | Settings → Notifications → add | An Apprise URL: `ntfys://ntfy.example.com/upAbC123xyz` (`ntfy://` for plain HTTP). |
 | **autobrr** | Settings → Notifications → add → **ntfy** | URL: the whole push address (autobrr posts straight to it), e.g. `https://ntfy.example.com/upAbC123xyz`. Pick the events. |
 | **Cleanuparr** | Settings → Notifications → add → **ntfy** | Server URL: the ntfy server. Topics: the topic. |
@@ -208,7 +210,7 @@ Native Android apps for self-hosted services and everyday tools, all with the sa
 | App | What it's for |
 | --- | --- |
 | [AdCtrl](https://github.com/VoidedKN0X/AdCtrl) | Control your AdGuard Home DNS server |
-| **ArrCtrl** (this app) | Radarr, Sonarr, Prowlarr, Bazarr, qBittorrent, autobrr and Cleanuparr in one app |
+| **ArrCtrl** (this app) | Radarr, Sonarr, Lidarr, Prowlarr, Bazarr, qBittorrent, autobrr and Cleanuparr in one app |
 | [BeamCtrl](https://github.com/VoidedKN0X/BeamCtrl) | TV remote for phones with an IR blaster |
 | [CraftyCtrl](https://github.com/VoidedKN0X/CraftyCtrl) | Manage Minecraft servers on Crafty Controller |
 | [ChatCtrl](https://github.com/VoidedKN0X/ChatCtrl) | Matrix chat client for matrix.org and self-hosted Synapse |

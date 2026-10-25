@@ -75,6 +75,7 @@ import com.vknxworks.arrctrl.ui.components.ctrlSegmentedColors
 import com.vknxworks.arrctrl.ui.components.topDivider
 import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.nav.MovieRoute
+import com.vknxworks.arrctrl.ui.nav.ArtistRoute
 import com.vknxworks.arrctrl.ui.nav.SeasonRoute
 import com.vknxworks.arrctrl.ui.nav.ServerEditRoute
 import com.vknxworks.arrctrl.ui.servers.failureText
@@ -98,7 +99,7 @@ data class WantedItem(
 )
 
 /** Which services have a Wanted list. */
-val WANTED_TYPES = setOf(ServiceType.RADARR, ServiceType.SONARR)
+val WANTED_TYPES = setOf(ServiceType.RADARR, ServiceType.SONARR, ServiceType.LIDARR)
 
 private const val PAGE = 50
 
@@ -129,14 +130,27 @@ suspend fun loadWanted(c: AppContainer, s: Server, cutoff: Boolean, page: Int): 
             )
         } to total
     }
+    ServiceType.LIDARR -> c.lidarr(s).wanted(cutoff, page, PAGE).let { (list, total) ->
+        list.map { a ->
+            WantedItem(
+                id = a.id,
+                title = a.artist?.name ?: a.title,
+                subtitle = listOfNotNull(a.title.takeIf { a.artist != null }, a.albumType).joinToString(" · ").ifBlank { null },
+                quality = null,
+                dateMs = a.releaseDate?.toEpochMilli(),
+                route = ArtistRoute(s.id, a.artistId),
+            )
+        } to total
+    }
     else -> emptyList<WantedItem>() to 0
 }
 
-/** Searches the chosen items (MoviesSearch / EpisodeSearch). */
+/** Searches the chosen items (MoviesSearch / EpisodeSearch / AlbumSearch). */
 suspend fun searchWanted(c: AppContainer, s: Server, ids: List<Int>) {
     when (s.type) {
         ServiceType.RADARR -> c.radarr(s).search(ids)
         ServiceType.SONARR -> c.sonarr(s).searchEpisodes(ids)
+        ServiceType.LIDARR -> c.lidarr(s).searchAlbums(ids)
         else -> Unit
     }
 }
@@ -146,6 +160,7 @@ suspend fun searchAllWanted(c: AppContainer, s: Server, cutoff: Boolean) {
     when (s.type) {
         ServiceType.RADARR -> if (cutoff) c.radarr(s).searchAllCutoffUnmet() else c.radarr(s).searchAllMissing()
         ServiceType.SONARR -> if (cutoff) c.sonarr(s).searchAllCutoffUnmet() else c.sonarr(s).searchAllMissing()
+        ServiceType.LIDARR -> if (cutoff) c.lidarr(s).searchAllCutoffUnmet() else c.lidarr(s).searchAllMissing()
         else -> Unit
     }
 }

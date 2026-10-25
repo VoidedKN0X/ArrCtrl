@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HealthAndSafety
 import androidx.compose.material.icons.outlined.ManageSearch
+import androidx.compose.material.icons.outlined.LibraryMusic
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -40,6 +41,7 @@ import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.nav.ProwlarrRoute
 import com.vknxworks.arrctrl.ui.nav.ServerEditRoute
 import com.vknxworks.arrctrl.ui.nav.WantedRoute
+import com.vknxworks.arrctrl.ui.nav.MusicRoute
 import com.vknxworks.arrctrl.ui.servers.icon
 
 @Composable
@@ -68,8 +70,19 @@ fun MoreScreen() {
                 .padding(bottom = 24.dp + LocalBottomClearance.current),
         ) {
             val wantedServers = servers.count { it.type in com.vknxworks.arrctrl.ui.wanted.WANTED_TYPES }
+            val lidarrs = servers.count { it.type == ServiceType.LIDARR }
             if (wantedServers > 0) {
                 Group(stringResource(R.string.more_library)) {
+                    // Music only once a Lidarr server is set up, so the More tab stays as it was without one.
+                    if (lidarrs > 0) {
+                        GroupRow(
+                            stringResource(R.string.music),
+                            stringResource(R.string.music_role),
+                            Icons.Outlined.LibraryMusic,
+                            showChevron = true,
+                            onClick = { nav.navigate(MusicRoute) },
+                        )
+                    }
                     GroupRow(
                         stringResource(R.string.wanted),
                         stringResource(R.string.wanted_role),

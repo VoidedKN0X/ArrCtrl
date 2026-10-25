@@ -78,7 +78,7 @@ object Ongoing {
     suspend fun update(context: Context, s: AppSettings): Boolean = coroutineScope {
         val c = context.container
         val servers = c.servers.current().filter { it.id !in s.notifyMuted }
-        val queues = servers.filter { it.type == ServiceType.RADARR || it.type == ServiceType.SONARR }.map { srv ->
+        val queues = servers.filter { it.type.isMediaArr }.map { srv ->
             async { runCatching { c.arr(srv).queue() }.getOrDefault(emptyList()) }
         }
         val torrents = servers.filter { it.type == ServiceType.QBITTORRENT }.map { srv ->

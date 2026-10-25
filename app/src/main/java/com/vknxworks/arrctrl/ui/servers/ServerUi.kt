@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.GppMaybe
 import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.LibraryMusic
 import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Subtitles
@@ -43,6 +44,7 @@ val ServiceType.icon: ImageVector
     get() = when (this) {
         ServiceType.RADARR -> Icons.Outlined.Movie
         ServiceType.SONARR -> Icons.Outlined.Tv
+        ServiceType.LIDARR -> Icons.Outlined.LibraryMusic
         ServiceType.QBITTORRENT -> Icons.Outlined.Download
         ServiceType.PROWLARR -> Icons.Outlined.Search
         ServiceType.BAZARR -> Icons.Outlined.Subtitles

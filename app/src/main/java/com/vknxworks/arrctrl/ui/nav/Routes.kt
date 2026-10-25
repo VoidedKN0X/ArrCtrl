@@ -36,6 +36,11 @@ import kotlinx.serialization.Serializable
 @Serializable data class EpisodeReleasesRoute(val serverId: String, val episodeId: Int, val title: String)
 @Serializable data class AddSeriesRoute(val serverId: String, val term: String? = null)
 
+// Music (Lidarr)
+@Serializable data object MusicRoute
+@Serializable data class ArtistRoute(val serverId: String, val artistId: Int)
+@Serializable data class AddArtistRoute(val serverId: String)
+
 // More
 @Serializable data object ProwlarrRoute
 @Serializable data object BazarrRoute

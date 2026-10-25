@@ -92,7 +92,7 @@ suspend fun checkHealth(c: AppContainer, servers: List<Server>): List<ServerHeal
 
 private suspend fun checkOne(c: AppContainer, s: Server): ServerHealth = try {
     when (s.type) {
-        ServiceType.RADARR, ServiceType.SONARR, ServiceType.PROWLARR -> coroutineScope {
+        ServiceType.RADARR, ServiceType.SONARR, ServiceType.LIDARR, ServiceType.PROWLARR -> coroutineScope {
             val issues = async { arrHealth(c.http, s) }
             val disks = async { if (s.type == ServiceType.PROWLARR) emptyList() else runCatching { arrDiskSpace(c.http, s) }.getOrDefault(emptyList()) }
             ServerHealth(

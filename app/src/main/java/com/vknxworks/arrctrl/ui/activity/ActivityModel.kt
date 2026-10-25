@@ -28,7 +28,7 @@ import kotlin.coroutines.cancellation.CancellationException
 class ActivityModel(private val c: AppContainer) : ViewModel() {
     private fun servers(vararg types: ServiceType): List<Server> = c.servers.servers.value.filter { it.type in types }
 
-    val arrServers: List<Server> get() = servers(ServiceType.RADARR, ServiceType.SONARR)
+    val arrServers: List<Server> get() = servers(ServiceType.RADARR, ServiceType.SONARR, ServiceType.LIDARR)
     val qbitServers: List<Server> get() = servers(ServiceType.QBITTORRENT)
 
     // ---------- Queue ----------

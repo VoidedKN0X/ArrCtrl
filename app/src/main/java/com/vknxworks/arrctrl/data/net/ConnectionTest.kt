@@ -60,7 +60,7 @@ object ConnectionTest {
         val client = if (draft) http.draftClient(server) else http.client(server)
         try {
             when (server.type) {
-                ServiceType.RADARR, ServiceType.SONARR, ServiceType.PROWLARR -> arr(client, server)
+                ServiceType.RADARR, ServiceType.SONARR, ServiceType.LIDARR, ServiceType.PROWLARR -> arr(client, server)
                 ServiceType.BAZARR -> bazarr(client, server)
                 ServiceType.QBITTORRENT -> qbittorrent(client, server)
                 ServiceType.AUTOBRR -> autobrr(client, server)
@@ -75,7 +75,7 @@ object ConnectionTest {
 
     // ---------- Per service ----------
 
-    /** Radarr, Sonarr and Prowlarr: GET system/status, which names the app. */
+    /** Radarr, Sonarr, Lidarr and Prowlarr: GET system/status, which names the app. */
     private fun arr(client: OkHttpClient, s: Server): TestResult = get(client, s.api("/system/status")) { r ->
         authFailure(r.code)?.let { return@get it }
         if (r.code == 404) return@get TestResult.WrongService(null)

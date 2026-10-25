@@ -89,6 +89,9 @@ import com.vknxworks.arrctrl.ui.series.SeasonScreen
 import com.vknxworks.arrctrl.ui.series.SeriesDetailScreen
 import com.vknxworks.arrctrl.ui.series.SeriesScreen
 import com.vknxworks.arrctrl.ui.wanted.WantedScreen
+import com.vknxworks.arrctrl.ui.music.AddArtistScreen
+import com.vknxworks.arrctrl.ui.music.ArtistScreen
+import com.vknxworks.arrctrl.ui.music.MusicScreen
 import com.vknxworks.arrctrl.ui.links.OpenLinkScreen
 
 @Composable
@@ -160,6 +163,7 @@ private fun MainScaffold() {
             "health" -> navController.navigate(HealthRoute) { launchSingleTop = true }
             "movie" -> parts.getOrNull(2)?.toIntOrNull()?.let { id -> navController.navigate(MovieRoute(parts[1], id)) { launchSingleTop = true } }
             "series" -> parts.getOrNull(2)?.toIntOrNull()?.let { id -> navController.navigate(SeriesDetailRoute(parts[1], id)) { launchSingleTop = true } }
+            "artist" -> parts.getOrNull(2)?.toIntOrNull()?.let { id -> navController.navigate(ArtistRoute(parts[1], id)) { launchSingleTop = true } }
             // An arrctrl:// link from another app, checked in MainActivity: "link/movie/<tmdb>" or "link/series/<tvdb>/<tmdb>".
             "link" -> when (parts.getOrNull(1)) {
                 "movie" -> parts.getOrNull(2)?.toIntOrNull()?.takeIf { it > 0 }?.let { navController.navigate(OpenLinkRoute("movie", tmdb = it)) }
@@ -314,6 +318,12 @@ private fun AppNavHost(navController: NavHostController) {
             val r = it.toRoute<OpenLinkRoute>()
             OpenLinkScreen(r.kind, r.tmdb, r.tvdb)
         }
+        composable<MusicRoute> { MusicScreen() }
+        composable<ArtistRoute> {
+            val r = it.toRoute<ArtistRoute>()
+            ArtistScreen(r.serverId, r.artistId)
+        }
+        composable<AddArtistRoute> { AddArtistScreen(it.toRoute<AddArtistRoute>().serverId) }
         composable<WantedRoute> { WantedScreen(it.toRoute<WantedRoute>().serverId) }
         composable<NotificationsRoute> { NotificationsScreen() }
         composable<MediaSubtitlesRoute> {

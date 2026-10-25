@@ -122,6 +122,7 @@ class AppContainer(val context: Context) {
     fun qbit(server: Server) = QbitApi(http, server)
     fun radarr(server: Server) = RadarrApi(http, server)
     fun sonarr(server: Server) = SonarrApi(http, server)
+    fun lidarr(server: Server) = com.vknxworks.arrctrl.data.api.LidarrApi(http, server)
     fun prowlarr(server: Server) = ProwlarrApi(http, server)
     fun bazarr(server: Server) = BazarrApi(http, server)
     fun autobrr(server: Server) = AutobrrApi(http, server)

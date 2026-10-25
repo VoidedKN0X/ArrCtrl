@@ -18,7 +18,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.coroutines.cancellation.CancellationException
 
-enum class EntryKind { MOVIE, EPISODE }
+enum class EntryKind { MOVIE, EPISODE, ALBUM }
 
 /** Which release of a movie lands on this day. */
 enum class MovieRelease { CINEMA, DIGITAL, PHYSICAL }
@@ -41,8 +41,10 @@ data class CalendarEntry(
     val season: Int? = null,
     val finale: Boolean = false,
     val premiere: Boolean = false,
+    /** Lidarr: the album's artist. */
+    val artistId: Int? = null,
 ) {
-    val key: String get() = "${server.id}:$kind:${movieId ?: seriesId}:${subtitle.orEmpty()}:${release ?: ""}:$day"
+    val key: String get() = "${server.id}:$kind:${movieId ?: seriesId ?: artistId}:${subtitle.orEmpty()}:${release ?: ""}:$day"
 }
 
 /**
@@ -58,10 +60,14 @@ class CalendarLoader(private val c: AppContainer) {
         val start = from.minusDays(1).atStartOfDay(zone).toInstant().toString()
         val end = to.plusDays(2).atStartOfDay(zone).toInstant().toString()
         val unmonitored = !monitoredOnly
-        val jobs = servers.filter { it.type == ServiceType.RADARR || it.type == ServiceType.SONARR }.map { s ->
+        val jobs = servers.filter { it.type.isMediaArr }.map { s ->
             async {
                 s to runCatching {
-                    if (s.type == ServiceType.RADARR) movies(s, start, end, unmonitored) else episodes(s, start, end, unmonitored)
+                    when (s.type) {
+                        ServiceType.RADARR -> movies(s, start, end, unmonitored)
+                        ServiceType.LIDARR -> albums(s, start, end, unmonitored)
+                        else -> episodes(s, start, end, unmonitored)
+                    }
                 }
             }
         }
@@ -100,6 +106,29 @@ class CalendarLoader(private val c: AppContainer) {
                     movieId = m.id,
                 )
             }
+        }
+    }
+
+    private suspend fun albums(s: Server, start: String, end: String, unmonitored: Boolean): List<CalendarEntry> {
+        val now = Instant.now()
+        return c.lidarr(s).calendar(start, end, unmonitored).mapNotNull { a ->
+            val at = a.releaseDate ?: return@mapNotNull null
+            CalendarEntry(
+                server = s,
+                kind = EntryKind.ALBUM,
+                at = at,
+                // Release dates are whole days, like Radarr's.
+                day = at.atZone(ZoneId.of("UTC")).toLocalDate(),
+                title = a.artist?.name ?: a.title,
+                subtitle = listOfNotNull(a.title.takeIf { a.artist != null }, a.albumType).joinToString(" · ").ifBlank { null },
+                status = when {
+                    a.complete -> EntryStatus.DOWNLOADED
+                    !a.monitored || a.artist?.monitored == false -> EntryStatus.UNMONITORED
+                    at.isBefore(now) -> EntryStatus.MISSING
+                    else -> EntryStatus.UPCOMING
+                },
+                artistId = a.artistId,
+            )
         }
     }
 

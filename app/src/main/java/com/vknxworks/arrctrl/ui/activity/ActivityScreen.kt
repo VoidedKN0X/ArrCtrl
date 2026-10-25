@@ -82,7 +82,7 @@ fun ActivityScreen() {
     val c = LocalContext.current.container
     val nav = LocalNavigator.current
     val servers by c.servers.servers.collectAsStateWithLifecycle()
-    val hasArr = servers.any { it.type == ServiceType.RADARR || it.type == ServiceType.SONARR }
+    val hasArr = servers.any { it.type.isMediaArr }
     val hasQbit = servers.any { it.type == ServiceType.QBITTORRENT }
 
     if (!hasArr && !hasQbit) {
