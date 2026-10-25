@@ -22,8 +22,8 @@ android {
         minSdk = 33
         targetSdk = 36
         // Bump both to publish a new release (see CHANGELOG.md).
-        versionCode = 27
-        versionName = "1.2.6"
+        versionCode = 28
+        versionName = "1.3.0"
         // 64-bit ARM phones only (arm64-v8a), like every Ctrl app.
         ndk { abiFilters += listOf("arm64-v8a") }
     }
@@ -118,7 +118,6 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.haze)
     implementation(libs.okhttp)
     implementation(libs.coil.compose)
     implementation(libs.coil.network)

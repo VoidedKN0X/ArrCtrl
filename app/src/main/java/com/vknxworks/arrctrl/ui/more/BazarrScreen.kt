@@ -1,5 +1,10 @@
 package com.vknxworks.arrctrl.ui.more
 
+import com.vknxworks.arrctrl.ui.components.ctrlSegmentedColors
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlFilterChip
+import com.vknxworks.arrctrl.ui.components.CtrlSheet
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
@@ -23,7 +28,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ErrorOutline
@@ -33,14 +37,11 @@ import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.SubtitlesOff
 import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material.icons.outlined.WarningAmber
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -139,8 +140,8 @@ private fun WantedTab(server: Server, api: BazarrApi) {
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             SingleChoiceSegmentedButtonRow(Modifier.weight(1f)) {
-                SegmentedButton(selected = !episodes, onClick = { episodes = false }, shape = SegmentedButtonDefaults.itemShape(0, 2)) { Text(stringResource(R.string.tab_movies)) }
-                SegmentedButton(selected = episodes, onClick = { episodes = true }, shape = SegmentedButtonDefaults.itemShape(1, 2)) { Text(stringResource(R.string.bazarr_episodes)) }
+                SegmentedButton(selected = !episodes, onClick = { episodes = false }, shape = SegmentedButtonDefaults.itemShape(0, 2), colors = ctrlSegmentedColors()) { Text(stringResource(R.string.tab_movies)) }
+                SegmentedButton(selected = episodes, onClick = { episodes = true }, shape = SegmentedButtonDefaults.itemShape(1, 2), colors = ctrlSegmentedColors()) { Text(stringResource(R.string.bazarr_episodes)) }
             }
             IconButton(onClick = { confirmAll = true }) { Icon(Icons.Outlined.Search, stringResource(R.string.bazarr_search_all)) }
         }
@@ -173,7 +174,7 @@ private fun WantedTab(server: Server, api: BazarrApi) {
                         item {
                             Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
                                 if (loadingMore) CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp)
-                                else OutlinedButton(onClick = { scope.launch { loadingMore = true; load(false); loadingMore = false } }, shape = CircleShape) {
+                                else OutlinedButton(onClick = { scope.launch { loadingMore = true; load(false); loadingMore = false } }, shape = CtrlShapes.Button) {
                                     Text(stringResource(R.string.history_load_more))
                                 }
                             }
@@ -194,7 +195,7 @@ private fun WantedTab(server: Server, api: BazarrApi) {
     }
 
     open?.let { w ->
-        ModalBottomSheet(onDismissRequest = { open = null }, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+        CtrlSheet(onDismissRequest = { open = null }) {
             Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(w.title, style = MaterialTheme.typography.titleLarge)
                 w.detail?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
@@ -210,7 +211,7 @@ private fun WantedTab(server: Server, api: BazarrApi) {
                             else -> Unit
                         }
                     },
-                    shape = CircleShape,
+                    shape = CtrlShapes.Button,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(Icons.Outlined.Search, null)
@@ -221,7 +222,7 @@ private fun WantedTab(server: Server, api: BazarrApi) {
                         open = null
                         nav.navigate(SubtitleSearchRoute(server.id, w.radarrId, w.seriesId, w.episodeId, listOfNotNull(w.title, w.detail).joinToString(" · ")))
                     },
-                    shape = CircleShape,
+                    shape = CtrlShapes.Button,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(Icons.Outlined.ManageSearch, null)
@@ -229,7 +230,7 @@ private fun WantedTab(server: Server, api: BazarrApi) {
                 }
                 OutlinedButton(
                     onClick = { open = null; languagesFor = w },
-                    shape = CircleShape,
+                    shape = CtrlShapes.Button,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(Icons.Outlined.Translate, null)
@@ -247,7 +248,7 @@ private fun WantedTab(server: Server, api: BazarrApi) {
     }
 
     if (confirmAll) {
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirmAll = false },
             title = { Text(stringResource(R.string.bazarr_search_all)) },
             text = { Text(stringResource(if (episodes) R.string.bazarr_search_all_episodes else R.string.bazarr_search_all_movies)) },
@@ -271,8 +272,8 @@ private fun SubHistoryTab(server: Server, api: BazarrApi) {
     }
     Column(Modifier.fillMaxSize()) {
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp)) {
-            SegmentedButton(selected = !episodes, onClick = { episodes = false }, shape = SegmentedButtonDefaults.itemShape(0, 2)) { Text(stringResource(R.string.tab_movies)) }
-            SegmentedButton(selected = episodes, onClick = { episodes = true }, shape = SegmentedButtonDefaults.itemShape(1, 2)) { Text(stringResource(R.string.bazarr_episodes)) }
+            SegmentedButton(selected = !episodes, onClick = { episodes = false }, shape = SegmentedButtonDefaults.itemShape(0, 2), colors = ctrlSegmentedColors()) { Text(stringResource(R.string.tab_movies)) }
+            SegmentedButton(selected = episodes, onClick = { episodes = true }, shape = SegmentedButtonDefaults.itemShape(1, 2), colors = ctrlSegmentedColors()) { Text(stringResource(R.string.bazarr_episodes)) }
         }
         val l = items
         when {
@@ -354,7 +355,7 @@ private fun ProvidersTab(server: Server, api: BazarrApi) {
     }
     if (confirmReset) {
         val done = stringResource(R.string.bazarr_providers_reset_done)
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirmReset = false },
             title = { Text(stringResource(R.string.bazarr_reset_providers_title)) },
             text = { Text(stringResource(R.string.bazarr_reset_providers_body)) },
@@ -405,7 +406,7 @@ fun LanguagesProfileDialog(api: BazarrApi, radarrId: Int?, seriesId: Int?, onDis
             .onFailure { error = failureText(context, it) }
     }
     val saved = stringResource(R.string.bazarr_languages_saved)
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.bazarr_languages_title)) },
         text = {
@@ -533,8 +534,8 @@ fun SubtitleSearchScreen(serverId: String, radarrId: Int?, seriesId: Int?, episo
                     if (languages.size > 1) {
                         item {
                             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                FilterChip(selected = language == null, onClick = { language = null }, label = { Text(stringResource(R.string.bazarr_all_languages)) })
-                                languages.forEach { l -> FilterChip(selected = language == l, onClick = { language = if (language == l) null else l }, label = { Text(l) }) }
+                                CtrlFilterChip(selected = language == null, onClick = { language = null }, label = { Text(stringResource(R.string.bazarr_all_languages)) })
+                                languages.forEach { l -> CtrlFilterChip(selected = language == l, onClick = { language = if (language == l) null else l }, label = { Text(l) }) }
                             }
                         }
                     }
@@ -563,7 +564,7 @@ fun SubtitleSearchScreen(serverId: String, radarrId: Int?, seriesId: Int?, episo
             }
             confirm?.let { s ->
                 val ok = stringResource(R.string.bazarr_downloaded)
-                AlertDialog(
+                CtrlAlertDialog(
                     onDismissRequest = { confirm = null },
                     title = { Text(stringResource(R.string.bazarr_download_title)) },
                     text = { Text(listOfNotNull(s.releaseInfo.firstOrNull(), s.provider, s.language).joinToString("\n"), style = MaterialTheme.typography.bodySmall) },

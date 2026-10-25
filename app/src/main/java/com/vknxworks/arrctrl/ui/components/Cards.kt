@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudOff
@@ -22,34 +23,34 @@ import androidx.compose.ui.unit.dp
 import com.vknxworks.arrctrl.data.net.TestResult
 import com.vknxworks.arrctrl.data.server.Server
 import com.vknxworks.arrctrl.ui.servers.resultText
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.theme.CtrlType
 import com.vknxworks.arrctrl.ui.theme.Gutter
 
 /** Inline card for one server that couldn't be reached; the rest of the screen keeps working. */
 @Composable
 fun ServerErrorCard(server: Server, result: TestResult, modifier: Modifier = Modifier) {
-    Surface(
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.errorContainer,
-        modifier = modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 4.dp),
-    ) {
-        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Outlined.CloudOff, null, tint = MaterialTheme.colorScheme.onErrorContainer)
+    CtrlCard(modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 4.dp), padding = androidx.compose.foundation.layout.PaddingValues(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Outlined.CloudOff, null, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.error)
             Spacer(Modifier.width(12.dp))
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(server.name, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onErrorContainer)
-                Text(resultText(result, server.type), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onErrorContainer)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(server.name, style = MaterialTheme.typography.titleMedium)
+                Text(resultText(result, server.type), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+            Spacer(Modifier.width(8.dp))
+            StatusDot(MaterialTheme.colorScheme.error)
         }
     }
 }
 
 /** Tiny rounded label (category, tag, quality). */
 @Composable
-fun Chip(text: String, color: Color = MaterialTheme.colorScheme.surfaceContainerHighest, content: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
-    Surface(shape = MaterialTheme.shapes.extraSmall, color = color) {
+fun Chip(text: String, color: Color = MaterialTheme.colorScheme.surfaceContainerHigh, content: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
+    Surface(shape = CtrlShapes.Badge, color = color) {
         Text(
             text,
-            style = MaterialTheme.typography.labelSmall,
+            style = CtrlType.Status,
             color = content,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

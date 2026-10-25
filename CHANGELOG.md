@@ -4,6 +4,35 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.3.0 (2026-10-25)
+
+A new look: ArrCtrl now uses **Ctrl / Signal**, the design shared by every Ctrl app. Dark, high-contrast and built around one violet accent colour. Everything works exactly as before; only the look changed.
+
+### Changed
+
+- **New colours.** A near-black background (#08080A) with dark grey cards outlined by a thin border, off-white text, and one violet accent (#B48CFF) for whatever is active, selected or most important. Errors are a softer red. "Done" states (downloaded, complete, healthy) are now white instead of green, so the accent always means "active".
+- **New fonts.** All text is now set in **Space Grotesk**, and numbers, sizes, speeds, ETAs, server addresses and section labels in **JetBrains Mono**. Both fonts are bundled in the app (no font downloads, nothing from Google). Manrope has been removed.
+- **New top bar.** The main tabs show the **ARR/CTRL** wordmark (the slash in the accent colour) on the left and your profile picture on the right as a rounded square, followed by the tab's name as a big headline. The profile picture gets a small accent square in its corner once one of your servers answers. Tapping it still opens the You page with servers, settings and About.
+- **New back button.** Pushed screens (a movie, a series, a torrent, settings, a tool) have a square back button next to the title instead of a plain arrow. On movie and series pages it floats over the artwork.
+- **Download speed is the star of Activity.** With qBittorrent set up, the Activity tab now opens with a big accent card showing the combined download speed in large type, with upload speed and free space underneath, and "Alternative limits on" in its corner while they're on.
+- **Queue and torrent lists.** Rows are separated by thin lines and each one now shows its progress as a percentage on the right with a small square status dot: violet while downloading, seeding or checking, grey when paused, queued or stopped, red when something needs attention. Sizes, ETAs, speeds and ratios are shown in the mono font. Progress bars are thicker (6dp) with a dark track.
+- **Posters.** Movie and series posters have 14dp rounded corners and a thin border. Titles under posters are a little bigger; years and episode counts are in the mono font.
+- **More tab.** Each tool (Prowlarr, Bazarr, autobrr, Cleanuparr) shows how many servers are set up ("1 ON") or "OFF" with a status dot.
+- **New bottom bar.** The floating tab bar is now a dark rounded rectangle with a thin border, sitting a little higher. The selected tab is a violet block with its icon and name; the other tabs show only their icon. On tablets the side rail uses the same colours.
+- **New switches.** Every switch is now a rounded rectangle with a square-ish knob: violet when on, grey when off. They still work with TalkBack as switches.
+- **Buttons, fields, chips and tabs.** Main buttons are violet with dark text; other buttons are dark with a thin border. Text fields are dark with a thin border that turns violet while you type. Filter chips and segmented buttons (Queue / Torrents / History, Movies / Episodes) fill with violet when selected. Rounded pill shapes are replaced by rounded rectangles.
+- **Dialogs and sheets.** Every dialog and bottom sheet is dark grey with larger rounded corners and a thin border.
+- **New lock screen.** The app lock shows a violet rounded-square lock badge, "VKNXWORKS · CTRL" and **Locked** in large type. The PIN is shown as small squares that fill in violet as you type. The keypad keys are larger rounded rectangles with the digits in the mono font, the OK key turns violet once your PIN is long enough, and **Use fingerprint** is an outlined violet button. How the lock works (PIN, fingerprint, timeouts, Forgot PIN) hasn't changed.
+- **New You page.** A violet profile badge with ArrCtrl's name and your first server's address in the mono font at the top. Sections (Servers, About, Privacy and security, Notifications) are labelled in small mono capitals and grouped in dark cards with thin dividers. **Support ArrCtrl** is now a violet button at the bottom, with "GOOGLE-FREE · TELEMETRY-FREE · ARM64" and the version underneath.
+- **Status and navigation bars** now use the app's background colour with light icons, edge to edge.
+- **Home screen widgets** use the new dark colours and the violet accent.
+- **Empty and error states** use a rounded-square icon badge, and a server that can't be reached shows as a dark card with a red status dot instead of a red block.
+
+### Removed
+
+- **Light, Follow system and Pure black themes, and "Use wallpaper colours".** Ctrl / Signal is dark only, so the **Appearance** section in Settings is gone. Your old choices are kept on the phone but no longer change anything. The widgets no longer follow your wallpaper colours either.
+- **The frosted-glass blur** behind the tab bar (and the Haze library it needed); the bar is now a solid, slightly see-through dark surface.
+
 ## v1.2.6 (2026-10-22)
 
 ### Fixed

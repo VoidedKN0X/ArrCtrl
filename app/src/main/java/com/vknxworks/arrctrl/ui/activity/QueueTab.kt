@@ -1,5 +1,15 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import com.vknxworks.arrctrl.ui.theme.CtrlType
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.components.topDivider
+import com.vknxworks.arrctrl.ui.components.StatusDot
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.heightIn
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlProgressBar
+import com.vknxworks.arrctrl.ui.components.CtrlSheet
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
@@ -17,20 +27,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DriveFileMove
 import androidx.compose.material.icons.outlined.WarningAmber
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -91,20 +97,30 @@ private fun QueueRow(q: QueueItem, showServer: Boolean, onClick: () -> Unit) {
         Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = Gutter, vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+            .padding(horizontal = Gutter)
+            .topDivider()
+            .heightIn(min = 52.dp)
+            .padding(vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(q.server.type.icon, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(10.dp))
             Text(q.title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-            if (q.hasWarning) Icon(Icons.Outlined.WarningAmber, stringResource(R.string.queue_needs_attention), Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
+            Spacer(Modifier.width(8.dp))
+            if (q.hasWarning) {
+                Icon(Icons.Outlined.WarningAmber, stringResource(R.string.queue_needs_attention), Modifier.size(18.dp), tint = MaterialTheme.colorScheme.error)
+                Spacer(Modifier.width(6.dp))
+            }
+            Text(Format.percent(q.progress.toDouble()), style = CtrlType.Status, color = queueColor(q))
+            Spacer(Modifier.width(8.dp))
+            StatusDot(queueColor(q))
         }
         val sub = listOfNotNull(q.detail, if (showServer) q.server.name else null).joinToString(" · ")
         if (sub.isNotBlank()) {
             Text(sub, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        LinearProgressIndicator(
+        CtrlProgressBar(
             progress = { q.progress },
             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
             color = if (q.hasWarning) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
@@ -117,7 +133,7 @@ private fun QueueRow(q: QueueItem, showServer: Boolean, onClick: () -> Unit) {
                     Format.bytes(q.size),
                     Format.eta(q.etaSeconds)?.let { stringResource(R.string.eta_left, it) },
                 ).joinToString(" · "),
-                style = MaterialTheme.typography.labelMedium,
+                style = CtrlType.Mono,
                 color = if (q.hasWarning) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -127,6 +143,14 @@ private fun QueueRow(q: QueueItem, showServer: Boolean, onClick: () -> Unit) {
             Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
+}
+
+/** Accent while it's moving, red when it needs you, grey when it's waiting. */
+@Composable
+private fun queueColor(q: QueueItem): Color = when {
+    q.hasWarning -> MaterialTheme.colorScheme.error
+    q.status == "paused" || q.status == "queued" || q.status == "delay" -> CtrlColors.Stopped
+    else -> CtrlColors.Accent
 }
 
 @Composable
@@ -154,7 +178,7 @@ private fun QueueSheet(q: QueueItem, model: ActivityModel, onDismiss: () -> Unit
     val scope = rememberCoroutineScope()
     var confirmRemove by remember { mutableStateOf(false) }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss) {
         Column(
             Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 24.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -162,7 +186,7 @@ private fun QueueSheet(q: QueueItem, model: ActivityModel, onDismiss: () -> Unit
             Text(q.title, style = MaterialTheme.typography.titleLarge)
             q.detail?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             Text(q.release, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            LinearProgressIndicator(progress = { q.progress }, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp))
+            CtrlProgressBar(progress = { q.progress }, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp))
             Detail(R.string.detail_status, queueStatusText(q))
             Detail(R.string.detail_progress, "${Format.bytes(q.size - q.sizeLeft)} / ${Format.bytes(q.size)}")
             Format.eta(q.etaSeconds)?.let { Detail(R.string.detail_eta, it) }
@@ -182,14 +206,14 @@ private fun QueueSheet(q: QueueItem, model: ActivityModel, onDismiss: () -> Unit
                         onDismiss()
                         nav.navigate(ManualImportRoute(q.server.id, q.downloadId.orEmpty(), q.title))
                     },
-                    shape = CircleShape,
+                    shape = CtrlShapes.Button,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(Icons.Outlined.DriveFileMove, null)
                     Text(stringResource(R.string.manual_import), Modifier.padding(start = 8.dp))
                 }
             }
-            OutlinedButton(onClick = { confirmRemove = true }, shape = CircleShape, modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(onClick = { confirmRemove = true }, shape = CtrlShapes.Button, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Outlined.Delete, null)
                 Text(stringResource(R.string.queue_remove), Modifier.padding(start = 8.dp))
             }
@@ -201,7 +225,7 @@ private fun QueueSheet(q: QueueItem, model: ActivityModel, onDismiss: () -> Unit
         var blocklist by remember { mutableStateOf(false) }
         var skipSearch by remember { mutableStateOf(false) }
         val done = stringResource(R.string.queue_removed)
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirmRemove = false },
             title = { Text(stringResource(R.string.queue_remove_title, q.title)) },
             text = {

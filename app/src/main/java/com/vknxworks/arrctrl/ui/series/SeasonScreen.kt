@@ -1,5 +1,9 @@
 package com.vknxworks.arrctrl.ui.series
 
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlSheet
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
@@ -19,7 +23,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bookmark
@@ -34,7 +37,6 @@ import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -42,7 +44,6 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -218,7 +219,7 @@ fun SeasonScreen(serverId: String, seriesId: Int, season: Int) {
     }
 
     if (confirmSearch) {
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirmSearch = false },
             title = { Text(stringResource(R.string.season_search_title, seasonName(season))) },
             text = { Text(stringResource(R.string.season_search_body)) },
@@ -289,7 +290,7 @@ private fun EpisodeStatusIcon(e: Episode, downloading: Boolean) {
         e.hasFile -> Icon(Icons.Outlined.CheckCircle, stringResource(R.string.badge_downloaded), tint = MaterialTheme.colorScheme.tertiary)
         !e.aired -> Icon(Icons.Outlined.Schedule, stringResource(R.string.episode_not_aired), tint = MaterialTheme.colorScheme.onSurfaceVariant)
         e.monitored -> Icon(Icons.Outlined.ErrorOutline, stringResource(R.string.badge_missing), tint = MaterialTheme.colorScheme.error)
-        else -> Icon(Icons.Outlined.RadioButtonUnchecked, stringResource(R.string.badge_missing), tint = MaterialTheme.colorScheme.outline)
+        else -> Icon(Icons.Outlined.RadioButtonUnchecked, stringResource(R.string.badge_missing), tint = CtrlColors.Stopped)
     }
 }
 
@@ -318,7 +319,7 @@ private fun EpisodeSheet(
         }
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss) {
         Column(
             Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 24.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -363,19 +364,19 @@ private fun EpisodeSheet(
             Spacer(Modifier.size(4.dp))
             FilledTonalButton(
                 onClick = { act(R.string.movie_search_started) { api.searchEpisodes(listOf(e.id)) } },
-                shape = CircleShape,
+                shape = CtrlShapes.Button,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(Icons.Outlined.Search, null)
                 Text(stringResource(R.string.episode_search), Modifier.padding(start = 8.dp))
             }
-            OutlinedButton(onClick = onInteractive, shape = CircleShape, modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(onClick = onInteractive, shape = CtrlShapes.Button, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Outlined.ManageSearch, null)
                 Text(stringResource(R.string.movie_interactive), Modifier.padding(start = 8.dp))
             }
             OutlinedButton(
                 onClick = { act(if (e.monitored) R.string.movie_now_unmonitored else R.string.movie_now_monitored) { api.setEpisodesMonitored(listOf(e.id), !e.monitored) } },
-                shape = CircleShape,
+                shape = CtrlShapes.Button,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(if (e.monitored) Icons.Outlined.BookmarkBorder else Icons.Outlined.Bookmark, null)
@@ -387,7 +388,7 @@ private fun EpisodeSheet(
             if (e.hasFile && series != null && CtrlApps.installed(context, CtrlApps.JELLYCTRL)) {
                 OutlinedButton(
                     onClick = { CtrlApps.open(context, CtrlApps.JELLYCTRL, CtrlApps.jellyEpisode(series.tvdbId, series.tmdbId, series.imdbId, series.title, series.year, e.season, e.number)) },
-                    shape = CircleShape,
+                    shape = CtrlShapes.Button,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(Icons.Outlined.PlayArrow, null)
@@ -404,7 +405,7 @@ private fun EpisodeSheet(
     }
 
     if (confirmDelete && file != null) {
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirmDelete = false },
             title = { Text(stringResource(R.string.movie_delete_file_title)) },
             text = { Text(file?.relativePath ?: e.code) },

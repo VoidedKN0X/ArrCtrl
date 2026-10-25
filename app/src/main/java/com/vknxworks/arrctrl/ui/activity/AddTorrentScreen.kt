@@ -1,5 +1,7 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import com.vknxworks.arrctrl.ui.lock.AppLock
 import com.vknxworks.arrctrl.ui.servers.failureText
 import com.vknxworks.arrctrl.ui.servers.ShownException
@@ -20,7 +22,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -35,7 +36,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -205,7 +205,7 @@ fun AddTorrentScreen(initialLink: String?, initialFile: String?) {
         ) {
             Column(Modifier.padding(horizontal = Gutter), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (fileUri == null) {
-                    OutlinedTextField(
+                    CtrlTextField(
                         value = link,
                         onValueChange = { link = it },
                         label = { Text(stringResource(R.string.torrent_add_link)) },
@@ -216,7 +216,7 @@ fun AddTorrentScreen(initialLink: String?, initialFile: String?) {
                     )
                     OutlinedButton(
                         onClick = { AppLock.expectReturn(); picker.launch(arrayOf("application/x-bittorrent", "application/octet-stream")) },
-                        shape = CircleShape,
+                        shape = CtrlShapes.Button,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Icon(Icons.Outlined.FileOpen, null)
@@ -250,7 +250,7 @@ fun AddTorrentScreen(initialLink: String?, initialFile: String?) {
             Button(
                 onClick = { add() },
                 enabled = canAdd,
-                shape = CircleShape,
+                shape = CtrlShapes.Button,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp),
             ) {
                 Text(

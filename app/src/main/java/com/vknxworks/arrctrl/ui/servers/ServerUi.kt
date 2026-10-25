@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.servers
 
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
 import androidx.compose.ui.platform.LocalContext
 import android.content.Context
 import com.vknxworks.arrctrl.data.api.ApiException
@@ -21,7 +22,6 @@ import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Subtitles
 import androidx.compose.material.icons.outlined.Tv
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -127,7 +127,7 @@ fun CheckIcon(check: ServerStatus.Check?) {
 /** Shows a self-signed certificate's fingerprint and asks whether to trust exactly that certificate. */
 @Composable
 fun CertDialog(host: String, fingerprint: String, changed: Boolean, onTrust: () -> Unit, onCancel: () -> Unit) {
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onCancel,
         icon = { Icon(Icons.Outlined.GppMaybe, null) },
         title = { Text(stringResource(if (changed) R.string.cert_changed_title else R.string.cert_trust_title)) },

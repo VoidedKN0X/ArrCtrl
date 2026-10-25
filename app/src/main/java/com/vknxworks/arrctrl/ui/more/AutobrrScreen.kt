@@ -1,5 +1,8 @@
 package com.vknxworks.arrctrl.ui.more
 
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlSwitch
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ErrorOutline
@@ -28,7 +30,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -164,7 +165,7 @@ private fun ReleasesTab(server: Server, api: AutobrrApi) {
                     item {
                         Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
                             if (loadingMore) CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp)
-                            else OutlinedButton(onClick = { scope.launch { loadingMore = true; load(false); loadingMore = false } }, shape = CircleShape) {
+                            else OutlinedButton(onClick = { scope.launch { loadingMore = true; load(false); loadingMore = false } }, shape = CtrlShapes.Button) {
                                 Text(stringResource(R.string.history_load_more))
                             }
                         }
@@ -195,7 +196,7 @@ private fun FiltersTab(server: Server, api: AutobrrApi) {
                         Text(f.name, style = MaterialTheme.typography.bodyLarge)
                         Text(stringResource(R.string.prowlarr_priority, f.priority), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    Switch(f.enabled, onCheckedChange = { on ->
+                    CtrlSwitch(f.enabled, onCheckedChange = { on ->
                         scope.launch {
                             runCatching { api.setFilterEnabled(f.id, on) }
                                 .onSuccess { load() }
@@ -228,7 +229,7 @@ private fun IrcTab(server: Server, api: AutobrrApi) {
                             null,
                             Modifier.size(18.dp),
                             tint = when {
-                                !n.enabled -> MaterialTheme.colorScheme.outline
+                                !n.enabled -> CtrlColors.Stopped
                                 ok -> MaterialTheme.colorScheme.tertiary
                                 else -> MaterialTheme.colorScheme.error
                             },

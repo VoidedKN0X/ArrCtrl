@@ -1,5 +1,9 @@
 package com.vknxworks.arrctrl.ui.series
 
+import com.vknxworks.arrctrl.ui.components.CtrlBackButton
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlProgressBar
 import android.text.format.DateUtils
 import com.vknxworks.arrctrl.ui.servers.failureText
 import android.widget.Toast
@@ -37,12 +41,10 @@ import androidx.compose.material.icons.outlined.Label
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -242,10 +244,10 @@ fun SeriesDetailScreen(serverId: String, seriesId: Int) {
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
-                            LinearProgressIndicator(
+                            CtrlProgressBar(
                                 progress = { pct },
                                 color = when {
-                                    !season.monitored -> MaterialTheme.colorScheme.outline
+                                    !season.monitored -> CtrlColors.Stopped
                                     season.episodeCount > 0 && season.episodeFileCount >= season.episodeCount -> MaterialTheme.colorScheme.tertiary
                                     else -> MaterialTheme.colorScheme.primary
                                 },
@@ -303,18 +305,14 @@ fun SeriesDetailScreen(serverId: String, seriesId: Int) {
             }
         }
 
-        IconButton(
-            onClick = nav::back,
-            colors = IconButtonDefaults.iconButtonColors(containerColor = Scrim, contentColor = Color.White),
-            modifier = Modifier.statusBarsPadding().padding(8.dp),
-        ) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back)) }
+        CtrlBackButton(Modifier.statusBarsPadding().padding(start = Gutter, top = 10.dp), container = CtrlColors.Surface.copy(alpha = 0.88f))
     }
 
     if (confirmDelete) {
         var files by remember { mutableStateOf(false) }
         var exclude by remember { mutableStateOf(false) }
         val deleted = stringResource(R.string.series_deleted)
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirmDelete = false },
             title = { Text(stringResource(R.string.movie_delete_title, s.title)) },
             text = {
@@ -338,7 +336,7 @@ fun SeriesDetailScreen(serverId: String, seriesId: Int) {
     }
 
     movingTo?.let { path ->
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { movingTo = null },
             title = { Text(stringResource(R.string.movie_move_title)) },
             text = { Text(stringResource(R.string.series_move_body, path)) },
@@ -432,7 +430,7 @@ private fun SeriesRenameDialog(api: SonarrApi, s: Series, onDismiss: () -> Unit,
     var failed by remember { mutableStateOf(false) }
     LaunchedEffect(s.id) { runCatching { api.renamePreview(s.id) }.onSuccess { items = it }.onFailure { failed = true } }
     val started = stringResource(R.string.movie_rename_started)
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.movie_rename)) },
         text = {

@@ -16,11 +16,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.Tv
-import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Movie
@@ -30,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,7 +55,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.vknxworks.arrctrl.R
 import com.vknxworks.arrctrl.ui.components.LocalBottomClearance
-import com.vknxworks.arrctrl.ui.components.LocalHazeState
+import com.vknxworks.arrctrl.ui.components.CtrlBottomBar
+import com.vknxworks.arrctrl.ui.components.TabItem
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
 import com.vknxworks.arrctrl.ui.components.rememberNotificationAccess
 import com.vknxworks.arrctrl.ui.lock.lockCovering
 import com.vknxworks.arrctrl.ui.servers.ImportScreen
@@ -90,8 +88,6 @@ import com.vknxworks.arrctrl.ui.series.SeasonReleasesScreen
 import com.vknxworks.arrctrl.ui.series.SeasonScreen
 import com.vknxworks.arrctrl.ui.series.SeriesDetailScreen
 import com.vknxworks.arrctrl.ui.series.SeriesScreen
-import dev.chrisbanes.haze.hazeSource
-import dev.chrisbanes.haze.rememberHazeState
 
 @Composable
 fun AppRoot() {
@@ -104,11 +100,11 @@ private data class TopDest(val route: Any, val item: TabItem)
 
 @Composable
 private fun topDestinations(): List<TopDest> = listOf(
-    TopDest(MoviesRoute, TabItem(stringResource(R.string.tab_movies), Icons.Outlined.Movie, Icons.Filled.Movie)),
-    TopDest(SeriesRoute, TabItem(stringResource(R.string.tab_series), Icons.Outlined.Tv, Icons.Filled.Tv)),
-    TopDest(CalendarRoute, TabItem(stringResource(R.string.tab_calendar), Icons.Outlined.CalendarMonth, Icons.Filled.CalendarMonth)),
-    TopDest(ActivityRoute, TabItem(stringResource(R.string.tab_activity), Icons.Outlined.Download, Icons.Filled.Download)),
-    TopDest(MoreRoute, TabItem(stringResource(R.string.tab_more), Icons.Outlined.Widgets, Icons.Filled.Widgets)),
+    TopDest(MoviesRoute, TabItem(stringResource(R.string.tab_movies), Icons.Outlined.Movie)),
+    TopDest(SeriesRoute, TabItem(stringResource(R.string.tab_series), Icons.Outlined.Tv)),
+    TopDest(CalendarRoute, TabItem(stringResource(R.string.tab_calendar), Icons.Outlined.CalendarMonth)),
+    TopDest(ActivityRoute, TabItem(stringResource(R.string.tab_activity), Icons.Outlined.Download)),
+    TopDest(MoreRoute, TabItem(stringResource(R.string.tab_more), Icons.Outlined.Widgets)),
 )
 
 @Composable
@@ -138,6 +134,10 @@ private fun MainScaffold() {
     LaunchedEffect(covered, appSettings.notifyEnabled, notificationAccess.granted) {
         if (!covered && appSettings.notifyEnabled) notificationAccess.askOnce()
     }
+
+    // Connection status for the profile picture's "connected" badge, checked whenever the server list changes.
+    val savedServers by c.servers.servers.collectAsStateWithLifecycle()
+    LaunchedEffect(savedServers) { c.status.refresh(savedServers) }
 
     val incoming by c.pendingTorrent.collectAsStateWithLifecycle()
     LaunchedEffect(incoming) {
@@ -177,8 +177,15 @@ private fun MainScaffold() {
                             NavigationRailItem(
                                 selected = selected,
                                 onClick = { selectTab(i) },
-                                icon = { Icon(if (selected) top.item.selectedIcon else top.item.icon, contentDescription = top.item.label) },
+                                icon = { Icon(top.item.icon, contentDescription = top.item.label) },
                                 label = { Text(top.item.label) },
+                                colors = NavigationRailItemDefaults.colors(
+                                    selectedIconColor = CtrlColors.OnAccent,
+                                    selectedTextColor = CtrlColors.Text,
+                                    indicatorColor = CtrlColors.Accent,
+                                    unselectedIconColor = CtrlColors.Muted,
+                                    unselectedTextColor = CtrlColors.Muted,
+                                ),
                             )
                         }
                         Spacer(Modifier.weight(1f))
@@ -193,8 +200,8 @@ private fun MainScaffold() {
 }
 
 /**
- * Phones: content runs edge to edge and scrolls under a floating glass island.
- * The island shows on the main tabs; pushed screens get the full height.
+ * Phones: content runs edge to edge and scrolls under the floating Signal bottom bar.
+ * The bar shows on the main tabs; pushed screens get the full height.
  */
 @Composable
 private fun PhoneLayout(
@@ -204,16 +211,14 @@ private fun PhoneLayout(
     onSelect: (Int) -> Unit,
 ) {
     val showTabs = selectedIndex >= 0
-    val hazeState = rememberHazeState()
     val density = LocalDensity.current
     var overlayHeight by remember { mutableStateOf(0.dp) }
 
     CompositionLocalProvider(
-        LocalHazeState provides hazeState,
         LocalBottomClearance provides if (showTabs) overlayHeight else 0.dp,
     ) {
         Box(Modifier.fillMaxSize()) {
-            Box(Modifier.fillMaxSize().hazeSource(hazeState)) {
+            Box(Modifier.fillMaxSize()) {
                 AppNavHost(navController)
             }
             AnimatedVisibility(
@@ -224,9 +229,9 @@ private fun PhoneLayout(
                     .align(Alignment.BottomCenter)
                     .onSizeChanged { overlayHeight = with(density) { it.height.toDp() } }
                     .navigationBarsPadding()
-                    .padding(bottom = 12.dp),
+                    .padding(bottom = 28.dp),
             ) {
-                GlassTabBar(items = items, selectedIndex = selectedIndex, onSelect = onSelect)
+                CtrlBottomBar(items = items, selectedIndex = selectedIndex, onSelect = onSelect)
             }
         }
     }

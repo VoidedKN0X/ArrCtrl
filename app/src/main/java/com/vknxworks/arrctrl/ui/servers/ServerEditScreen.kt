@@ -1,5 +1,9 @@
 package com.vknxworks.arrctrl.ui.servers
 
+import com.vknxworks.arrctrl.ui.components.ctrlSegmentedColors
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -24,14 +27,12 @@ import androidx.compose.material.icons.outlined.NoEncryption
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material.icons.outlined.VerifiedUser
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -207,7 +208,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                OutlinedTextField(
+                CtrlTextField(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text(stringResource(R.string.field_name)) },
@@ -215,7 +216,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
-                OutlinedTextField(
+                CtrlTextField(
                     value = url,
                     onValueChange = { url = it; result = null },
                     label = { Text(stringResource(R.string.field_address)) },
@@ -245,12 +246,12 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                         SegmentedButton(
                             selected = !qbitUsesKey,
                             onClick = { qbitUsesKey = false; result = null },
-                            shape = SegmentedButtonDefaults.itemShape(0, 2),
+                            shape = SegmentedButtonDefaults.itemShape(0, 2), colors = ctrlSegmentedColors(),
                         ) { Text(stringResource(R.string.qbit_login)) }
                         SegmentedButton(
                             selected = qbitUsesKey,
                             onClick = { qbitUsesKey = true; result = null },
-                            shape = SegmentedButtonDefaults.itemShape(1, 2),
+                            shape = SegmentedButtonDefaults.itemShape(1, 2), colors = ctrlSegmentedColors(),
                         ) { Text(stringResource(R.string.qbit_api_key)) }
                     }
                 }
@@ -265,7 +266,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                     }
                 }
                 if (usesKey) {
-                    OutlinedTextField(
+                    CtrlTextField(
                         value = apiKey,
                         onValueChange = { apiKey = it; result = null },
                         label = { Text(stringResource(R.string.field_api_key)) },
@@ -280,7 +281,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                         modifier = Modifier.fillMaxWidth(),
                     )
                 } else {
-                    OutlinedTextField(
+                    CtrlTextField(
                         value = username,
                         onValueChange = { username = it; result = null },
                         label = { Text(stringResource(R.string.field_username)) },
@@ -290,7 +291,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                         keyboardOptions = KeyboardOptions(autoCorrectEnabled = false, imeAction = ImeAction.Next),
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    OutlinedTextField(
+                    CtrlTextField(
                         value = password,
                         onValueChange = { password = it; result = null },
                         label = { Text(stringResource(R.string.field_password)) },
@@ -358,7 +359,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                 OutlinedButton(
                     onClick = { certError = false; test() },
                     enabled = !testing,
-                    shape = CircleShape,
+                    shape = CtrlShapes.Button,
                     modifier = Modifier.weight(1f),
                 ) { Text(stringResource(R.string.test_connection)) }
                 Button(
@@ -369,7 +370,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                         }
                     },
                     enabled = !testing,
-                    shape = CircleShape,
+                    shape = CtrlShapes.Button,
                     modifier = Modifier.weight(1f),
                 ) { Text(stringResource(R.string.save)) }
             }
@@ -387,7 +388,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
     }
 
     if (confirmSave) {
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirmSave = false },
             title = { Text(stringResource(R.string.save_anyway_title)) },
             text = { Text(stringResource(R.string.save_anyway_body)) },
@@ -397,7 +398,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
     }
 
     if (confirmDelete && existing != null) {
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirmDelete = false },
             title = { Text(stringResource(R.string.remove_server_title, existing.name)) },
             text = { Text(stringResource(R.string.remove_server_body)) },

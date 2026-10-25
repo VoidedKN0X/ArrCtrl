@@ -1,5 +1,8 @@
 package com.vknxworks.arrctrl.ui.movies
 
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.components.CtrlBackButton
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
 import android.text.format.DateUtils
 import com.vknxworks.arrctrl.ui.servers.failureText
 import android.widget.Toast
@@ -19,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -36,7 +38,6 @@ import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -292,18 +293,14 @@ fun MovieScreen(serverId: String, movieId: Int) {
         }
 
         // Back button over the artwork.
-        IconButton(
-            onClick = nav::back,
-            colors = IconButtonDefaults.iconButtonColors(containerColor = Scrim, contentColor = Color.White),
-            modifier = Modifier.statusBarsPadding().padding(8.dp),
-        ) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back)) }
+        CtrlBackButton(Modifier.statusBarsPadding().padding(start = Gutter, top = 10.dp), container = CtrlColors.Surface.copy(alpha = 0.88f))
     }
 
     if (confirmDelete) {
         var files by remember { mutableStateOf(false) }
         var exclude by remember { mutableStateOf(false) }
         val deleted = stringResource(R.string.movie_deleted)
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirmDelete = false },
             title = { Text(stringResource(R.string.movie_delete_title, mv.title)) },
             text = {
@@ -327,7 +324,7 @@ fun MovieScreen(serverId: String, movieId: Int) {
     }
 
     if (confirmDeleteFile && mv.file != null) {
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirmDeleteFile = false },
             title = { Text(stringResource(R.string.movie_delete_file_title)) },
             text = { Text(mv.file.relativePath ?: mv.title) },
@@ -342,7 +339,7 @@ fun MovieScreen(serverId: String, movieId: Int) {
     }
 
     movingTo?.let { path ->
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { movingTo = null },
             title = { Text(stringResource(R.string.movie_move_title)) },
             text = { Text(stringResource(R.string.movie_move_body, path)) },
@@ -466,7 +463,7 @@ private fun RenameDialog(api: RadarrApi, m: Movie, onDismiss: () -> Unit, onDone
     var failed by remember { mutableStateOf(false) }
     LaunchedEffect(m.id) { runCatching { api.renamePreview(m.id) }.onSuccess { items = it }.onFailure { failed = true } }
     val started = stringResource(R.string.movie_rename_started)
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.movie_rename)) },
         text = {
@@ -502,7 +499,7 @@ private fun RenameDialog(api: RadarrApi, m: Movie, onDismiss: () -> Unit, onDone
 @Composable
 fun TagsPicker(all: List<Tag>, initial: Set<Int>, onDismiss: () -> Unit, onSave: (List<Int>) -> Unit) {
     var chosen by remember { mutableStateOf(initial) }
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.movie_tags)) },
         text = {

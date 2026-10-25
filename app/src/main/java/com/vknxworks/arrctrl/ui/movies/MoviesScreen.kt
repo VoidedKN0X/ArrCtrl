@@ -1,5 +1,9 @@
 package com.vknxworks.arrctrl.ui.movies
 
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlFilterChip
+import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.background
@@ -26,7 +30,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.BookmarkBorder
@@ -38,12 +41,9 @@ import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -164,12 +164,12 @@ fun MoviesScreen() {
         if (radarrs.size > 1) {
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 radarrs.forEach { s ->
-                    FilterChip(selected = s.id == server.id, onClick = { model.serverId = s.id }, label = { Text(s.name) })
+                    CtrlFilterChip(selected = s.id == server.id, onClick = { model.serverId = s.id }, label = { Text(s.name) })
                 }
             }
         }
         if (searching) {
-            OutlinedTextField(
+            CtrlTextField(
                 value = model.query,
                 onValueChange = { model.query = it },
                 placeholder = { Text(stringResource(R.string.movies_search_hint)) },
@@ -183,7 +183,7 @@ fun MoviesScreen() {
         }
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             MovieFilter.entries.forEach { f ->
-                FilterChip(selected = f == model.filter, onClick = { model.filter = f }, label = { Text(stringResource(f.label)) })
+                CtrlFilterChip(selected = f == model.filter, onClick = { model.filter = f }, label = { Text(stringResource(f.label)) })
             }
         }
 
@@ -290,20 +290,20 @@ private fun GridTile(m: Movie, model: MoviesModel, selected: Boolean, onClick: (
                 Icon(
                     Icons.Outlined.BookmarkBorder,
                     stringResource(R.string.badge_unmonitored),
-                    Modifier.align(Alignment.TopEnd).padding(6.dp).background(Scrim, CircleShape).padding(4.dp).size(16.dp),
+                    Modifier.align(Alignment.TopEnd).padding(6.dp).background(Scrim, CtrlShapes.Badge).padding(4.dp).size(16.dp),
                     tint = androidx.compose.ui.graphics.Color.White,
                 )
             }
             if (selected) {
-                Box(Modifier.matchParentSize().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.35f), MaterialTheme.shapes.medium))
+                Box(Modifier.matchParentSize().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.35f), com.vknxworks.arrctrl.ui.theme.CtrlShapes.Poster))
                 Icon(Icons.Filled.CheckCircle, null, Modifier.align(Alignment.Center).size(36.dp), tint = MaterialTheme.colorScheme.onPrimary)
             }
         }
-        Spacer(Modifier.height(6.dp))
-        Text(m.title, style = MaterialTheme.typography.labelLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Spacer(Modifier.height(8.dp))
+        Text(m.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(
             m.year?.toString().orEmpty(),
-            style = MaterialTheme.typography.labelSmall,
+            style = com.vknxworks.arrctrl.ui.theme.CtrlType.Mono,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
@@ -381,7 +381,7 @@ private fun BulkDialog(action: SelectionAction, model: MoviesModel, onDismiss: (
         SelectionAction.DELETE -> {
             var files by remember { mutableStateOf(false) }
             var exclude by remember { mutableStateOf(false) }
-            AlertDialog(
+            CtrlAlertDialog(
                 onDismissRequest = onDismiss,
                 title = { Text(androidx.compose.ui.res.pluralStringResource(R.plurals.movies_delete_title, ids.size, ids.size)) },
                 text = {
@@ -406,7 +406,7 @@ private fun BulkDialog(action: SelectionAction, model: MoviesModel, onDismiss: (
                     else -> R.string.bulk_search
                 },
             )
-            AlertDialog(
+            CtrlAlertDialog(
                 onDismissRequest = onDismiss,
                 title = { Text(title) },
                 text = { Text(androidx.compose.ui.res.pluralStringResource(R.plurals.bulk_confirm, ids.size, ids.size)) },

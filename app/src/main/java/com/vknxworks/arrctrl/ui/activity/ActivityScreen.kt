@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import com.vknxworks.arrctrl.ui.components.ctrlSegmentedColors
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.ArrowDownward
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Speed
@@ -43,6 +43,18 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.sp
+import com.vknxworks.arrctrl.ui.components.CtrlHeroCard
+import com.vknxworks.arrctrl.ui.components.CtrlLabel
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.theme.CtrlType
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
 import com.vknxworks.arrctrl.R
 import com.vknxworks.arrctrl.container
 import com.vknxworks.arrctrl.data.api.Format
@@ -139,6 +151,7 @@ fun ActivityScreen() {
                             Icons.Outlined.Speed,
                             stringResource(if (altOn) R.string.alt_speed_turn_off else R.string.alt_speed_turn_on),
                             tint = if (altOn) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(22.dp),
                         )
                     }
                 }
@@ -163,7 +176,7 @@ fun ActivityScreen() {
                         SegmentedButton(
                             selected = t == tab,
                             onClick = { tabName = t.name },
-                            shape = SegmentedButtonDefaults.itemShape(i, tabs.size),
+                            shape = SegmentedButtonDefaults.itemShape(i, tabs.size), colors = ctrlSegmentedColors(),
                             icon = {},
                         ) { Text(if (count != null && count > 0) stringResource(R.string.label_count, label, count) else label, maxLines = 1) }
                     }
@@ -198,6 +211,9 @@ fun ActivityScreen() {
         if (tab == ActivityTab.TORRENTS) {
             ExtendedFloatingActionButton(
                 onClick = { nav.navigate(AddTorrentRoute()) },
+                shape = CtrlShapes.Cta,
+                containerColor = CtrlColors.Accent,
+                contentColor = CtrlColors.OnAccent,
                 icon = { Icon(Icons.Outlined.Add, null) },
                 text = { Text(stringResource(R.string.torrent_add)) },
                 modifier = Modifier
@@ -208,29 +224,48 @@ fun ActivityScreen() {
     }
 }
 
-/** Combined qBittorrent speeds, plus a note when alternative limits are on. */
+/**
+ * Combined qBittorrent speeds as the screen's hero card: download speed big on the accent, upload and
+ * free space underneath, plus a note when alternative limits are on.
+ */
 @Composable
 private fun SpeedStrip(model: ActivityModel) {
     val t = model.transfer ?: return
-    Row(
-        Modifier.fillMaxWidth().padding(horizontal = Gutter),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Outlined.ArrowDownward, stringResource(R.string.download_speed), Modifier.padding(end = 2.dp), tint = MaterialTheme.colorScheme.primary)
-            Text(Format.speed(t.dlSpeed), style = MaterialTheme.typography.labelLarge)
+    val dl = Format.speed(t.dlSpeed)
+    val number = dl.substringBeforeLast(' ')
+    val unit = dl.substringAfterLast(' ', "")
+    CtrlHeroCard(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 4.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            CtrlLabel(stringResource(R.string.download_speed), Modifier.weight(1f), color = CtrlColors.OnAccent, style = CtrlType.LabelStrong)
+            if (t.altSpeed) {
+                CtrlLabel(stringResource(R.string.alt_speed_active), color = CtrlColors.OnAccent, style = CtrlType.LabelStrong)
+            }
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Outlined.ArrowUpward, stringResource(R.string.upload_speed), Modifier.padding(end = 2.dp), tint = MaterialTheme.colorScheme.tertiary)
-            Text(Format.speed(t.upSpeed), style = MaterialTheme.typography.labelLarge)
-        }
-        if (t.altSpeed) {
-            Text(
-                stringResource(R.string.alt_speed_active),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
+        Text(
+            buildAnnotatedString {
+                append(number)
+                if (unit.isNotEmpty()) {
+                    withStyle(SpanStyle(fontSize = 26.sp, letterSpacing = 0.sp)) { append(" ") ; append(unit) }
+                }
+            },
+            style = CtrlType.HeroNumber,
+            color = CtrlColors.OnAccent,
+            maxLines = 1,
+        )
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Outlined.ArrowUpward, stringResource(R.string.upload_speed), Modifier.size(16.dp), tint = CtrlColors.OnAccent)
+                Spacer(Modifier.width(4.dp))
+                Text(Format.speed(t.upSpeed), style = CtrlType.MonoMedium, color = CtrlColors.OnAccent)
+            }
+            t.freeSpace?.let { free ->
+                Text(
+                    stringResource(R.string.free_space, Format.bytes(free)),
+                    style = CtrlType.MonoMedium,
+                    color = CtrlColors.OnAccent,
+                    maxLines = 1,
+                )
+            }
         }
     }
 }

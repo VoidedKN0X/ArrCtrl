@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -26,18 +27,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Backspace
 import androidx.compose.material.icons.outlined.Fingerprint
 import androidx.compose.material.icons.outlined.Lock
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -62,12 +58,23 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.em
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlLabel
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.theme.CtrlType
 import com.vknxworks.arrctrl.R
 import com.vknxworks.arrctrl.container
 import com.vknxworks.arrctrl.data.lock.LockVault
@@ -312,9 +319,9 @@ private fun Modifier.blockTouches(): Modifier =
 @Composable
 private fun LockBadge() {
     Box(
-        Modifier.size(72.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f)),
+        Modifier.size(72.dp).clip(RoundedCornerShape(24.dp)).background(CtrlColors.Accent),
         contentAlignment = Alignment.Center,
-    ) { Icon(Icons.Outlined.Lock, null, Modifier.size(36.dp), tint = MaterialTheme.colorScheme.primary) }
+    ) { Icon(Icons.Outlined.Lock, null, Modifier.size(30.dp), tint = CtrlColors.OnAccent) }
 }
 
 /** The lock screen: PIN pad, fingerprint, and "Forgot PIN?". */
@@ -416,9 +423,15 @@ private fun PinLockScreen() {
         confirmLabel = stringResource(R.string.lock_ok),
         bottom = {
             if (bioAvailable) {
-                TextButton(onClick = ::askFingerprint) {
-                    Icon(Icons.Outlined.Fingerprint, null)
-                    Spacer(Modifier.size(8.dp))
+                OutlinedButton(
+                    onClick = ::askFingerprint,
+                    shape = KeyShape,
+                    border = BorderStroke(1.dp, CtrlColors.Accent),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = CtrlColors.Accent),
+                    modifier = Modifier.heightIn(min = 56.dp),
+                ) {
+                    Icon(Icons.Outlined.Fingerprint, null, Modifier.size(24.dp))
+                    Spacer(Modifier.size(10.dp))
                     Text(stringResource(R.string.lock_use_fingerprint))
                 }
             }
@@ -426,7 +439,7 @@ private fun PinLockScreen() {
         },
     )
     if (forgetting) {
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { forgetting = false },
             title = { Text(stringResource(R.string.lock_forgot_title)) },
             text = { Text(stringResource(R.string.lock_forgot_body)) },
@@ -573,16 +586,23 @@ private fun PinPadScreen(
 ) {
     val cs = MaterialTheme.colorScheme
     val haptics = LocalHapticFeedback.current
-    Surface(Modifier.fillMaxSize().blockTouches(), color = cs.background) {
+    Surface(Modifier.fillMaxSize().blockTouches(), color = CtrlColors.Background) {
         Column(
-            Modifier.fillMaxSize().systemBarsPadding().verticalScroll(rememberScrollState()).padding(24.dp),
+            Modifier.fillMaxSize().systemBarsPadding().verticalScroll(rememberScrollState()).padding(horizontal = 32.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
             LockBadge()
-            Spacer(Modifier.height(18.dp))
-            Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(28.dp))
+            CtrlLabel(stringResource(R.string.lock_brand), style = CtrlType.Label.copy(letterSpacing = 0.18.em))
+            Spacer(Modifier.height(8.dp))
+            Text(
+                title,
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.widthIn(max = 340.dp),
+            )
+            Spacer(Modifier.height(8.dp))
             Text(
                 message,
                 style = MaterialTheme.typography.bodyMedium,
@@ -590,36 +610,74 @@ private fun PinPadScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.widthIn(max = 340.dp),
             )
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(28.dp))
             Box(Modifier.height(20.dp).offset { IntOffset(shake.roundToInt(), 0) }, contentAlignment = Alignment.Center) {
-                if (checking) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                else Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                if (checking) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = CtrlColors.Accent)
+                else Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     repeat(maxOf(pin.length, LockVault.PIN_MIN)) { i ->
-                        Box(Modifier.size(12.dp).clip(CircleShape).background(if (i < pin.length) cs.primary else cs.surfaceContainerHighest))
+                        val cell = Modifier.size(14.dp).clip(PinCellShape)
+                        Box(
+                            if (i < pin.length) cell.background(CtrlColors.Accent)
+                            else cell.border(2.dp, CtrlColors.PinEmpty, PinCellShape),
+                        )
                     }
                 }
             }
-            Spacer(Modifier.height(28.dp))
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Spacer(Modifier.height(36.dp))
+            Column(
+                Modifier.widthIn(max = 360.dp).fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 listOf("123", "456", "789").forEach { row ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         row.forEach { d ->
-                            DigitKey(d.toString(), enabled) {
+                            DigitKey(d.toString(), enabled, Modifier.weight(1f)) {
                                 haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 onDigit(d)
                             }
                         }
                     }
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(20.dp), verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onBackspace, enabled = enabled && pin.isNotEmpty(), modifier = Modifier.size(72.dp)) {
-                        Icon(Icons.AutoMirrored.Outlined.Backspace, stringResource(R.string.lock_delete_digit))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        Modifier
+                            .weight(1f)
+                            .height(68.dp)
+                            .clip(KeyShape)
+                            .clickable(enabled = enabled && pin.isNotEmpty(), role = Role.Button, onClick = onBackspace),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Outlined.Backspace,
+                            stringResource(R.string.lock_delete_digit),
+                            Modifier.size(24.dp),
+                            tint = if (enabled && pin.isNotEmpty()) cs.onSurfaceVariant else cs.onSurfaceVariant.copy(alpha = 0.4f),
+                        )
                     }
-                    DigitKey("0", enabled) {
+                    DigitKey("0", enabled, Modifier.weight(1f)) {
                         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         onDigit('0')
                     }
-                    TextButton(onClick = onConfirm, enabled = enabled && showConfirm, modifier = Modifier.size(72.dp)) { Text(confirmLabel) }
+                    val confirmOn = enabled && showConfirm
+                    Box(
+                        Modifier
+                            .weight(1f)
+                            .height(68.dp)
+                            .clip(KeyShape)
+                            .then(
+                                if (confirmOn) Modifier.background(CtrlColors.Accent)
+                                else Modifier.border(1.dp, CtrlColors.CardBorder, KeyShape),
+                            )
+                            .clickable(enabled = confirmOn, role = Role.Button, onClick = onConfirm),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            confirmLabel,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = if (confirmOn) CtrlColors.OnAccent else cs.onSurfaceVariant.copy(alpha = 0.5f),
+                        )
+                    }
                 }
             }
             Spacer(Modifier.height(16.dp))
@@ -629,14 +687,19 @@ private fun PinPadScreen(
 }
 
 @Composable
-private fun DigitKey(label: String, enabled: Boolean, onClick: () -> Unit) {
-    FilledIconButton(
-        onClick = onClick,
-        enabled = enabled,
-        colors = IconButtonDefaults.filledIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-        ),
-        modifier = Modifier.size(72.dp),
-    ) { Text(label, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Medium) }
+private fun DigitKey(label: String, enabled: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Box(
+        modifier
+            .height(68.dp)
+            .clip(KeyShape)
+            .background(CtrlColors.Surface)
+            .border(1.dp, CtrlColors.CardBorder, KeyShape)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(label, style = CtrlType.Key, color = if (enabled) CtrlColors.Text else CtrlColors.Stopped)
+    }
 }
+
+private val KeyShape = RoundedCornerShape(22.dp)
+private val PinCellShape = RoundedCornerShape(5.dp)

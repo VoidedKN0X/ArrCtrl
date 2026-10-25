@@ -1,6 +1,9 @@
 package com.vknxworks.arrctrl.ui.movies
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,7 +27,10 @@ import com.vknxworks.arrctrl.ui.components.Chip
 @Composable
 fun Poster(url: String?, title: String, modifier: Modifier = Modifier) {
     Box(
-        modifier.clip(MaterialTheme.shapes.medium).background(MaterialTheme.colorScheme.surfaceContainerHigh),
+        modifier
+            .clip(CtrlShapes.Poster)
+            .background(CtrlColors.Surface)
+            .border(1.dp, CtrlColors.CardBorder, CtrlShapes.Poster),
         contentAlignment = Alignment.Center,
     ) {
         Text(
@@ -57,10 +63,10 @@ fun badgeLabel(b: MovieBadge): String = stringResource(
 fun BadgeChip(b: MovieBadge) {
     val (bg, fg) = when (b) {
         MovieBadge.DOWNLOADING -> MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary
-        MovieBadge.DOWNLOADED -> MaterialTheme.colorScheme.tertiary to MaterialTheme.colorScheme.onTertiary
+        MovieBadge.DOWNLOADED -> CtrlColors.Text to CtrlColors.OnAccent
         MovieBadge.MISSING -> MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError
-        MovieBadge.IN_CINEMAS -> MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
-        MovieBadge.ANNOUNCED -> MaterialTheme.colorScheme.surfaceContainerHighest to MaterialTheme.colorScheme.onSurfaceVariant
+        MovieBadge.IN_CINEMAS -> CtrlColors.Raised to CtrlColors.Text
+        MovieBadge.ANNOUNCED -> CtrlColors.Raised to CtrlColors.Muted
     }
     Chip(badgeLabel(b), bg, fg)
 }

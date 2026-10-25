@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.more
 
+import com.vknxworks.arrctrl.ui.components.CtrlProgressBar
 import com.vknxworks.arrctrl.ui.lock.AppLock
 import android.content.Intent
 import android.net.Uri
@@ -27,7 +28,6 @@ import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -255,7 +255,7 @@ fun HealthScreen() {
                                             color = if (isLow) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                     }
-                                    LinearProgressIndicator(
+                                    CtrlProgressBar(
                                         progress = { usedPct.coerceIn(0f, 1f) },
                                         color = if (isLow) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.fillMaxWidth().height(6.dp),

@@ -1,5 +1,8 @@
 package com.vknxworks.arrctrl.ui.more
 
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlFilterChip
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.horizontalScroll
@@ -17,14 +20,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -104,7 +104,7 @@ fun CleanuparrScreen() = ToolScaffold(stringResource(R.string.service_cleanuparr
             item {
                 Row(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(24 to R.string.cleanuparr_24h, 168 to R.string.cleanuparr_7d, 720 to R.string.cleanuparr_30d).forEach { (h, l) ->
-                        FilterChip(selected = hours == h, onClick = { hours = h }, label = { Text(stringResource(l)) })
+                        CtrlFilterChip(selected = hours == h, onClick = { hours = h }, label = { Text(stringResource(l)) })
                     }
                 }
             }
@@ -190,7 +190,7 @@ fun CleanuparrScreen() = ToolScaffold(stringResource(R.string.service_cleanuparr
                                 scope.launch {
                                     runCatching { api.events(eventPage + 1) }.onSuccess { (list, t) -> events = events + list; eventsTotal = t; eventPage += 1 }
                                 }
-                            }, shape = CircleShape) { Text(stringResource(R.string.history_load_more)) }
+                            }, shape = CtrlShapes.Button) { Text(stringResource(R.string.history_load_more)) }
                         }
                     }
                 }
@@ -200,7 +200,7 @@ fun CleanuparrScreen() = ToolScaffold(stringResource(R.string.service_cleanuparr
 
     trigger?.let { j ->
         val started = stringResource(R.string.cleanuparr_started)
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { trigger = null },
             title = { Text(stringResource(R.string.cleanuparr_run_title, humanize(j.name))) },
             text = { Text(stringResource(R.string.cleanuparr_run_body)) },

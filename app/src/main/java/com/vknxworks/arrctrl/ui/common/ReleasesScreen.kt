@@ -1,5 +1,7 @@
 package com.vknxworks.arrctrl.ui.common
 
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlFilterChip
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
@@ -22,9 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.SearchOff
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -152,9 +152,9 @@ fun ReleasesScreen(title: String, type: ServiceType, load: suspend () -> List<Re
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         ReleaseSort.entries.forEach { s ->
-                            FilterChip(selected = s == sort, onClick = { sortName = s.name }, label = { Text(stringResource(s.label)) })
+                            CtrlFilterChip(selected = s == sort, onClick = { sortName = s.name }, label = { Text(stringResource(s.label)) })
                         }
-                        FilterChip(selected = hideRejected, onClick = { hideRejected = !hideRejected }, label = { Text(stringResource(R.string.release_hide_rejected)) })
+                        CtrlFilterChip(selected = hideRejected, onClick = { hideRejected = !hideRejected }, label = { Text(stringResource(R.string.release_hide_rejected)) })
                     }
                     Text(
                         androidx.compose.ui.res.pluralStringResource(R.plurals.release_count, list.size, list.size, list.count { !it.rejected }),
@@ -173,7 +173,7 @@ fun ReleasesScreen(title: String, type: ServiceType, load: suspend () -> List<Re
     }
 
     confirm?.let { r ->
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirm = null },
             title = { Text(stringResource(R.string.release_rejected_title)) },
             text = {

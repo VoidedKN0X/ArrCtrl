@@ -15,23 +15,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Gavel
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Gavel
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.ui.text.style.TextOverflow
+import com.vknxworks.arrctrl.ui.components.CtrlPrimaryButton
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.theme.CtrlType
+import com.vknxworks.arrctrl.ui.theme.Gutter
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Movie
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.outlined.Fingerprint
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Password
@@ -72,7 +78,6 @@ import com.vknxworks.arrctrl.BuildConfig
 import com.vknxworks.arrctrl.R
 import com.vknxworks.arrctrl.container
 import com.vknxworks.arrctrl.data.settings.AppSettings
-import com.vknxworks.arrctrl.data.settings.ThemeChoice
 import com.vknxworks.arrctrl.data.server.ServiceType
 import com.vknxworks.arrctrl.ui.components.ChoiceSheet
 import com.vknxworks.arrctrl.ui.components.Group
@@ -104,24 +109,38 @@ fun YouScreen() {
         containerColor = MaterialTheme.colorScheme.background,
         topBar = { ScreenTopBar(stringResource(R.string.you_title)) },
     ) { padding ->
-        Column(Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = 24.dp)) {
+        Column(Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 24.dp)) {
             val servers by LocalContext.current.container.servers.servers.collectAsStateWithLifecycle()
-            Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            // Profile header: accent avatar, name and the main server's address in mono.
+            Row(
+                Modifier.fillMaxWidth().padding(start = Gutter, end = Gutter, top = 8.dp, bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Box(
-                    Modifier.size(96.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
+                    Modifier.size(68.dp).clip(CtrlShapes.Card).background(CtrlColors.Accent),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Filled.AccountCircle, null, Modifier.size(56.dp), tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Outlined.Person, null, Modifier.size(32.dp), tint = CtrlColors.OnAccent)
                 }
-                Spacer(Modifier.height(14.dp))
-                Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
-                Text(
-                    if (servers.isEmpty()) stringResource(R.string.you_no_servers)
-                    else pluralStringResource(R.plurals.you_servers, servers.size, servers.size),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                )
+                Spacer(Modifier.width(16.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall)
+                    Text(
+                        servers.firstOrNull()?.url?.substringAfter("://")?.trimEnd('/')
+                            ?: stringResource(R.string.you_no_servers),
+                        style = CtrlType.Mono,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    if (servers.size > 1) {
+                        Text(
+                            pluralStringResource(R.plurals.you_servers, servers.size, servers.size),
+                            style = CtrlType.Mono,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
             }
 
             ServersSection()
@@ -137,17 +156,38 @@ fun YouScreen() {
             }
 
             Group(stringResource(R.string.group_about)) {
-                GroupRow(stringResource(R.string.support_title), stringResource(R.string.support_subtitle), Icons.Filled.Favorite, showChevron = true, onClick = { AppLock.expectReturn(); uri.openUri(SPONSORS_URL) })
-                GroupRow(stringResource(R.string.bugs_title), stringResource(R.string.bugs_subtitle), Icons.Filled.BugReport, showChevron = true, onClick = { AppLock.expectReturn(); uri.openUri(ISSUES_URL) })
-                GroupRow(stringResource(R.string.source_title), stringResource(R.string.source_subtitle), Icons.Filled.Code, showChevron = true, onClick = { AppLock.expectReturn(); uri.openUri(REPO_URL) })
-                GroupRow(stringResource(R.string.licence_title), stringResource(R.string.licence_subtitle), Icons.Filled.Gavel, showChevron = true, onClick = { AppLock.expectReturn(); uri.openUri(LICENCE_URL) })
+                GroupRow(stringResource(R.string.bugs_title), stringResource(R.string.bugs_subtitle), Icons.Outlined.BugReport, showChevron = true, onClick = { AppLock.expectReturn(); uri.openUri(ISSUES_URL) })
+                GroupRow(stringResource(R.string.source_title), stringResource(R.string.source_subtitle), Icons.Outlined.Code, showChevron = true, onClick = { AppLock.expectReturn(); uri.openUri(REPO_URL) })
+                GroupRow(stringResource(R.string.licence_title), stringResource(R.string.licence_subtitle), Icons.Outlined.Gavel, showChevron = true, onClick = { AppLock.expectReturn(); uri.openUri(LICENCE_URL) })
             }
 
+            // Donations: the accent button at the bottom, as in every Ctrl app.
+            CtrlPrimaryButton(
+                stringResource(R.string.support_title),
+                onClick = { AppLock.expectReturn(); uri.openUri(SPONSORS_URL) },
+                icon = Icons.Outlined.FavoriteBorder,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 12.dp),
+            )
             Text(
-                stringResource(R.string.about_footer, BuildConfig.VERSION_NAME),
+                stringResource(R.string.support_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = Gutter),
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                stringResource(R.string.signal_footer),
+                style = CtrlType.Label,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = Gutter),
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                stringResource(R.string.about_footer, BuildConfig.VERSION_NAME).uppercase(),
+                style = CtrlType.Label,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 6.dp),
                 textAlign = TextAlign.Center,
             )
         }
@@ -219,20 +259,6 @@ fun SettingsScreen() {
         topBar = { ScreenTopBar(stringResource(R.string.settings)) },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = 32.dp)) {
-            Group(stringResource(R.string.appearance)) {
-                GroupChoice(
-                    stringResource(R.string.theme),
-                    ThemeChoice.entries.map { it to stringResource(it.label) },
-                    s.theme,
-                    Icons.Filled.DarkMode,
-                ) { v -> update { it.copy(theme = v) } }
-                GroupSwitch(
-                    stringResource(R.string.dynamic_colour),
-                    stringResource(R.string.dynamic_colour_subtitle),
-                    checked = s.dynamicColor,
-                    icon = Icons.Filled.Palette,
-                ) { v -> update { it.copy(dynamicColor = v) } }
-            }
             Group(stringResource(R.string.notifications)) {
                 val nav = LocalNavigator.current
                 val notificationAccess = rememberNotificationAccess()

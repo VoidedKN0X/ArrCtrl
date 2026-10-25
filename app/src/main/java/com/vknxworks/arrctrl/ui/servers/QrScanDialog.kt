@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.servers
 
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
 import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Size
@@ -21,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -81,7 +81,7 @@ fun QrScanDialog(onResult: (String) -> Unit, onDismiss: () -> Unit) {
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                 )
-                Button(onClick = onDismiss, shape = CircleShape) { Text(stringResource(R.string.cancel)) }
+                Button(onClick = onDismiss, shape = CtrlShapes.Button) { Text(stringResource(R.string.cancel)) }
             }
         }
     }

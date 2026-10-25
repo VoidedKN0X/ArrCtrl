@@ -1,5 +1,7 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.components.CtrlProgressBar
 import android.text.format.DateUtils
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +25,6 @@ import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryTabRow
@@ -163,7 +164,7 @@ fun TorrentScreen(serverId: String, hash: String) {
             }
             val cur = t!!
             Column(Modifier.padding(horizontal = Gutter, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                LinearProgressIndicator(progress = { cur.progress.toFloat() }, modifier = Modifier.fillMaxWidth())
+                CtrlProgressBar(progress = { cur.progress.toFloat() }, modifier = Modifier.fillMaxWidth())
                 Text(
                     listOfNotNull(torrentStateText(cur), Format.percent(cur.progress), Format.bytes(cur.size), Format.eta(cur.eta)).joinToString(" · "),
                     style = MaterialTheme.typography.labelLarge,
@@ -255,11 +256,11 @@ private fun FilesTab(files: List<TorrentFile>?, onPriority: (List<Int>, Int) -> 
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(f.name, style = MaterialTheme.typography.bodyMedium, maxLines = 3, overflow = TextOverflow.Ellipsis)
-                LinearProgressIndicator(progress = { f.progress.toFloat() }, modifier = Modifier.fillMaxWidth())
+                CtrlProgressBar(progress = { f.progress.toFloat() }, modifier = Modifier.fillMaxWidth())
                 Text(
                     listOf(Format.percent(f.progress), Format.bytes(f.size), stringResource(filePriorityLabel(f.priority))).joinToString(" · "),
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (f.priority == 0) MaterialTheme.colorScheme.outline else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (f.priority == 0) CtrlColors.Stopped else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

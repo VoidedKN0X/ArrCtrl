@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.more
 
+import com.vknxworks.arrctrl.ui.components.CtrlFilterChip
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloudOff
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -68,7 +68,7 @@ fun ToolScaffold(
         }
         if (servers.size > 1) {
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                servers.forEach { s -> FilterChip(selected = s.id == server.id, onClick = { chosen = s.id }, label = { Text(s.name) }) }
+                servers.forEach { s -> CtrlFilterChip(selected = s.id == server.id, onClick = { chosen = s.id }, label = { Text(s.name) }) }
             }
         }
         key(server.id) { content(server) }

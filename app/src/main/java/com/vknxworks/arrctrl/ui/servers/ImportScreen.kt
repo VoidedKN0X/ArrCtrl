@@ -1,5 +1,7 @@
 package com.vknxworks.arrctrl.ui.servers
 
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +12,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,7 +22,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -122,7 +122,7 @@ fun ImportScreen() {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedButton(
                         onClick = { scanning = true },
-                        shape = CircleShape,
+                        shape = CtrlShapes.Button,
                         modifier = Modifier.weight(1f),
                     ) {
                         Icon(Icons.Outlined.QrCodeScanner, null)
@@ -130,14 +130,14 @@ fun ImportScreen() {
                     }
                     OutlinedButton(
                         onClick = { clipboard.getText()?.text?.let(::parse) },
-                        shape = CircleShape,
+                        shape = CtrlShapes.Button,
                         modifier = Modifier.weight(1f),
                     ) {
                         Icon(Icons.Outlined.ContentPaste, null)
                         Text(stringResource(R.string.import_paste), Modifier.padding(start = 8.dp))
                     }
                 }
-                OutlinedTextField(
+                CtrlTextField(
                     value = text,
                     onValueChange = ::parse,
                     label = { Text(stringResource(R.string.import_field)) },
@@ -192,7 +192,7 @@ fun ImportScreen() {
                     }
                 },
                 enabled = ready.isNotEmpty(),
-                shape = CircleShape,
+                shape = CtrlShapes.Button,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp),
             ) {
                 Text(

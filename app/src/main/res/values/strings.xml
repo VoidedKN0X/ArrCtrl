@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ArrCtrl</string>
+    <!-- First half of the "ARR/CTRL" wordmark in the top bar. -->
+    <string name="wordmark_name" translatable="false">ARR</string>
+    <string name="more_status_off">OFF</string>
+    <string name="more_status_count">%1$d ON</string>
+    <string name="signal_footer" translatable="false">GOOGLE-FREE · TELEMETRY-FREE · ARM64</string>
 
     <!-- Common -->
     <string name="back">Back</string>
@@ -881,7 +886,8 @@
     <string name="hide_screenshots_subtitle">Screenshots and screen recordings show a blank screen</string>
     <string name="hide_recents">Hide in recent apps</string>
     <string name="hide_recents_subtitle">The recent apps view shows a blank card instead of the app</string>
-    <string name="lock_title">ArrCtrl is locked</string>
+    <string name="lock_title">Locked</string>
+    <string name="lock_brand" translatable="false">VKNXWORKS · CTRL</string>
     <string name="lock_prompt_title">Unlock ArrCtrl</string>
     <string name="lock_prompt_subtitle">Your *arr servers and downloads</string>
     <string name="lock_use_pin">Use PIN</string>

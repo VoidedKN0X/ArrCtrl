@@ -1,5 +1,11 @@
 package com.vknxworks.arrctrl.ui.series
 
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlFilterChip
+import com.vknxworks.arrctrl.ui.components.CtrlProgressBar
+import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.background
@@ -26,7 +32,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Add
@@ -38,14 +43,10 @@ import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.outlined.Tv
 import androidx.compose.material.icons.outlined.ViewList
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -165,11 +166,11 @@ fun SeriesScreen() {
 
         if (sonarrs.size > 1) {
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                sonarrs.forEach { s -> FilterChip(selected = s.id == server.id, onClick = { model.serverId = s.id }, label = { Text(s.name) }) }
+                sonarrs.forEach { s -> CtrlFilterChip(selected = s.id == server.id, onClick = { model.serverId = s.id }, label = { Text(s.name) }) }
             }
         }
         if (searching) {
-            OutlinedTextField(
+            CtrlTextField(
                 value = model.query,
                 onValueChange = { model.query = it },
                 placeholder = { Text(stringResource(R.string.series_search_hint)) },
@@ -183,7 +184,7 @@ fun SeriesScreen() {
         }
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SeriesFilter.entries.forEach { f ->
-                FilterChip(selected = f == model.filter, onClick = { model.filter = f }, label = { Text(stringResource(f.label)) })
+                CtrlFilterChip(selected = f == model.filter, onClick = { model.filter = f }, label = { Text(stringResource(f.label)) })
             }
         }
 
@@ -276,7 +277,7 @@ private val SeriesSort.label: Int
 /** Progress bar colour: done, still missing episodes, or unmonitored. */
 @Composable
 fun progressColor(s: Series): Color = when {
-    !s.monitored -> MaterialTheme.colorScheme.outline
+    !s.monitored -> CtrlColors.Stopped
     s.complete -> MaterialTheme.colorScheme.tertiary
     s.ended -> MaterialTheme.colorScheme.error
     else -> MaterialTheme.colorScheme.primary
@@ -297,25 +298,25 @@ private fun GridTile(s: Series, downloading: Boolean, selected: Boolean, onClick
                 Icon(
                     Icons.Outlined.BookmarkBorder,
                     stringResource(R.string.badge_unmonitored),
-                    Modifier.align(Alignment.TopEnd).padding(6.dp).background(Scrim, CircleShape).padding(4.dp).size(16.dp),
+                    Modifier.align(Alignment.TopEnd).padding(6.dp).background(Scrim, CtrlShapes.Badge).padding(4.dp).size(16.dp),
                     tint = Color.White,
                 )
             }
             if (selected) {
-                Box(Modifier.matchParentSize().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.35f), MaterialTheme.shapes.medium))
+                Box(Modifier.matchParentSize().background(MaterialTheme.colorScheme.primary.copy(alpha = 0.35f), com.vknxworks.arrctrl.ui.theme.CtrlShapes.Poster))
                 Icon(Icons.Filled.CheckCircle, null, Modifier.align(Alignment.Center).size(36.dp), tint = MaterialTheme.colorScheme.onPrimary)
             }
         }
-        LinearProgressIndicator(
+        CtrlProgressBar(
             progress = { s.progress },
             color = progressColor(s),
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp).height(3.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 6.dp), height = 4.dp,
         )
         Spacer(Modifier.height(4.dp))
-        Text(s.title, style = MaterialTheme.typography.labelLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(s.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(
             "${s.episodeFileCount}/${s.episodeCount}",
-            style = MaterialTheme.typography.labelSmall,
+            style = com.vknxworks.arrctrl.ui.theme.CtrlType.Mono,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
@@ -353,7 +354,7 @@ private fun ListRow(s: Series, model: SeriesModel, selected: Boolean, onClick: (
                 overflow = TextOverflow.Ellipsis,
             )
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                LinearProgressIndicator(progress = { s.progress }, color = progressColor(s), modifier = Modifier.weight(1f).height(4.dp))
+                CtrlProgressBar(progress = { s.progress }, color = progressColor(s), modifier = Modifier.weight(1f), height = 4.dp)
                 Text("${s.episodeFileCount}/${s.episodeCount}", style = MaterialTheme.typography.labelSmall)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -393,7 +394,7 @@ private fun SelectionActionDialog(action: SelectionAction, model: SeriesModel, o
         SelectionAction.DELETE -> {
             var files by remember { mutableStateOf(false) }
             var exclude by remember { mutableStateOf(false) }
-            AlertDialog(
+            CtrlAlertDialog(
                 onDismissRequest = onDismiss,
                 title = { Text(pluralStringResource(R.plurals.series_delete_title, ids.size, ids.size)) },
                 text = {
@@ -418,7 +419,7 @@ private fun SelectionActionDialog(action: SelectionAction, model: SeriesModel, o
                     else -> R.string.bulk_search
                 },
             )
-            AlertDialog(
+            CtrlAlertDialog(
                 onDismissRequest = onDismiss,
                 title = { Text(title) },
                 text = { Text(pluralStringResource(R.plurals.bulk_confirm_series, ids.size, ids.size)) },

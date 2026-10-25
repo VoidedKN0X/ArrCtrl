@@ -1,5 +1,8 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlSheet
+import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import android.content.Context
 import com.vknxworks.arrctrl.ui.servers.failureText
 import android.widget.Toast
@@ -27,11 +30,8 @@ import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material.icons.outlined.SwapVert
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -75,7 +75,7 @@ fun TorrentActionsSheet(
     var dialog by remember { mutableStateOf<Dialog?>(null) }
 
     if (dialog == null) {
-        ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+        CtrlSheet(onDismissRequest = onDismiss) {
             Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
                 Text(t.name, style = MaterialTheme.typography.titleMedium, maxLines = 2, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
                 val actions = rememberTorrentActions(t, context, scope, onChanged)
@@ -154,7 +154,7 @@ fun DeleteTorrentDialog(t: Torrent, onDismiss: () -> Unit, onDeleted: () -> Unit
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var withFiles by remember { mutableStateOf(false) }
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.torrent_delete_title)) },
         text = {
@@ -192,11 +192,11 @@ private fun TagsDialog(t: Torrent, onDismiss: () -> Unit, onChanged: () -> Unit)
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var text by remember { mutableStateOf(t.tags.joinToString(", ")) }
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.torrent_tags)) },
         text = {
-            OutlinedTextField(
+            CtrlTextField(
                 value = text,
                 onValueChange = { text = it },
                 label = { Text(stringResource(R.string.torrent_tags_field)) },
@@ -228,12 +228,12 @@ private fun SpeedLimitDialog(t: Torrent, onDismiss: () -> Unit, onChanged: () ->
     fun kb(v: Long) = if (v <= 0) "" else (v / 1024).toString()
     var down by remember { mutableStateOf(kb(t.dlLimit)) }
     var up by remember { mutableStateOf(kb(t.upLimit)) }
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.torrent_speed_limits)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
+                CtrlTextField(
                     value = down,
                     onValueChange = { v -> down = v.filter { it.isDigit() } },
                     label = { Text(stringResource(R.string.torrent_limit_down)) },
@@ -241,7 +241,7 @@ private fun SpeedLimitDialog(t: Torrent, onDismiss: () -> Unit, onChanged: () ->
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
-                OutlinedTextField(
+                CtrlTextField(
                     value = up,
                     onValueChange = { v -> up = v.filter { it.isDigit() } },
                     label = { Text(stringResource(R.string.torrent_limit_up)) },
@@ -270,7 +270,7 @@ private fun SpeedLimitDialog(t: Torrent, onDismiss: () -> Unit, onChanged: () ->
 private fun QueuePositionSheet(t: Torrent, onDismiss: () -> Unit, onChanged: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss) {
         Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 8.dp)) {
             Text(stringResource(R.string.torrent_queue_position), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
             fun go(m: QbitApi.Move) = rememberlessRun(context, scope, { onChanged(); onDismiss() }) { context.container.qbit(t.server).move(listOf(t.hash), m) }

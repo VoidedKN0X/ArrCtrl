@@ -1,5 +1,7 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlFilterChip
 import android.text.format.DateUtils
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Block
 import androidx.compose.material.icons.outlined.CloudDownload
@@ -27,7 +28,6 @@ import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -77,7 +77,7 @@ fun HistoryTab(model: ActivityModel) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 HistoryFilter.entries.forEach { f ->
-                    FilterChip(selected = f == filter, onClick = { filterName = f.name }, label = { Text(stringResource(f.label)) })
+                    CtrlFilterChip(selected = f == filter, onClick = { filterName = f.name }, label = { Text(stringResource(f.label)) })
                 }
             }
         }
@@ -96,7 +96,7 @@ fun HistoryTab(model: ActivityModel) {
                     if (model.historyLoading) {
                         CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp)
                     } else {
-                        OutlinedButton(onClick = { scope.launch { runCatching { model.loadHistory(reset = false) } } }, shape = CircleShape) {
+                        OutlinedButton(onClick = { scope.launch { runCatching { model.loadHistory(reset = false) } } }, shape = CtrlShapes.Button) {
                             Text(stringResource(R.string.history_load_more))
                         }
                     }

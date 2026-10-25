@@ -1,5 +1,8 @@
 package com.vknxworks.arrctrl.ui.series
 
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlSheet
+import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
@@ -16,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -34,8 +36,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -137,7 +137,7 @@ fun AddSeriesScreen(serverId: String) {
         topBar = { ScreenTopBar(stringResource(R.string.series_add)) },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize().imePadding()) {
-            OutlinedTextField(
+            CtrlTextField(
                 value = term,
                 onValueChange = { term = it },
                 placeholder = { Text(stringResource(R.string.series_add_hint)) },
@@ -213,7 +213,7 @@ private fun AddSeriesSheet(api: SonarrApi, s: LookupSeries, onDismiss: () -> Uni
     }
 
     val addedText = stringResource(R.string.series_added)
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 8.dp)) {
             Text(s.year?.let { context.getString(R.string.title_year, s.title, it) } ?: s.title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
             Group {
@@ -257,7 +257,7 @@ private fun AddSeriesSheet(api: SonarrApi, s: LookupSeries, onDismiss: () -> Uni
                     }
                 },
                 enabled = !adding && profileId != null && folder != null,
-                shape = CircleShape,
+                shape = CtrlShapes.Button,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 8.dp),
             ) { Text(stringResource(R.string.series_add_button)) }
         }

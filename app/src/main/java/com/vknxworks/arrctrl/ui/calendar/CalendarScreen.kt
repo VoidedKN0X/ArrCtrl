@@ -1,5 +1,8 @@
 package com.vknxworks.arrctrl.ui.calendar
 
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlFilterChip
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -22,7 +25,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
@@ -33,7 +35,6 @@ import androidx.compose.material.icons.outlined.Today
 import androidx.compose.material.icons.outlined.Tv
 import androidx.compose.material.icons.outlined.ViewAgenda
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -95,7 +96,7 @@ fun statusColor(s: EntryStatus): Color = when (s) {
     EntryStatus.DOWNLOADED -> MaterialTheme.colorScheme.tertiary
     EntryStatus.MISSING -> MaterialTheme.colorScheme.error
     EntryStatus.UPCOMING -> MaterialTheme.colorScheme.primary
-    EntryStatus.UNMONITORED -> MaterialTheme.colorScheme.outline
+    EntryStatus.UNMONITORED -> CtrlColors.Stopped
 }
 
 @Composable
@@ -185,13 +186,13 @@ fun CalendarScreen() {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             KindFilter.entries.forEach { k ->
-                FilterChip(
+                CtrlFilterChip(
                     selected = k == kind,
                     onClick = { scope.launch { c.settings.update { it.copy(calendarKind = k.name) } } },
                     label = { Text(stringResource(k.label)) },
                 )
             }
-            FilterChip(
+            CtrlFilterChip(
                 selected = monitoredOnly,
                 onClick = { scope.launch { c.settings.update { it.copy(calendarMonitoredOnly = !it.calendarMonitoredOnly) } } },
                 label = { Text(stringResource(R.string.calendar_monitored_only)) },
@@ -249,7 +250,7 @@ private fun Legend() {
             EntryStatus.UNMONITORED to R.string.badge_unmonitored,
         ).forEach { (s, label) ->
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(8.dp).clip(CircleShape).background(statusColor(s)))
+                Box(Modifier.size(8.dp).clip(CtrlShapes.Dot).background(statusColor(s)))
                 Spacer(Modifier.width(5.dp))
                 Text(stringResource(label), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -282,7 +283,7 @@ private fun AgendaView(
         items(model.errors.entries.toList(), key = { "err-" + it.key.id }) { (s, r) -> ServerErrorCard(s, r) }
         item(key = "earlier") {
             Box(Modifier.fillMaxWidth().padding(vertical = 4.dp), contentAlignment = Alignment.Center) {
-                OutlinedButton(onClick = onEarlier, shape = CircleShape) {
+                OutlinedButton(onClick = onEarlier, shape = CtrlShapes.Button) {
                     Text(stringResource(if (from.isBefore(today)) R.string.calendar_even_earlier else R.string.calendar_earlier))
                 }
             }
@@ -308,7 +309,7 @@ private fun AgendaView(
             item(key = "more") {
                 Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
                     if (model.loading) CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp)
-                    else OutlinedButton(onClick = onMore, shape = CircleShape) { Text(stringResource(R.string.calendar_show_more)) }
+                    else OutlinedButton(onClick = onMore, shape = CtrlShapes.Button) { Text(stringResource(R.string.calendar_show_more)) }
                 }
             }
         }
@@ -322,7 +323,7 @@ private fun EntryRow(e: CalendarEntry, multiServer: Boolean, onClick: () -> Unit
         Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = Gutter, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.width(4.dp).height(40.dp).clip(CircleShape).background(color))
+        Box(Modifier.width(4.dp).height(40.dp).clip(CtrlShapes.Dot).background(color))
         Spacer(Modifier.width(12.dp))
         Column(Modifier.width(56.dp)) {
             Text(
@@ -477,13 +478,13 @@ private fun DayCell(
             color = when {
                 isToday -> MaterialTheme.colorScheme.primary
                 inMonth -> MaterialTheme.colorScheme.onSurface
-                else -> MaterialTheme.colorScheme.outline
+                else -> CtrlColors.Stopped
             },
         )
         Spacer(Modifier.height(4.dp))
         // Up to three dots, one per entry, in that entry's status colour; "+n" for the rest.
         Row(horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight(0.4f)) {
-            entries.take(3).forEach { e -> Box(Modifier.size(6.dp).clip(CircleShape).background(statusColor(e.status))) }
+            entries.take(3).forEach { e -> Box(Modifier.size(6.dp).clip(CtrlShapes.Dot).background(statusColor(e.status))) }
         }
         if (entries.size > 3) {
             Text("+${entries.size - 3}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.settings
 
+import com.vknxworks.arrctrl.ui.components.CtrlSwitch
 import com.vknxworks.arrctrl.ui.lock.AppLock
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -35,7 +36,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -291,7 +291,7 @@ private fun PushRows(s: AppSettings, tick: Int, update: ((AppSettings) -> AppSet
         enabled = ntfyInstalled || s.pushEnabled,
         onClick = null,
         trailing = {
-            Switch(
+            CtrlSwitch(
                 checked = s.pushEnabled,
                 enabled = ntfyInstalled || s.pushEnabled,
                 onCheckedChange = { on ->

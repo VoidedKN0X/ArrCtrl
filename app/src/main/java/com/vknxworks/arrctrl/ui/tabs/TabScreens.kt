@@ -1,6 +1,14 @@
 package com.vknxworks.arrctrl.ui.tabs
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import com.vknxworks.arrctrl.ui.components.StatusDot
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.theme.CtrlType
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -65,8 +73,18 @@ fun MoreScreen() {
                         stringResource(t.label),
                         state,
                         t.icon,
-                        showChevron = true,
                         onClick = { if (count == 0) nav.navigate(ServerEditRoute(type = t.id)) else nav.navigate(route) },
+                        trailing = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    if (count == 0) stringResource(R.string.more_status_off) else stringResource(R.string.more_status_count, count),
+                                    style = CtrlType.Status,
+                                    color = if (count == 0) CtrlColors.Stopped else CtrlColors.Accent,
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                StatusDot(if (count == 0) CtrlColors.Stopped else CtrlColors.Accent)
+                            }
+                        },
                     )
                 }
             }

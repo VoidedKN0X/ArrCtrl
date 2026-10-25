@@ -1,5 +1,14 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import com.vknxworks.arrctrl.ui.theme.CtrlType
+import com.vknxworks.arrctrl.ui.components.topDivider
+import com.vknxworks.arrctrl.ui.components.StatusDot
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.heightIn
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.components.CtrlFilterChip
+import com.vknxworks.arrctrl.ui.components.CtrlProgressBar
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -14,8 +23,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Inbox
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -74,7 +81,7 @@ fun TorrentsTab(model: ActivityModel) {
             ) {
                 TorrentFilter.entries.forEach { f ->
                     val count = model.torrents.count { f.matches(it) }
-                    FilterChip(
+                    CtrlFilterChip(
                         selected = f == filter,
                         onClick = { filterName = f.name },
                         label = { Text(stringResource(R.string.label_count, stringResource(f.label), count)) },
@@ -142,17 +149,31 @@ private fun TorrentRow(t: Torrent, showServer: Boolean, onClick: () -> Unit, onL
                 onClick = onClick,
                 onLongClick = { haptics.performHapticFeedback(HapticFeedbackType.LongPress); onLongClick() },
             )
-            .padding(horizontal = Gutter, vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+            .padding(horizontal = Gutter)
+            .topDivider()
+            .heightIn(min = 52.dp)
+            .padding(vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Text(t.name, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
         val error = t.kind == TorrentKind.ERROR
-        LinearProgressIndicator(
+        val stateColor = when {
+            error -> MaterialTheme.colorScheme.error
+            t.kind == TorrentKind.DOWNLOADING || t.kind == TorrentKind.SEEDING || t.kind == TorrentKind.CHECKING -> CtrlColors.Accent
+            else -> CtrlColors.Stopped
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(t.name, style = MaterialTheme.typography.titleMedium, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(10.dp))
+            Text(Format.percent(t.progress), style = CtrlType.Status, color = stateColor)
+            Spacer(Modifier.width(8.dp))
+            StatusDot(stateColor)
+        }
+        CtrlProgressBar(
             progress = { t.progress.toFloat() },
             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
             color = when {
                 error -> MaterialTheme.colorScheme.error
-                t.kind == TorrentKind.STOPPED -> MaterialTheme.colorScheme.outline
+                t.kind == TorrentKind.STOPPED -> CtrlColors.Stopped
                 t.progress >= 1.0 -> MaterialTheme.colorScheme.tertiary
                 else -> MaterialTheme.colorScheme.primary
             },
@@ -164,7 +185,7 @@ private fun TorrentRow(t: Torrent, showServer: Boolean, onClick: () -> Unit, onL
                 Format.bytes(t.size),
                 if (t.progress < 1.0) Format.eta(t.eta) else null,
             ).joinToString(" · "),
-            style = MaterialTheme.typography.labelMedium,
+            style = CtrlType.Mono,
             color = if (error) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -177,7 +198,7 @@ private fun TorrentRow(t: Torrent, showServer: Boolean, onClick: () -> Unit, onL
                     Format.speed(t.upSpeed),
                     stringResource(R.string.torrent_ratio_peers, Format.ratio(t.ratio), t.seeds, t.seedsTotal, t.peers, t.peersTotal),
                 ),
-                style = MaterialTheme.typography.labelSmall,
+                style = CtrlType.Mono,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

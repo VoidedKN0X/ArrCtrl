@@ -1,5 +1,9 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlSheet
+import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
@@ -16,17 +20,13 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.FolderOff
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -123,7 +123,7 @@ fun ManualImportScreen(serverId: String, downloadId: String, title: String) {
                 Button(
                     onClick = { if (chosen.any { it.rejections.isNotEmpty() }) confirm = true else runImport() },
                     enabled = chosen.isNotEmpty() && chosen.all { it.isMapped(sonarr) } && !importing,
-                    shape = CircleShape,
+                    shape = CtrlShapes.Button,
                     modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = Gutter, vertical = 12.dp),
                 ) {
                     Text(androidx.compose.ui.res.pluralStringResource(R.plurals.manual_import_files, chosen.size, chosen.size))
@@ -177,7 +177,7 @@ fun ManualImportScreen(serverId: String, downloadId: String, title: String) {
     }
 
     if (confirm) {
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirm = false },
             title = { Text(stringResource(R.string.manual_import_rejected_title)) },
             text = { Text(stringResource(R.string.manual_import_rejected_body)) },
@@ -251,9 +251,9 @@ private fun LibraryPicker(api: ArrApi, onDismiss: () -> Unit, onPick: (LibraryEn
     var failed by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
     LaunchedEffect(api) { runCatching { api.library() }.onSuccess { all = it }.onFailure { failed = true } }
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss) {
         Column(Modifier.fillMaxWidth().navigationBarsPadding()) {
-            OutlinedTextField(
+            CtrlTextField(
                 value = query,
                 onValueChange = { query = it },
                 label = { Text(stringResource(R.string.search)) },
@@ -295,7 +295,7 @@ private fun EpisodePicker(
     var failed by remember(series.id) { mutableStateOf(false) }
     var chosen by remember(series.id) { mutableStateOf(initial) }
     LaunchedEffect(series.id) { runCatching { api.episodes(series.id) }.onSuccess { eps = it }.onFailure { failed = true } }
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss) {
         Column(Modifier.fillMaxWidth().navigationBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(series.title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -326,7 +326,7 @@ private fun EpisodePicker(
                     Button(
                         onClick = { onPick(list.filter { it.id in chosen }) },
                         enabled = chosen.isNotEmpty(),
-                        shape = CircleShape,
+                        shape = CtrlShapes.Button,
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
                     ) { Text(stringResource(R.string.manual_import_use_episodes)) }
                 }

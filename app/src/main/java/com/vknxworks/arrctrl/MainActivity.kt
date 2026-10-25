@@ -1,7 +1,6 @@
 package com.vknxworks.arrctrl
 
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
@@ -9,9 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.core.content.IntentCompat
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import com.vknxworks.arrctrl.ui.components.ScreenPrivacy
 import com.vknxworks.arrctrl.ui.lock.AppLockGate
@@ -19,34 +16,26 @@ import com.vknxworks.arrctrl.ui.lock.lockCovering
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.arrctrl.data.notify.Notifications
-import com.vknxworks.arrctrl.data.settings.ThemeChoice
 import com.vknxworks.arrctrl.ui.activity.extractTorrentLinks
 import com.vknxworks.arrctrl.ui.activity.isForeignContentUri
 import com.vknxworks.arrctrl.ui.nav.AppRoot
 import com.vknxworks.arrctrl.ui.theme.ArrCtrlTheme
+
+/** Status and navigation bar colour: the Signal background (#08080A). */
+private const val BAR_COLOR = 0xFF08080A.toInt()
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // A blank Recents card until the settings have been read ("Hide in recent apps" below).
         setRecentsScreenshotEnabled(false)
-        enableEdgeToEdge()
+        // Ctrl / Signal is dark only: light bar icons on the app's near-black background, edge to edge.
+        val bars = SystemBarStyle.dark(BAR_COLOR)
+        enableEdgeToEdge(statusBarStyle = bars, navigationBarStyle = bars)
         if (savedInstanceState == null) handleIntent(intent)
         val c = container
         setContent {
             val settings by c.settings.settings.collectAsStateWithLifecycle()
-            val dark = when (settings.theme) {
-                ThemeChoice.SYSTEM -> isSystemInDarkTheme()
-                ThemeChoice.LIGHT -> false
-                ThemeChoice.DARK, ThemeChoice.BLACK -> true
-            }
-            // Keep status and navigation bar icons readable when the app theme differs from the system's.
-            DisposableEffect(dark) {
-                val style = if (dark) SystemBarStyle.dark(Color.TRANSPARENT)
-                else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
-                enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
-                onDispose { }
-            }
             // "Hide in screenshots": FLAG_SECURE (also blanks the Recents preview). Always on, whatever the
             // switch says, while an API key, password or pasted server settings, the lock screen or a PIN screen are on screen.
             val secure = settings.hideScreenshots || ScreenPrivacy.forced > 0 || lockCovering(c.vault)

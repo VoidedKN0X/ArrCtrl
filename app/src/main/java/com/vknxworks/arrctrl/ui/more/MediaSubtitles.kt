@@ -1,5 +1,10 @@
 package com.vknxworks.arrctrl.ui.more
 
+import com.vknxworks.arrctrl.ui.theme.CtrlColors
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlFilterChip
+import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
@@ -25,14 +29,11 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Subtitles
 import androidx.compose.material.icons.outlined.SubtitlesOff
 import androidx.compose.material.icons.outlined.Translate
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -187,7 +188,7 @@ fun EpisodeSubtitlesButton(seriesId: Int, tvdbId: Int?, seriesTitle: String, epi
     val s = server ?: return
     OutlinedButton(
         onClick = { onOpen(); nav.navigate(MediaSubtitlesRoute(s.id, seriesId = seriesId, episodeId = episodeId, title = title)) },
-        shape = CircleShape,
+        shape = CtrlShapes.Button,
         modifier = Modifier.fillMaxWidth(),
     ) {
         Icon(Icons.Outlined.Subtitles, null)
@@ -262,7 +263,7 @@ fun MediaSubtitlesScreen(bazarrId: String, radarrId: Int?, seriesId: Int?, episo
                     m == null -> MessageView(Icons.Outlined.SubtitlesOff, stringResource(R.string.subs_not_in_bazarr))
                     else -> Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(vertical = 8.dp)) {
                         Group(stringResource(R.string.subs_on_disk), footer = stringResource(R.string.subs_delete_hint).takeIf { m.subtitles.any { !it.embedded } }) {
-                            if (m.subtitles.isEmpty()) GroupRow(stringResource(R.string.subs_none_yet), icon = Icons.Outlined.SubtitlesOff, iconTint = MaterialTheme.colorScheme.outline)
+                            if (m.subtitles.isEmpty()) GroupRow(stringResource(R.string.subs_none_yet), icon = Icons.Outlined.SubtitlesOff, iconTint = CtrlColors.Stopped)
                             m.subtitles.forEach { s ->
                                 GroupRow(
                                     subLabel(s.name, s.hi, s.forced, hiText, forcedText),
@@ -326,7 +327,7 @@ fun MediaSubtitlesScreen(bazarrId: String, radarrId: Int?, seriesId: Int?, episo
                 LanguagesProfileDialog(api, radarrId, if (radarrId == null) seriesId else null, onDismiss = { editProfile = false }) { reload++ }
             }
             deleting?.let { s ->
-                AlertDialog(
+                CtrlAlertDialog(
                     onDismissRequest = { deleting = null },
                     title = { Text(stringResource(R.string.subs_delete_title, subLabel(s.name, s.hi, s.forced, hiText, forcedText))) },
                     text = { Text(s.fileName.orEmpty(), style = MaterialTheme.typography.bodySmall) },
@@ -357,7 +358,7 @@ private fun LanguagePickerDialog(api: BazarrApi, onDismiss: () -> Unit, onPick: 
     var hi by remember { mutableStateOf(false) }
     var forced by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { runCatching { api.languages() }.onSuccess { all = it }.onFailure { error = failureText(context, it) } }
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.subs_add_language)) },
         text = {
@@ -371,12 +372,12 @@ private fun LanguagePickerDialog(api: BazarrApi, onDismiss: () -> Unit, onPick: 
                     val shown = base.filter { query.isBlank() || it.name.contains(query, ignoreCase = true) || it.code.equals(query.trim(), ignoreCase = true) }
                     if (enabled.isNotEmpty()) {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            FilterChip(selected = !showAll, onClick = { showAll = false }, label = { Text(stringResource(R.string.subs_enabled_languages)) })
-                            FilterChip(selected = showAll, onClick = { showAll = true }, label = { Text(stringResource(R.string.subs_all_languages)) })
+                            CtrlFilterChip(selected = !showAll, onClick = { showAll = false }, label = { Text(stringResource(R.string.subs_enabled_languages)) })
+                            CtrlFilterChip(selected = showAll, onClick = { showAll = true }, label = { Text(stringResource(R.string.subs_all_languages)) })
                         }
                     }
                     if (showAll || enabled.isEmpty()) {
-                        OutlinedTextField(query, { query = it }, singleLine = true, placeholder = { Text(stringResource(R.string.subs_find_language)) }, modifier = Modifier.fillMaxWidth())
+                        CtrlTextField(query, { query = it }, singleLine = true, placeholder = { Text(stringResource(R.string.subs_find_language)) }, modifier = Modifier.fillMaxWidth())
                     }
                     if (showAll && enabled.isNotEmpty()) {
                         Text(stringResource(R.string.subs_all_languages_hint), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

@@ -1,5 +1,10 @@
 package com.vknxworks.arrctrl.ui.more
 
+import com.vknxworks.arrctrl.ui.theme.CtrlShapes
+import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.arrctrl.ui.components.CtrlSheet
+import com.vknxworks.arrctrl.ui.components.CtrlSwitch
+import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import android.widget.Toast
 import com.vknxworks.arrctrl.ui.servers.failureText
 import androidx.compose.foundation.clickable
@@ -15,22 +20,17 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.SearchOff
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SecondaryTabRow
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -141,7 +141,7 @@ private fun IndexersTab(server: Server, api: ProwlarrApi) {
                                 Text(stringResource(R.string.prowlarr_paused_until, relative(it.toEpochMilli())), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                             }
                         }
-                        Switch(i.enabled, onCheckedChange = { on ->
+                        CtrlSwitch(i.enabled, onCheckedChange = { on ->
                             scope.launch {
                                 runCatching { api.setEnabled(i, on) }
                                     .onSuccess { load() }
@@ -173,7 +173,7 @@ private fun IndexerSheet(api: ProwlarrApi, i: Indexer, onDismiss: () -> Unit) {
     var testing by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<String?>(null) }
     val passed = stringResource(R.string.prowlarr_test_passed)
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss) {
         Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 24.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(i.name, style = MaterialTheme.typography.titleLarge)
             i.definition?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
@@ -187,7 +187,7 @@ private fun IndexerSheet(api: ProwlarrApi, i: Indexer, onDismiss: () -> Unit) {
                     }
                 },
                 enabled = !testing,
-                shape = CircleShape,
+                shape = CtrlShapes.Button,
                 modifier = Modifier.fillMaxWidth(),
             ) { Text(stringResource(if (testing) R.string.status_checking else R.string.prowlarr_test)) }
             result?.let {
@@ -219,7 +219,7 @@ private fun SearchTab(server: Server, api: ProwlarrApi) {
     }
 
     Column(Modifier.fillMaxSize()) {
-        OutlinedTextField(
+        CtrlTextField(
             value = query,
             onValueChange = { query = it },
             placeholder = { Text(stringResource(R.string.prowlarr_search_hint)) },
@@ -265,7 +265,7 @@ private fun SearchTab(server: Server, api: ProwlarrApi) {
 
     val sentText = stringResource(R.string.prowlarr_sent)
     confirm?.let { s ->
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { confirm = null },
             title = { Text(stringResource(R.string.prowlarr_grab_title)) },
             text = { Text(s.title + "\n\n" + stringResource(R.string.prowlarr_grab_body), style = MaterialTheme.typography.bodySmall) },
