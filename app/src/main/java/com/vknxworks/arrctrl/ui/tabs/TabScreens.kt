@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.HealthAndSafety
+import androidx.compose.material.icons.outlined.ManageSearch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -38,6 +39,7 @@ import com.vknxworks.arrctrl.ui.nav.HealthRoute
 import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.nav.ProwlarrRoute
 import com.vknxworks.arrctrl.ui.nav.ServerEditRoute
+import com.vknxworks.arrctrl.ui.nav.WantedRoute
 import com.vknxworks.arrctrl.ui.servers.icon
 
 @Composable
@@ -65,6 +67,18 @@ fun MoreScreen() {
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = 24.dp + LocalBottomClearance.current),
         ) {
+            val wantedServers = servers.count { it.type in com.vknxworks.arrctrl.ui.wanted.WANTED_TYPES }
+            if (wantedServers > 0) {
+                Group(stringResource(R.string.more_library)) {
+                    GroupRow(
+                        stringResource(R.string.wanted),
+                        stringResource(R.string.wanted_role),
+                        Icons.Outlined.ManageSearch,
+                        showChevron = true,
+                        onClick = { nav.navigate(WantedRoute()) },
+                    )
+                }
+            }
             Group(stringResource(R.string.more_tools), footer = stringResource(R.string.more_footer)) {
                 tools.forEach { (t, route) ->
                     val count = servers.count { it.type == t }

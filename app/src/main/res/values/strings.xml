@@ -950,4 +950,54 @@
     <string name="torrent_speeds_lines">↓ %1$s\n↑ %2$s</string>
     <string name="label_count">%1$s %2$d</string>
     <string name="notify_push_test_message">ArrCtrl test</string>
+    <!-- Wanted (1.5.0) -->
+    <string name="more_library">Library</string>
+    <string name="wanted">Wanted</string>
+    <string name="wanted_role">Missing and cutoff unmet, with search</string>
+    <string name="wanted_missing">Missing</string>
+    <string name="wanted_cutoff">Cutoff unmet</string>
+    <string name="wanted_no_server">No Radarr or Sonarr server yet</string>
+    <string name="wanted_missing_empty">Nothing missing</string>
+    <string name="wanted_cutoff_empty">Everything meets its cutoff</string>
+    <string name="wanted_empty_body">Only monitored items are listed.</string>
+    <string name="wanted_search_all">Search all</string>
+    <string name="wanted_search_selected">Search selected</string>
+    <plurals name="wanted_search_all_missing">
+        <item quantity="one">Search for the %1$d missing item on %2$s? This asks your indexers for it.</item>
+        <item quantity="other">Search for all %1$d missing items on %2$s? This asks your indexers for each one and can take a while.</item>
+    </plurals>
+    <plurals name="wanted_search_all_cutoff">
+        <item quantity="one">Search for an upgrade for the %1$d item below its cutoff on %2$s?</item>
+        <item quantity="other">Search for upgrades for all %1$d items below their cutoff on %2$s? This can take a while.</item>
+    </plurals>
+
+    <!-- qBittorrent extras (1.5.0) -->
+    <string name="torrent_set_location">Set location</string>
+    <string name="torrent_location_field">Folder on the qBittorrent machine</string>
+    <string name="torrent_location_help">The files are moved there. qBittorrent creates the folder if needed and turns automatic management off for this torrent.</string>
+    <string name="torrent_location_recent">Recent folders</string>
+    <string name="torrent_location_forget">Forget this folder</string>
+    <string name="torrent_location_move">Move</string>
+    <string name="torrent_location_moving">Moving files</string>
+    <string name="torrent_location_cant_create">qBittorrent couldn't create that folder</string>
+    <string name="torrent_share_limits">Share limits</string>
+    <string name="share_ratio">Ratio</string>
+    <string name="share_seeding_time">Seeding time (minutes)</string>
+    <string name="share_inactive_time">Inactive seeding time (minutes)</string>
+    <string name="share_global">Global</string>
+    <string name="share_custom">Set</string>
+    <string name="share_help">Global uses qBittorrent's own share limits. What happens when a limit is reached is set in qBittorrent.</string>
+    <string name="speed_limits_title">Global speed limits</string>
+    <string name="speed_limits_normal">Normal limits</string>
+    <string name="speed_limits_alt">Alternative limits</string>
+    <string name="speed_limits_alt_on">Alternative limits are in use now. Empty or 0 means unlimited.</string>
+    <string name="speed_limits_alt_off">Normal limits are in use now. Empty or 0 means unlimited.</string>
+    <string name="speed_limits_saved">Speed limits saved</string>
+
+    <!-- arrctrl:// links (1.5.0) -->
+    <string name="link_opening_movie">Opening movie</string>
+    <string name="link_opening_series">Opening series</string>
+    <string name="link_not_in_radarr">Not in any of your Radarr servers yet.</string>
+    <string name="link_not_in_sonarr">Not in any of your Sonarr servers yet.</string>
+    <string name="link_add_to">Add it to</string>
 </resources>

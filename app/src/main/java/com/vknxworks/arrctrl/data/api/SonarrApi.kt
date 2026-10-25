@@ -92,6 +92,9 @@ data class Episode(
     val aired: Boolean get() = airDate?.isBefore(Instant.now()) == true
 }
 
+/** An episode on the Wanted list, with its series and (cutoff unmet) the quality it has now. */
+data class WantedEpisode(val episode: Episode, val series: Series?, val currentQuality: String?)
+
 data class EpisodeFileInfo(
     val id: Int,
     val relativePath: String?,
@@ -135,6 +138,31 @@ class SonarrApi(private val http: Http, val server: Server) {
     suspend fun allSeries(): List<Series> = Api.json(client, Api.get(url("/series"))).objects().mapNotNull(::series)
 
     suspend fun series(id: Int): Series? = (Api.json(client, Api.get(url("/series/$id"))) as? JsonObject)?.let(::series)
+
+    /** The series with this TVDB id when it's in the library (GET /series?tvdbId=). */
+    suspend fun byTvdb(tvdbId: Int): Series? = Api.json(client, Api.get(url("/series?tvdbId=$tvdbId"))).objects().firstOrNull()?.let(::series)
+
+    /** The series with this TMDB id when it's in the library (Sonarr has no filter for it, so the whole list). */
+    suspend fun byTmdb(tmdbId: Int): Series? = allSeries().firstOrNull { it.tmdbId == tmdbId }
+
+    /**
+     * One page of monitored episodes that are missing ([cutoff] false, GET /wanted/missing) or below the
+     * cutoff ([cutoff] true, GET /wanted/cutoff), newest first, each with its series and (cutoff) the current
+     * file's quality. Also the total count.
+     */
+    suspend fun wanted(cutoff: Boolean, page: Int, pageSize: Int = 50): Pair<List<WantedEpisode>, Int> {
+        val path = if (cutoff) "/wanted/cutoff" else "/wanted/missing"
+        val extra = if (cutoff) "&includeEpisodeFile=true" else ""
+        val body = Api.json(
+            client,
+            Api.get(url("$path?page=$page&pageSize=$pageSize&monitored=true&includeSeries=true$extra&sortKey=episodes.airDateUtc&sortDirection=descending")),
+        ) as? JsonObject
+        val items = body.arr("records").objects().mapNotNull { o ->
+            val e = episode(o) ?: return@mapNotNull null
+            WantedEpisode(e, o.obj("series")?.let(::series), o.obj("episodeFile").obj("quality").obj("quality").str("name"))
+        }
+        return items to (body.int("totalRecords") ?: items.size)
+    }
 
     /** Series ids with a download in Sonarr's queue, for the "downloading" badge; and the episode ids. */
     suspend fun queued(): Pair<Set<Int>, Set<Int>> {
@@ -330,6 +358,12 @@ class SonarrApi(private val http: Http, val server: Server) {
     suspend fun searchSeries(seriesId: Int) = command("SeriesSearch") { put("seriesId", seriesId) }
     suspend fun searchSeason(seriesId: Int, season: Int) = command("SeasonSearch") { put("seriesId", seriesId); put("seasonNumber", season) }
     suspend fun searchEpisodes(ids: List<Int>) = command("EpisodeSearch") { put("episodeIds", JsonArray(ids.map { JsonPrimitive(it) })) }
+
+    /** Searches every monitored missing episode (Wanted → Missing → Search All). */
+    suspend fun searchAllMissing() = command("MissingEpisodeSearch") { put("monitored", true) }
+
+    /** Searches every monitored episode whose file is below the cutoff. */
+    suspend fun searchAllCutoffUnmet() = command("CutoffUnmetEpisodeSearch") { put("monitored", true) }
 
     /** Bulk search: one SeriesSearch per series (Sonarr has no multi-series search command). */
     suspend fun searchMany(ids: List<Int>) = ids.forEach { searchSeries(it) }

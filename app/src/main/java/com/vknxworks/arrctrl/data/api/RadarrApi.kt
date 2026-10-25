@@ -147,6 +147,20 @@ class RadarrApi(private val http: Http, val server: Server) {
 
     suspend fun movie(id: Int): Movie? = (Api.json(client, Api.get(url("/movie/$id"))) as? JsonObject)?.let(::movie)
 
+    /** The movie with this TMDB id when it's in the library (GET /movie?tmdbId=). */
+    suspend fun byTmdb(tmdbId: Int): Movie? = Api.json(client, Api.get(url("/movie?tmdbId=$tmdbId"))).objects().firstOrNull()?.let(::movie)
+
+    /**
+     * One page of monitored movies that are missing ([cutoff] false, GET /wanted/missing) or whose file
+     * hasn't reached the quality profile's cutoff ([cutoff] true, GET /wanted/cutoff), with the total count.
+     */
+    suspend fun wanted(cutoff: Boolean, page: Int, pageSize: Int = 50): Pair<List<Movie>, Int> {
+        val path = if (cutoff) "/wanted/cutoff" else "/wanted/missing"
+        val body = Api.json(client, Api.get(url("$path?page=$page&pageSize=$pageSize&monitored=true"))) as? JsonObject
+        val items = body.arr("records").objects().mapNotNull(::movie)
+        return items to (body.int("totalRecords") ?: items.size)
+    }
+
     /** Movie ids with a download in Radarr's queue, for the "downloading" badge. */
     suspend fun queuedMovieIds(): Set<Int> {
         val body = Api.json(client, Api.get(url("/queue?page=1&pageSize=500&includeUnknownMovieItems=false"))) as? JsonObject
@@ -278,6 +292,12 @@ class RadarrApi(private val http: Http, val server: Server) {
     }
 
     suspend fun search(ids: List<Int>) = command("MoviesSearch") { put("movieIds", JsonArray(ids.map { JsonPrimitive(it) })) }
+    /** Searches every monitored missing movie (as Wanted → Missing → Search All in the web UI). */
+    suspend fun searchAllMissing() = command("MissingMoviesSearch") { put("filterKey", "monitored"); put("filterValue", "true") }
+
+    /** Searches every monitored movie whose file is below the cutoff. */
+    suspend fun searchAllCutoffUnmet() = command("CutoffUnmetMoviesSearch") { put("filterKey", "monitored"); put("filterValue", "true") }
+
     suspend fun refresh(ids: List<Int>) = command("RefreshMovie") { put("movieIds", JsonArray(ids.map { JsonPrimitive(it) })) }
 
     suspend fun renamePreview(movieId: Int): List<RenameItem> =

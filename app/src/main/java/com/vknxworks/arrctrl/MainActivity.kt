@@ -21,6 +21,7 @@ import com.vknxworks.arrctrl.data.notify.Notifications
 import com.vknxworks.arrctrl.ui.activity.extractTorrentLinks
 import com.vknxworks.arrctrl.ui.activity.isForeignContentUri
 import com.vknxworks.arrctrl.ui.nav.AppRoot
+import com.vknxworks.arrctrl.ui.links.DeepLink
 import com.vknxworks.arrctrl.ui.theme.ArrCtrlTheme
 
 /** Status and navigation bar colours: the Signal backgrounds, dark (#08080A) and light (#F5F5F1). */
@@ -81,6 +82,11 @@ class MainActivity : ComponentActivity() {
         }
         if (intent.action == "android.service.quicksettings.action.QS_TILE_PREFERENCES") {
             container.pendingOpen.value = "activity"
+            return
+        }
+        // arrctrl:// links: checked here, opened by the UI only after the app lock (AppRoot isn't shown while locked).
+        if (intent.action == Intent.ACTION_VIEW && intent.data?.scheme.equals(DeepLink.SCHEME, ignoreCase = true)) {
+            DeepLink.parse(intent.data)?.let { container.pendingOpen.value = it }
             return
         }
         val incoming = when (intent.action) {

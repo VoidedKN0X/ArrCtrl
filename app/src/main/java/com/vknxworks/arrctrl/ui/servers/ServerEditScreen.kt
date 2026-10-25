@@ -410,6 +410,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                     scope.launch {
                         c.http.forget(existing)
                         c.servers.remove(existing.id)
+                        com.vknxworks.arrctrl.data.settings.RecentPaths.prune(context, c.servers.current().map { it.id }.toSet())
                         // Posters and fanart from that server shouldn't stay on the phone.
                         clearImageCaches(context)
                         onDone()

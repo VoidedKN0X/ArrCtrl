@@ -66,6 +66,15 @@
                 <data android:scheme="content" />
                 <data android:mimeType="application/x-bittorrent" />
             </intent-filter>
+            <!-- arrctrl://movie?tmdb=… and arrctrl://series?tvdb=…&tmdb=… from other apps (JellyCtrl, SeerrCtrl).
+                 Not BROWSABLE, so web pages can't open them; MainActivity checks every link and it only opens a
+                 screen once the app lock is unlocked. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="arrctrl" android:host="movie" />
+                <data android:scheme="arrctrl" android:host="series" />
+            </intent-filter>
             <!-- Share sheet: a .torrent file, or text containing a magnet link. -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

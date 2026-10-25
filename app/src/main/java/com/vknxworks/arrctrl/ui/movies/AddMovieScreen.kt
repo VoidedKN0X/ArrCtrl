@@ -79,7 +79,7 @@ import kotlinx.coroutines.launch
 private val MONITOR = listOf("movieOnly", "movieAndCollection", "none")
 
 @Composable
-fun AddMovieScreen(serverId: String) {
+fun AddMovieScreen(serverId: String, initialTerm: String? = null) {
     val c = LocalContext.current.container
     val nav = LocalNavigator.current
     val scope = rememberCoroutineScope()
@@ -94,11 +94,13 @@ fun AddMovieScreen(serverId: String) {
     }
     val api = remember(server) { c.radarr(server) }
 
-    var term by rememberSaveable { mutableStateOf("") }
+    var term by rememberSaveable { mutableStateOf(initialTerm.orEmpty()) }
     var results by remember { mutableStateOf<List<LookupMovie>?>(null) }
     var searching by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<TestResult?>(null) }
     var picked by remember { mutableStateOf<LookupMovie?>(null) }
+
+    var autoPick by rememberSaveable { mutableStateOf(initialTerm != null) }
 
     fun search() {
         val t = term.trim()
@@ -108,11 +110,20 @@ fun AddMovieScreen(serverId: String) {
         error = null
         scope.launch {
             runCatching { api.lookup(t) }
-                .onSuccess { results = it }
+                .onSuccess {
+                    results = it
+                    // Opened from a link with an exact id: go straight to adding the one match.
+                    if (autoPick) {
+                        autoPick = false
+                        it.singleOrNull()?.let { m -> if (m.inLibraryId != null) nav.navigate(MovieRoute(server.id, m.inLibraryId)) else picked = m }
+                    }
+                }
                 .onFailure { error = it.toTestResult() }
             searching = false
         }
     }
+
+    LaunchedEffect(Unit) { if (autoPick && results == null) search() }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),

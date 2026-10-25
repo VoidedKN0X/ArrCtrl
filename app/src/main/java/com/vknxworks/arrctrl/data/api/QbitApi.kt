@@ -4,6 +4,8 @@ import com.vknxworks.arrctrl.data.net.Http
 import com.vknxworks.arrctrl.data.server.Server
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -36,6 +38,10 @@ data class Torrent(
     val addedOn: Long,
     val forceStart: Boolean,
     val savePath: String?,
+    /** Share limits: -2 = use the global limit, -1 = unlimited. Ratio as a number, times in minutes. */
+    val ratioLimit: Double = QbitApi.LIMIT_GLOBAL.toDouble(),
+    val seedingTimeLimit: Int = QbitApi.LIMIT_GLOBAL,
+    val inactiveSeedingTimeLimit: Int = QbitApi.LIMIT_GLOBAL,
 ) {
     val key: String get() = "${server.id}:$hash"
     val kind: TorrentKind get() = TorrentKind.of(state)
@@ -60,6 +66,9 @@ enum class TorrentKind {
         }
     }
 }
+
+/** Global speed limits in bytes per second; 0 = unlimited. */
+data class SpeedLimits(val download: Long, val upload: Long, val altDownload: Long, val altUpload: Long, val defaultSavePath: String? = null)
 
 data class Transfer(val dlSpeed: Long, val upSpeed: Long, val altSpeed: Boolean, val freeSpace: Long?)
 
@@ -181,6 +190,9 @@ class QbitApi(private val http: Http, val server: Server) {
             addedOn = o.long("added_on") ?: 0,
             forceStart = o.bool("force_start") ?: false,
             savePath = o.str("save_path"),
+            ratioLimit = o.dbl("ratio_limit") ?: LIMIT_GLOBAL.toDouble(),
+            seedingTimeLimit = o.int("seeding_time_limit") ?: LIMIT_GLOBAL,
+            inactiveSeedingTimeLimit = o.int("inactive_seeding_time_limit") ?: LIMIT_GLOBAL,
         )
 
     fun transfer(state: SyncState): Transfer {
@@ -247,6 +259,67 @@ class QbitApi(private val http: Http, val server: Server) {
         postForm("/torrents/setUploadLimit", "hashes" to hashes.joinToString("|"), "limit" to limit.coerceAtLeast(0).toString())
 
     suspend fun toggleAltSpeed() = postForm("/transfer/toggleSpeedLimitsMode")
+
+    /**
+     * Moves the torrents' files to [location] (POST /torrents/setLocation). qBittorrent creates the folder if
+     * needed and turns automatic torrent management off for them; it answers 409 when it can't create it.
+     */
+    suspend fun setLocation(hashes: List<String>, location: String) =
+        postForm("/torrents/setLocation", "hashes" to hashes.joinToString("|"), "location" to location.trim())
+
+    /**
+     * Per-torrent share limits (POST /torrents/setShareLimits). For each value [LIMIT_GLOBAL] means "use the
+     * global limit" and [LIMIT_NONE] "unlimited"; times are in minutes. The action and mode stay on qBittorrent's
+     * defaults (5.x requires them; older versions ignore them).
+     */
+    suspend fun setShareLimits(hashes: List<String>, ratio: Double, seedingMinutes: Int, inactiveMinutes: Int) =
+        postForm(
+            "/torrents/setShareLimits",
+            "hashes" to hashes.joinToString("|"),
+            "ratioLimit" to String.format(java.util.Locale.ROOT, "%.2f", ratio),
+            "seedingTimeLimit" to seedingMinutes.toString(),
+            "inactiveSeedingTimeLimit" to inactiveMinutes.toString(),
+            "shareLimitAction" to "Default",
+            "shareLimitsMode" to "Default",
+        )
+
+    // ---------- Global speed limits ----------
+
+    /** True while the alternative speed limits are in use (GET /transfer/speedLimitsMode answers 1). */
+    suspend fun altSpeedActive(): Boolean = authed { Api.text(client, Api.get(url("/transfer/speedLimitsMode"))) }.trim() == "1"
+
+    /** The normal and alternative global limits in bytes per second (0 = unlimited), from app/preferences. */
+    suspend fun speedLimits(): SpeedLimits {
+        val o = getJson("/app/preferences") as? JsonObject
+        return SpeedLimits(
+            download = (o.long("dl_limit") ?: 0).coerceAtLeast(0),
+            upload = (o.long("up_limit") ?: 0).coerceAtLeast(0),
+            altDownload = (o.long("alt_dl_limit") ?: 0).coerceAtLeast(0),
+            altUpload = (o.long("alt_up_limit") ?: 0).coerceAtLeast(0),
+            defaultSavePath = o.str("save_path"),
+        )
+    }
+
+    /**
+     * Saves the global limits. The normal ones go through transfer/setDownloadLimit and setUploadLimit, which
+     * change whichever set is in use, so they're only used while the alternative limits are off; otherwise
+     * (and always for the alternative ones) app/setPreferences sets them directly.
+     */
+    suspend fun setSpeedLimits(limits: SpeedLimits, altActive: Boolean) {
+        if (!altActive) {
+            postForm("/transfer/setDownloadLimit", "limit" to limits.download.coerceAtLeast(0).toString())
+            postForm("/transfer/setUploadLimit", "limit" to limits.upload.coerceAtLeast(0).toString())
+        }
+        val prefs = buildJsonObject {
+            if (altActive) {
+                put("dl_limit", limits.download.coerceAtLeast(0))
+                put("up_limit", limits.upload.coerceAtLeast(0))
+            }
+            put("alt_dl_limit", limits.altDownload.coerceAtLeast(0))
+            put("alt_up_limit", limits.altUpload.coerceAtLeast(0))
+        }
+        postForm("/app/setPreferences", "json" to prefs.toString())
+    }
 
     /** 0 = don't download, 1 = normal, 6 = high, 7 = maximum. */
     suspend fun setFilePriority(hash: String, indexes: List<Int>, priority: Int) =
@@ -343,6 +416,10 @@ class QbitApi(private val http: Http, val server: Server) {
     }
 
     companion object {
+        /** Share limit values qBittorrent understands: use the global limit, or no limit. */
+        const val LIMIT_GLOBAL = -2
+        const val LIMIT_NONE = -1
+
         private val TORRENT_TYPE = "application/x-bittorrent".toMediaType()
 
         /** Servers known to need pause/resume instead of stop/start, remembered for the session. */

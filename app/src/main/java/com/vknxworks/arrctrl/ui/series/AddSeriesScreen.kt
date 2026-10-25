@@ -99,7 +99,7 @@ private fun monitorLabel(v: String): String = stringResource(
 )
 
 @Composable
-fun AddSeriesScreen(serverId: String) {
+fun AddSeriesScreen(serverId: String, initialTerm: String? = null) {
     val c = LocalContext.current.container
     val nav = LocalNavigator.current
     val scope = rememberCoroutineScope()
@@ -114,11 +114,13 @@ fun AddSeriesScreen(serverId: String) {
     }
     val api = remember(server) { c.sonarr(server) }
 
-    var term by rememberSaveable { mutableStateOf("") }
+    var term by rememberSaveable { mutableStateOf(initialTerm.orEmpty()) }
     var results by remember { mutableStateOf<List<LookupSeries>?>(null) }
     var searching by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<TestResult?>(null) }
     var picked by remember { mutableStateOf<LookupSeries?>(null) }
+
+    var autoPick by rememberSaveable { mutableStateOf(initialTerm != null) }
 
     fun search() {
         val t = term.trim()
@@ -127,10 +129,18 @@ fun AddSeriesScreen(serverId: String) {
         searching = true
         error = null
         scope.launch {
-            runCatching { api.lookup(t) }.onSuccess { results = it }.onFailure { error = it.toTestResult() }
+            runCatching { api.lookup(t) }.onSuccess {
+                results = it
+                if (autoPick) {
+                    autoPick = false
+                    it.singleOrNull()?.let { m -> if (m.inLibraryId != null) nav.navigate(SeriesDetailRoute(server.id, m.inLibraryId)) else picked = m }
+                }
+            }.onFailure { error = it.toTestResult() }
             searching = false
         }
     }
+
+    LaunchedEffect(Unit) { if (autoPick && results == null) search() }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),

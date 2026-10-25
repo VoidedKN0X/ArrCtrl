@@ -4,6 +4,26 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.5.0 (2026-10-25)
+
+Wanted lists for Radarr and Sonarr, more qBittorrent controls, and links from JellyCtrl and SeerrCtrl that open a movie or series in ArrCtrl.
+
+### New
+
+- **Wanted** (More → Library → **Wanted**, shown once you have a Radarr or Sonarr server): every monitored movie and episode that's **Missing**, or whose file is below its quality profile's cutoff (**Cutoff unmet**), 50 at a time with **Load more**. Episodes show the series, episode code, title and air date, newest first; cutoff-unmet items also show the quality they have now. With more than one Radarr or Sonarr server, chips at the top pick the server. Pull down to refresh.
+  - Tap an item to open the movie, or the episode's season.
+  - The **search** button on a row searches for just that movie or episode.
+  - Long-press to select items (tap more to add them, or **Select all**), then **Search selected**.
+  - **Search all** (top right) asks the server to search for everything on the list, after you confirm how many items that is. This is the same as Search All in the web UI (Radarr's MissingMoviesSearch / CutoffUnmetMoviesSearch, Sonarr's MissingEpisodeSearch / CutoffUnmetEpisodeSearch) and only covers monitored items.
+- **Set location** for a torrent (torrent actions → **Set location**): type the folder on the qBittorrent machine to move its files to. The field starts with the current save path, and your last 8 folders per qBittorrent server are listed underneath to fill it in with one tap (tap ✕ to forget one). qBittorrent creates the folder if it doesn't exist and turns automatic torrent management off for that torrent; if it can't create the folder, ArrCtrl says so. The recent folders are kept on your phone only and are removed with the server, or with **Forgot PIN?**.
+- **Share limits** for a torrent (torrent actions → **Share limits**): ratio, seeding time and inactive seeding time, each set to **Global** (qBittorrent's own share limits), **Unlimited** or a value you type (times in minutes, up to a year). What happens when a limit is reached stays as set in qBittorrent.
+- **Global speed limits** editor: tap the download speed card on Activity, or the new sliders button at the top of Activity. It shows qBittorrent's **normal** and **alternative** download and upload limits in KB/s (empty or 0 is unlimited) and which set is in use now, and saves both. With more than one qBittorrent server, chips pick the server. The Alt. speed button, tile and per-torrent limits work as before.
+- **arrctrl:// links** from other apps: `arrctrl://movie?tmdb=<id>` opens that movie in Radarr, and `arrctrl://series?tvdb=<id>&tmdb=<id>` opens that series in Sonarr (by its TVDB id, or by its TMDB id when there's no TVDB id). ArrCtrl looks on every Radarr or Sonarr server you have. When none of them has it, it opens **Add movie** or **Add series** already searched by that id, and opens the add sheet straight away when there's exactly one match; with more than one server you first pick which one to add it to. JellyCtrl and SeerrCtrl use these links for their "Open in ArrCtrl" buttons.
+
+### Security
+
+- **arrctrl:// links are checked strictly and never act on their own.** Only `movie` with exactly one `tmdb` parameter and `series` with a `tvdb` and/or `tmdb` parameter are accepted; ids must be plain positive numbers, and links with any other part (path, port, user info, fragment, unknown or repeated parameters) are ignored. Web pages can't open them (the link isn't marked as browsable). A link only opens a screen: it never adds, searches or changes anything without you tapping, and with the app lock on nothing opens until you've unlocked ArrCtrl.
+
 ## v1.4.0 (2026-10-25)
 
 Light mode that follows the device theme: ArrCtrl is now light when your phone is in light mode and dark when it's in dark mode, switching by itself as soon as you change it (or when your phone's schedule does).

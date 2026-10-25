@@ -88,6 +88,8 @@ import com.vknxworks.arrctrl.ui.series.SeasonReleasesScreen
 import com.vknxworks.arrctrl.ui.series.SeasonScreen
 import com.vknxworks.arrctrl.ui.series.SeriesDetailScreen
 import com.vknxworks.arrctrl.ui.series.SeriesScreen
+import com.vknxworks.arrctrl.ui.wanted.WantedScreen
+import com.vknxworks.arrctrl.ui.links.OpenLinkScreen
 
 @Composable
 fun AppRoot() {
@@ -158,6 +160,16 @@ private fun MainScaffold() {
             "health" -> navController.navigate(HealthRoute) { launchSingleTop = true }
             "movie" -> parts.getOrNull(2)?.toIntOrNull()?.let { id -> navController.navigate(MovieRoute(parts[1], id)) { launchSingleTop = true } }
             "series" -> parts.getOrNull(2)?.toIntOrNull()?.let { id -> navController.navigate(SeriesDetailRoute(parts[1], id)) { launchSingleTop = true } }
+            // An arrctrl:// link from another app, checked in MainActivity: "link/movie/<tmdb>" or "link/series/<tvdb>/<tmdb>".
+            "link" -> when (parts.getOrNull(1)) {
+                "movie" -> parts.getOrNull(2)?.toIntOrNull()?.takeIf { it > 0 }?.let { navController.navigate(OpenLinkRoute("movie", tmdb = it)) }
+                "series" -> {
+                    val tvdb = parts.getOrNull(2)?.toIntOrNull()?.coerceAtLeast(0) ?: 0
+                    val tmdb = parts.getOrNull(3)?.toIntOrNull()?.coerceAtLeast(0) ?: 0
+                    if (tvdb > 0 || tmdb > 0) navController.navigate(OpenLinkRoute("series", tmdb = tmdb, tvdb = tvdb))
+                }
+                else -> Unit
+            }
             else -> Unit
         }
     }
@@ -271,7 +283,7 @@ private fun AppNavHost(navController: NavHostController) {
         }
         composable<AddMovieRoute> {
             val r = it.toRoute<AddMovieRoute>()
-            AddMovieScreen(r.serverId)
+            AddMovieScreen(r.serverId, r.term)
         }
         composable<SeriesDetailRoute> {
             val r = it.toRoute<SeriesDetailRoute>()
@@ -291,13 +303,18 @@ private fun AppNavHost(navController: NavHostController) {
         }
         composable<AddSeriesRoute> {
             val r = it.toRoute<AddSeriesRoute>()
-            AddSeriesScreen(r.serverId)
+            AddSeriesScreen(r.serverId, r.term)
         }
         composable<ProwlarrRoute> { ProwlarrScreen() }
         composable<BazarrRoute> { BazarrScreen() }
         composable<AutobrrRoute> { AutobrrScreen() }
         composable<CleanuparrRoute> { CleanuparrScreen() }
         composable<HealthRoute> { HealthScreen() }
+        composable<OpenLinkRoute> {
+            val r = it.toRoute<OpenLinkRoute>()
+            OpenLinkScreen(r.kind, r.tmdb, r.tvdb)
+        }
+        composable<WantedRoute> { WantedScreen(it.toRoute<WantedRoute>().serverId) }
         composable<NotificationsRoute> { NotificationsScreen() }
         composable<MediaSubtitlesRoute> {
             val r = it.toRoute<MediaSubtitlesRoute>()

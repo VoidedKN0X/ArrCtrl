@@ -26,14 +26,15 @@ import kotlinx.serialization.Serializable
 // Movies
 @Serializable data class MovieRoute(val serverId: String, val movieId: Int)
 @Serializable data class MovieReleasesRoute(val serverId: String, val movieId: Int, val title: String)
-@Serializable data class AddMovieRoute(val serverId: String)
+/** [term] pre-fills the search (e.g. "tmdb:603" from an arrctrl:// link) and runs it straight away. */
+@Serializable data class AddMovieRoute(val serverId: String, val term: String? = null)
 
 // Series
 @Serializable data class SeriesDetailRoute(val serverId: String, val seriesId: Int)
 @Serializable data class SeasonRoute(val serverId: String, val seriesId: Int, val season: Int)
 @Serializable data class SeasonReleasesRoute(val serverId: String, val seriesId: Int, val season: Int, val title: String)
 @Serializable data class EpisodeReleasesRoute(val serverId: String, val episodeId: Int, val title: String)
-@Serializable data class AddSeriesRoute(val serverId: String)
+@Serializable data class AddSeriesRoute(val serverId: String, val term: String? = null)
 
 // More
 @Serializable data object ProwlarrRoute
@@ -41,5 +42,9 @@ import kotlinx.serialization.Serializable
 @Serializable data object AutobrrRoute
 @Serializable data object CleanuparrRoute
 @Serializable data object HealthRoute
+@Serializable data class WantedRoute(val serverId: String? = null)
 @Serializable data class MediaSubtitlesRoute(val bazarrId: String, val radarrId: Int? = null, val seriesId: Int? = null, val episodeId: Int? = null, val title: String)
 @Serializable data class SubtitleSearchRoute(val serverId: String, val radarrId: Int? = null, val seriesId: Int? = null, val episodeId: Int? = null, val title: String)
+
+// Inbound arrctrl:// links (already validated): [kind] is "movie" or "series"; ids are 0 when not given.
+@Serializable data class OpenLinkRoute(val kind: String, val tmdb: Int = 0, val tvdb: Int = 0)

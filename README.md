@@ -15,8 +15,10 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 ## Features
 
 - **Movies and Series**: your Radarr and Sonarr libraries with automatic and interactive search, monitoring, quality profiles, renaming and bulk edits
+- **Wanted**: Radarr and Sonarr's missing and cutoff-unmet lists, with search for one item, a selection or everything
 - **Calendar** with upcoming movies and episodes from both
 - **Activity**: the Radarr and Sonarr queues with manual import, your qBittorrent torrents with full controls, and the Radarr and Sonarr history
+- **qBittorrent extras**: move a torrent's files (set location, with recent folders), per-torrent share limits, and the global normal and alternative speed limits
 - **Add torrents** from magnet links and `.torrent` files, straight from the share sheet
 - **Subtitles** through Bazarr on every movie and episode: see what's there, get any other language, or pick one yourself
 - **Prowlarr** indexers and cross-indexer search, **Bazarr** subtitles, **autobrr** filters and releases, **Cleanuparr** stats and jobs
@@ -25,7 +27,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Widgets** for upcoming releases and active downloads, and a quick settings tile for qBittorrent's alternative speed limits
 - **Every service is optional**, and you can add more than one of each (a second Radarr for 4K, say)
 - **Import all your servers at once** by pasting one block of settings or scanning it as a QR code
-- **Play in JellyCtrl** and **Open in SeerrCtrl** buttons when those apps are installed (for now they open the app)
+- **Play in JellyCtrl** and **Open in SeerrCtrl** buttons when those apps are installed, and `arrctrl://` links that let JellyCtrl and SeerrCtrl open a movie or series in ArrCtrl (or add it)
 - **The Ctrl / Signal look**: high-contrast and shared by every Ctrl app, dark or light following your phone's theme, with Space Grotesk and JetBrains Mono type
 - **Self-signed certificates** trusted per server, by fingerprint
 - **App lock** with its own PIN and optional fingerprint unlock; your API keys and passwords stay encrypted while the app is locked
@@ -65,7 +67,7 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
 
 Every service is optional, and you can add more than one of each.
 
-Your servers, **Settings** and **About** are all on the **You** page behind your profile picture. The **More** tab only holds the extra tools (Prowlarr, Bazarr, autobrr, Cleanuparr and System health).
+Your servers, **Settings** and **About** are all on the **You** page behind your profile picture. The **More** tab holds **Wanted** and the extra tools (Prowlarr, Bazarr, autobrr, Cleanuparr and System health).
 
 ### Import all servers at once
 
@@ -103,6 +105,15 @@ To make a QR code on Linux, save the JSON as `arrctrl.json` and run `qrencode -t
 ### Adding torrents
 
 Tap **Add torrent** on the Torrents tab and paste a magnet link (or several), or pick a `.torrent` file. ArrCtrl also shows up when you open a `magnet:` link or a `.torrent` file, and in the share sheet. To make it the default for magnet links, open one and pick **ArrCtrl** → **Always**, or set it in Android's Settings → Apps → Default apps → Opening links.
+
+### Links from other apps
+
+Other apps (JellyCtrl and SeerrCtrl do) can open a movie or series in ArrCtrl:
+
+- `arrctrl://movie?tmdb=603` opens the movie with that TMDB id in Radarr, or **Add movie** looked up by that id when it isn't in any of your Radarr servers.
+- `arrctrl://series?tvdb=81189&tmdb=1396` opens the series in Sonarr (by TVDB id, or TMDB id when there's no TVDB id), or **Add series** when it isn't there yet.
+
+A link only opens a screen, after the app lock; it never adds or searches anything until you tap. Web pages can't open these links.
 
 ### Notifications
 

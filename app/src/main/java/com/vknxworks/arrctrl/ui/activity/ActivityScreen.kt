@@ -16,6 +16,9 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Speed
+import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -131,11 +134,17 @@ fun ActivityScreen() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var refreshing by remember { mutableStateOf(false) }
+    var editingLimits by remember { mutableStateOf(false) }
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
             TabTitle(stringResource(R.string.tab_activity)) {
                 val t = model.transfer
+                if (hasQbit) {
+                    IconButton(onClick = { editingLimits = true }) {
+                        Icon(Icons.Outlined.Tune, stringResource(R.string.speed_limits_title), Modifier.size(22.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
                 if (hasQbit && t != null) {
                     val altOn = t.altSpeed
                     val toastOn = stringResource(R.string.alt_speed_on)
@@ -156,7 +165,7 @@ fun ActivityScreen() {
                     }
                 }
             }
-            if (hasQbit) SpeedStrip(model)
+            if (hasQbit) SpeedStrip(model) { editingLimits = true }
 
             if (tabs.size > 1) {
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp)) {
@@ -208,6 +217,13 @@ fun ActivityScreen() {
             }
         }
 
+        if (editingLimits) {
+            SpeedLimitsSheet(model.qbitServers, onDismiss = { editingLimits = false }) {
+                editingLimits = false
+                scope.launch { runCatching { model.refreshTorrents() } }
+            }
+        }
+
         if (tab == ActivityTab.TORRENTS) {
             ExtendedFloatingActionButton(
                 onClick = { nav.navigate(AddTorrentRoute()) },
@@ -229,12 +245,16 @@ fun ActivityScreen() {
  * free space underneath, plus a note when alternative limits are on.
  */
 @Composable
-private fun SpeedStrip(model: ActivityModel) {
+private fun SpeedStrip(model: ActivityModel, onEditLimits: () -> Unit) {
     val t = model.transfer ?: return
     val dl = Format.speed(t.dlSpeed)
     val number = dl.substringBeforeLast(' ')
     val unit = dl.substringAfterLast(' ', "")
-    CtrlHeroCard(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 4.dp)) {
+    CtrlHeroCard(
+        Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 4.dp)
+            .clip(CtrlShapes.Hero)
+            .clickable(onClickLabel = stringResource(R.string.speed_limits_title), onClick = onEditLimits),
+    ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             CtrlLabel(stringResource(R.string.download_speed), Modifier.weight(1f), color = CtrlColors.OnAccent, style = CtrlType.LabelStrong)
             if (t.altSpeed) {

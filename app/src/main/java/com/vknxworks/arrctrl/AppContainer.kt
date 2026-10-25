@@ -80,6 +80,7 @@ class AppContainer(val context: Context) {
         http.forgetAll()
         withContext(Dispatchers.IO) {
             NotifyChecker.reset(context)
+            com.vknxworks.arrctrl.data.settings.RecentPaths.prune(context, null)
             runCatching { WidgetStore.save(context, WidgetSnapshot(noCalendarServers = true, noDownloadServers = true)) }
         }
         vault.disable()
