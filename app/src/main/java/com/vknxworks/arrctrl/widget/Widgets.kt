@@ -46,14 +46,15 @@ import com.vknxworks.arrctrl.R
 import com.vknxworks.arrctrl.container
 import com.vknxworks.arrctrl.data.api.Format
 import com.vknxworks.arrctrl.data.notify.Notifications
-import com.vknxworks.arrctrl.ui.theme.WidgetScheme
+import com.vknxworks.arrctrl.ui.theme.WidgetDark
+import com.vknxworks.arrctrl.ui.theme.WidgetLight
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-/** ArrCtrl's dark Signal colours, always (there's no light or wallpaper theme any more). */
+/** ArrCtrl's Signal colours: dark or light, following the phone's dark theme (no wallpaper colours). */
 @Suppress("UNUSED_PARAMETER", "RedundantSuspendModifier")
 private suspend fun widgetColors(context: Context): ColorProviders? =
-    androidx.glance.material3.ColorProviders(light = WidgetScheme, dark = WidgetScheme)
+    androidx.glance.material3.ColorProviders(light = WidgetLight, dark = WidgetDark)
 
 /** Opens ArrCtrl at [open]; each target gets its own URI so list rows don't share one PendingIntent. */
 private fun openIntent(context: Context, open: String): Intent =

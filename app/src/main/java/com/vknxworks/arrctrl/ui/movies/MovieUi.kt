@@ -62,8 +62,8 @@ fun badgeLabel(b: MovieBadge): String = stringResource(
 @Composable
 fun BadgeChip(b: MovieBadge) {
     val (bg, fg) = when (b) {
-        MovieBadge.DOWNLOADING -> MaterialTheme.colorScheme.primary to MaterialTheme.colorScheme.onPrimary
-        MovieBadge.DOWNLOADED -> CtrlColors.Text to CtrlColors.OnAccent
+        MovieBadge.DOWNLOADING -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
+        MovieBadge.DOWNLOADED -> CtrlColors.Text to CtrlColors.Background
         MovieBadge.MISSING -> MaterialTheme.colorScheme.error to MaterialTheme.colorScheme.onError
         MovieBadge.IN_CINEMAS -> CtrlColors.Raised to CtrlColors.Text
         MovieBadge.ANNOUNCED -> CtrlColors.Raised to CtrlColors.Muted

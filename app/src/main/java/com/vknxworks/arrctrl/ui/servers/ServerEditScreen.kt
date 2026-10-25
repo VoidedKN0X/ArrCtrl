@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.servers
 
+import com.vknxworks.arrctrl.ui.components.ctrlPrimaryButtonColors
 import com.vknxworks.arrctrl.ui.components.ctrlSegmentedColors
 import com.vknxworks.arrctrl.ui.theme.CtrlShapes
 import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
@@ -363,6 +364,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                     modifier = Modifier.weight(1f),
                 ) { Text(stringResource(R.string.test_connection)) }
                 Button(
+                    colors = ctrlPrimaryButtonColors(),
                     onClick = {
                         if (valid()) {
                             if (result is TestResult.Ok) save()

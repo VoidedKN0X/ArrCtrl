@@ -291,7 +291,7 @@ private fun GridTile(s: Series, downloading: Boolean, selected: Boolean, onClick
             Poster(api.poster(s.id), s.title, Modifier.fillMaxWidth().aspectRatio(2f / 3f))
             if (downloading) {
                 Box(Modifier.align(Alignment.BottomStart).padding(6.dp)) {
-                    Chip(stringResource(R.string.badge_downloading), MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary)
+                    Chip(stringResource(R.string.badge_downloading), MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
                 }
             }
             if (!s.monitored) {
@@ -358,7 +358,7 @@ private fun ListRow(s: Series, model: SeriesModel, selected: Boolean, onClick: (
                 Text("${s.episodeFileCount}/${s.episodeCount}", style = MaterialTheme.typography.labelSmall)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                if (s.id in model.downloading) Chip(stringResource(R.string.badge_downloading), MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary)
+                if (s.id in model.downloading) Chip(stringResource(R.string.badge_downloading), MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
                 Chip(stringResource(if (s.ended) R.string.series_ended else R.string.series_continuing))
                 if (!s.monitored) Chip(stringResource(R.string.badge_unmonitored))
             }

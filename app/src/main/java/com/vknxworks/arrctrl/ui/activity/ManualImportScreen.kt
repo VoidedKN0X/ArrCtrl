@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import com.vknxworks.arrctrl.ui.components.ctrlPrimaryButtonColors
 import com.vknxworks.arrctrl.ui.theme.CtrlShapes
 import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
 import com.vknxworks.arrctrl.ui.components.CtrlSheet
@@ -121,6 +122,7 @@ fun ManualImportScreen(serverId: String, downloadId: String, title: String) {
             if (list != null && list.isNotEmpty()) {
                 val chosen = list.filter { it.path in selected }
                 Button(
+                    colors = ctrlPrimaryButtonColors(),
                     onClick = { if (chosen.any { it.rejections.isNotEmpty() }) confirm = true else runImport() },
                     enabled = chosen.isNotEmpty() && chosen.all { it.isMapped(sonarr) } && !importing,
                     shape = CtrlShapes.Button,
@@ -324,6 +326,7 @@ private fun EpisodePicker(
                         }
                     }
                     Button(
+                        colors = ctrlPrimaryButtonColors(),
                         onClick = { onPick(list.filter { it.id in chosen }) },
                         enabled = chosen.isNotEmpty(),
                         shape = CtrlShapes.Button,

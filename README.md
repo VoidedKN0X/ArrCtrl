@@ -26,7 +26,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Every service is optional**, and you can add more than one of each (a second Radarr for 4K, say)
 - **Import all your servers at once** by pasting one block of settings or scanning it as a QR code
 - **Play in JellyCtrl** and **Open in SeerrCtrl** buttons when those apps are installed (for now they open the app)
-- **The Ctrl / Signal look**: dark, high-contrast and shared by every Ctrl app, with Space Grotesk and JetBrains Mono type
+- **The Ctrl / Signal look**: high-contrast and shared by every Ctrl app, dark or light following your phone's theme, with Space Grotesk and JetBrains Mono type
 - **Self-signed certificates** trusted per server, by fingerprint
 - **App lock** with its own PIN and optional fingerprint unlock; your API keys and passwords stay encrypted while the app is locked
 - **API keys and passwords are encrypted** on your phone with the Android Keystore, and the server and import screens always block screenshots. Optional **Hide in screenshots** and **Hide in recent apps** switches cover the rest of the app
@@ -141,7 +141,7 @@ Android limits apps in the background to save battery. The Notifications screen 
 - **Upcoming** shows movies and episodes coming in the next two weeks, by day, with episode air times. A red dot means it's out and missing.
 - **Downloads** shows what's downloading, with progress, time left and the total qBittorrent speed.
 
-Long-press your home screen → Widgets → ArrCtrl. Both refresh every 30 minutes, when you open ArrCtrl and when you tap the refresh button; Downloads also refreshes every couple of minutes while something is downloading. Tap a row to open it in ArrCtrl. They use ArrCtrl's dark Signal colours.
+Long-press your home screen → Widgets → ArrCtrl. Both refresh every 30 minutes, when you open ArrCtrl and when you tap the refresh button; Downloads also refreshes every couple of minutes while something is downloading. Tap a row to open it in ArrCtrl. They use ArrCtrl's Signal colours, dark or light following your phone's theme.
 
 The **Alt. speed** tile (pull down Quick Settings → edit → drag it in) turns qBittorrent's alternative speed limits on or off for all your qBittorrent servers, like the button on the Torrents tab. On the phone's lock screen it asks you to unlock the phone first. Long-press it to open the Torrents tab.
 

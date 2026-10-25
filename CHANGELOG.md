@@ -4,6 +4,28 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.4.0 (2026-10-25)
+
+Light mode that follows the device theme: ArrCtrl is now light when your phone is in light mode and dark when it's in dark mode, switching by itself as soon as you change it (or when your phone's schedule does).
+
+### New
+
+- **Signal Light.** A new light version of the Ctrl / Signal look: a warm off-white background (#F5F5F1), white cards and sheets with a thin light grey border, near-black text (#0B0B0D) and grey secondary text. It's used automatically whenever your phone's dark theme is off. There is no setting for it in ArrCtrl, and wallpaper colours are still not used.
+- **Readable accent in light mode.** Filled accent areas (the download speed card on Activity, main buttons, the selected tab, switches that are on, the PIN dots, the profile badge, "Downloading" badges) keep the same violet (#B48CFF) with dark content in both modes. Where the accent is used as text or an icon on a light background (the slash in ARR/CTRL, status words and percentages in the queue and torrent lists, "ON" in the More tab, checkmarks, the focused text field border and cursor, dialog icons, the outlined **Use fingerprint** button) it's a deeper violet (#6A3BDB) in light mode, because the pale violet is too faint on white. In dark mode it stays #B48CFF.
+
+### Changed
+
+- **Every screen works in both modes**: Movies, Series, Calendar, Activity (queue, torrents, history), More and every tool (Prowlarr, Bazarr, autobrr, Cleanuparr, System health), movie, series, season and torrent pages, add screens, servers, import, notifications, settings and the You page.
+- **Lock screen in light mode**: white keypad keys with a thin border, empty PIN cells with a light grey outline (#C9C9C1), and violet filled cells as you type.
+- **Switches in light mode**: a light grey track (#DCDCD5) with a grey knob when off; violet track with a dark knob when on.
+- **Progress bars in light mode**: a light grey track (#E2E2DC) with a near-black fill, violet for the main metric (queue and health bars).
+- **Bottom bar in light mode**: white at 92% with a thin grey border; the selected tab is still a violet block with dark icon and label.
+- **Dialogs and bottom sheets** are white in light mode, with the same large rounded corners and thin border.
+- **Errors** are a deeper red (#D93636) in light mode so they stay readable on white.
+- **Status and navigation bars** use the background colour of the current mode, with light icons in dark mode and dark icons in light mode. The splash/start-up background matches the mode too.
+- **Home screen widgets** (Upcoming, Downloads) follow your phone's theme as well: light in light mode, dark in dark mode.
+- The **QR code scanner** stays black in both modes, so the camera view isn't framed in white. Artwork headers on movie and series pages fade into the current background colour.
+
 ## v1.3.0 (2026-10-25)
 
 A new look: ArrCtrl now uses **Ctrl / Signal**, the design shared by every Ctrl app. Dark, high-contrast and built around one violet accent colour. Everything works exactly as before; only the look changed.

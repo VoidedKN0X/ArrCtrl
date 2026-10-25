@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.activity
 
+import com.vknxworks.arrctrl.ui.components.ctrlPrimaryButtonColors
 import com.vknxworks.arrctrl.ui.theme.CtrlShapes
 import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import com.vknxworks.arrctrl.ui.lock.AppLock
@@ -248,6 +249,7 @@ fun AddTorrentScreen(initialLink: String?, initialFile: String?) {
                 GroupSwitch(stringResource(R.string.torrent_add_stopped), stringResource(R.string.torrent_add_stopped_help), stopped) { stopped = it }
             }
             Button(
+                colors = ctrlPrimaryButtonColors(),
                 onClick = { add() },
                 enabled = canAdd,
                 shape = CtrlShapes.Button,

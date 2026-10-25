@@ -329,7 +329,7 @@ private fun EpisodeSheet(
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
                 Chip(stringResource(if (e.monitored) R.string.filter_monitored else R.string.filter_unmonitored))
                 when {
-                    downloading -> Chip(stringResource(R.string.badge_downloading), MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary)
+                    downloading -> Chip(stringResource(R.string.badge_downloading), MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
                     e.hasFile -> Chip(stringResource(R.string.badge_downloaded), MaterialTheme.colorScheme.tertiary, MaterialTheme.colorScheme.onTertiary)
                     e.aired && e.monitored -> Chip(stringResource(R.string.badge_missing), MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.onError)
                     !e.aired -> Chip(stringResource(R.string.episode_not_aired))

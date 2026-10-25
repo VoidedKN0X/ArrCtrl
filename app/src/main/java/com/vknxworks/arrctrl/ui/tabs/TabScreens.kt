@@ -79,10 +79,10 @@ fun MoreScreen() {
                                 Text(
                                     if (count == 0) stringResource(R.string.more_status_off) else stringResource(R.string.more_status_count, count),
                                     style = CtrlType.Status,
-                                    color = if (count == 0) CtrlColors.Stopped else CtrlColors.Accent,
+                                    color = if (count == 0) CtrlColors.Stopped else CtrlColors.AccentText,
                                 )
                                 Spacer(Modifier.width(8.dp))
-                                StatusDot(if (count == 0) CtrlColors.Stopped else CtrlColors.Accent)
+                                StatusDot(if (count == 0) CtrlColors.Stopped else CtrlColors.AccentText)
                             }
                         },
                     )

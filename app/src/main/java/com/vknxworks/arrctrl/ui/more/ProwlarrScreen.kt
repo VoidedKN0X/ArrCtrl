@@ -244,7 +244,7 @@ private fun SearchTab(server: Server, api: ProwlarrApi) {
                         Text(s.title, style = MaterialTheme.typography.bodyMedium, maxLines = 3, overflow = TextOverflow.Ellipsis)
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             s.categories.take(2).forEach { Chip(it) }
-                            if (s.guid in sent) Chip(stringResource(R.string.release_sent_chip), MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.onPrimary)
+                            if (s.guid in sent) Chip(stringResource(R.string.release_sent_chip), MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
                         }
                         Text(
                             listOfNotNull(

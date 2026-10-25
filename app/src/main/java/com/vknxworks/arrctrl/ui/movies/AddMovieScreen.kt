@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.movies
 
+import com.vknxworks.arrctrl.ui.components.ctrlPrimaryButtonColors
 import com.vknxworks.arrctrl.ui.theme.CtrlShapes
 import com.vknxworks.arrctrl.ui.components.CtrlSheet
 import com.vknxworks.arrctrl.ui.components.CtrlTextField
@@ -222,6 +223,7 @@ private fun AddMovieSheet(api: RadarrApi, m: LookupMovie, onDismiss: () -> Unit,
                 GroupSwitch(stringResource(R.string.movie_search_on_add), stringResource(R.string.movie_search_on_add_help), searchNow) { searchNow = it }
             }
             Button(
+                colors = ctrlPrimaryButtonColors(),
                 onClick = {
                     val p = profileId
                     val f = folder

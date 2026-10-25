@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.servers
 
+import com.vknxworks.arrctrl.ui.components.ctrlPrimaryButtonColors
 import com.vknxworks.arrctrl.ui.theme.CtrlShapes
 import com.vknxworks.arrctrl.ui.components.CtrlTextField
 import androidx.compose.foundation.layout.Arrangement
@@ -183,6 +184,8 @@ fun ImportScreen() {
             }
 
             Button(
+
+                colors = ctrlPrimaryButtonColors(),
                 onClick = {
                     scope.launch {
                         ready.forEach { c.http.forget(it) }

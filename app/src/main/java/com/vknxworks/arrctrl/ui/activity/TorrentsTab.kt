@@ -158,7 +158,7 @@ private fun TorrentRow(t: Torrent, showServer: Boolean, onClick: () -> Unit, onL
         val error = t.kind == TorrentKind.ERROR
         val stateColor = when {
             error -> MaterialTheme.colorScheme.error
-            t.kind == TorrentKind.DOWNLOADING || t.kind == TorrentKind.SEEDING || t.kind == TorrentKind.CHECKING -> CtrlColors.Accent
+            t.kind == TorrentKind.DOWNLOADING || t.kind == TorrentKind.SEEDING || t.kind == TorrentKind.CHECKING -> CtrlColors.AccentText
             else -> CtrlColors.Stopped
         }
         Row(verticalAlignment = Alignment.CenterVertically) {

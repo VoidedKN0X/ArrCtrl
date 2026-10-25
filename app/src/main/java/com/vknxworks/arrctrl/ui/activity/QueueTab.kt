@@ -150,7 +150,7 @@ private fun QueueRow(q: QueueItem, showServer: Boolean, onClick: () -> Unit) {
 private fun queueColor(q: QueueItem): Color = when {
     q.hasWarning -> MaterialTheme.colorScheme.error
     q.status == "paused" || q.status == "queued" || q.status == "delay" -> CtrlColors.Stopped
-    else -> CtrlColors.Accent
+    else -> CtrlColors.AccentText
 }
 
 @Composable

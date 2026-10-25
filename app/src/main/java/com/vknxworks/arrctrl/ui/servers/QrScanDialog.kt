@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.servers
 
+import com.vknxworks.arrctrl.ui.components.ctrlPrimaryButtonColors
 import com.vknxworks.arrctrl.ui.theme.CtrlShapes
 import android.Manifest
 import android.content.pm.PackageManager
@@ -81,7 +82,7 @@ fun QrScanDialog(onResult: (String) -> Unit, onDismiss: () -> Unit) {
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                 )
-                Button(onClick = onDismiss, shape = CtrlShapes.Button) { Text(stringResource(R.string.cancel)) }
+                Button(onClick = onDismiss, shape = CtrlShapes.Button, colors = ctrlPrimaryButtonColors()) { Text(stringResource(R.string.cancel)) }
             }
         }
     }

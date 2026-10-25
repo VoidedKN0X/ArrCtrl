@@ -91,7 +91,7 @@ fun CtrlWordmark(modifier: Modifier = Modifier) {
     Text(
         buildAnnotatedString {
             append(name)
-            withStyle(SpanStyle(color = CtrlColors.Accent)) { append("/") }
+            withStyle(SpanStyle(color = CtrlColors.AccentText)) { append("/") }
             append("CTRL")
         },
         style = CtrlType.Wordmark,
@@ -250,6 +250,7 @@ fun CtrlHeroCard(modifier: Modifier = Modifier, content: @Composable ColumnScope
 }
 
 /** A 1dp divider along the top of a list row. */
+@Composable
 fun Modifier.topDivider(color: Color = CtrlColors.Divider): Modifier = drawBehind {
     drawLine(color, Offset(0f, 0.5f), Offset(size.width, 0.5f), strokeWidth = 1.dp.toPx())
 }
@@ -280,7 +281,7 @@ fun CtrlSwitch(
     enabled: Boolean = true,
 ) {
     val track by animateColorAsState(if (checked) CtrlColors.Accent else CtrlColors.SwitchOff, label = "switch-track")
-    val knob by animateColorAsState(if (checked) CtrlColors.OnAccent else CtrlColors.Stopped, label = "switch-knob")
+    val knob by animateColorAsState(if (checked) CtrlColors.OnAccent else CtrlColors.SwitchOffKnob, label = "switch-knob")
     val x by animateDpAsState(if (checked) 20.dp else 0.dp, label = "switch-x")
     val toggle = if (onCheckedChange != null) {
         Modifier.toggleable(
@@ -333,6 +334,11 @@ fun CtrlPrimaryButton(
         Text(text, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold))
     }
 }
+
+/** Accent-filled colours for a Material [Button] (dark content on the accent, in both modes). */
+@Composable
+fun ctrlPrimaryButtonColors(): androidx.compose.material3.ButtonColors =
+    ButtonDefaults.buttonColors(containerColor = CtrlColors.Accent, contentColor = CtrlColors.OnAccent)
 
 /** Secondary button: surface fill with a hairline border. */
 @Composable
@@ -406,11 +412,11 @@ fun CtrlTextField(
             unfocusedContainerColor = CtrlColors.Surface,
             disabledContainerColor = CtrlColors.Surface,
             errorContainerColor = CtrlColors.Surface,
-            focusedBorderColor = CtrlColors.Accent,
+            focusedBorderColor = CtrlColors.AccentText,
             unfocusedBorderColor = CtrlColors.ControlBorder,
             disabledBorderColor = CtrlColors.CardBorder,
-            cursorColor = CtrlColors.Accent,
-            focusedLabelColor = CtrlColors.Accent,
+            cursorColor = CtrlColors.AccentText,
+            focusedLabelColor = CtrlColors.AccentText,
             unfocusedLabelColor = CtrlColors.Muted,
             focusedLeadingIconColor = CtrlColors.Text,
             unfocusedLeadingIconColor = CtrlColors.Muted,
@@ -445,7 +451,7 @@ fun CtrlAlertDialog(
         text = text,
         shape = CtrlShapes.Dialog,
         containerColor = CtrlColors.Surface,
-        iconContentColor = CtrlColors.Accent,
+        iconContentColor = CtrlColors.AccentText,
         titleContentColor = CtrlColors.Text,
         textContentColor = CtrlColors.Muted,
         tonalElevation = 0.dp,

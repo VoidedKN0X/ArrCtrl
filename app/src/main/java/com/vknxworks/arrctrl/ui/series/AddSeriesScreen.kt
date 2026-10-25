@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.series
 
+import com.vknxworks.arrctrl.ui.components.ctrlPrimaryButtonColors
 import com.vknxworks.arrctrl.ui.theme.CtrlShapes
 import com.vknxworks.arrctrl.ui.components.CtrlSheet
 import com.vknxworks.arrctrl.ui.components.CtrlTextField
@@ -238,6 +239,7 @@ private fun AddSeriesSheet(api: SonarrApi, s: LookupSeries, onDismiss: () -> Uni
                 GroupSwitch(stringResource(R.string.series_search_cutoff), stringResource(R.string.series_search_cutoff_help), searchCutoff) { searchCutoff = it }
             }
             Button(
+                colors = ctrlPrimaryButtonColors(),
                 onClick = {
                     val p = profileId
                     val f = folder

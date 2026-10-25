@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.DisposableEffect
 import androidx.core.content.IntentCompat
 import androidx.compose.runtime.LaunchedEffect
 import com.vknxworks.arrctrl.ui.components.ScreenPrivacy
@@ -21,21 +23,28 @@ import com.vknxworks.arrctrl.ui.activity.isForeignContentUri
 import com.vknxworks.arrctrl.ui.nav.AppRoot
 import com.vknxworks.arrctrl.ui.theme.ArrCtrlTheme
 
-/** Status and navigation bar colour: the Signal background (#08080A). */
-private const val BAR_COLOR = 0xFF08080A.toInt()
+/** Status and navigation bar colours: the Signal backgrounds, dark (#08080A) and light (#F5F5F1). */
+private const val BAR_DARK = 0xFF08080A.toInt()
+private const val BAR_LIGHT = 0xFFF5F5F1.toInt()
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // A blank Recents card until the settings have been read ("Hide in recent apps" below).
         setRecentsScreenshotEnabled(false)
-        // Ctrl / Signal is dark only: light bar icons on the app's near-black background, edge to edge.
-        val bars = SystemBarStyle.dark(BAR_COLOR)
-        enableEdgeToEdge(statusBarStyle = bars, navigationBarStyle = bars)
+        enableEdgeToEdge()
         if (savedInstanceState == null) handleIntent(intent)
         val c = container
         setContent {
             val settings by c.settings.settings.collectAsStateWithLifecycle()
+            // Signal follows the phone's dark theme: bars in the background colour, with light icons in
+            // dark mode and dark icons in light mode.
+            val dark = isSystemInDarkTheme()
+            DisposableEffect(dark) {
+                val bars = if (dark) SystemBarStyle.dark(BAR_DARK) else SystemBarStyle.light(BAR_LIGHT, BAR_DARK)
+                enableEdgeToEdge(statusBarStyle = bars, navigationBarStyle = bars)
+                onDispose { }
+            }
             // "Hide in screenshots": FLAG_SECURE (also blanks the Recents preview). Always on, whatever the
             // switch says, while an API key, password or pasted server settings, the lock screen or a PIN screen are on screen.
             val secure = settings.hideScreenshots || ScreenPrivacy.forced > 0 || lockCovering(c.vault)

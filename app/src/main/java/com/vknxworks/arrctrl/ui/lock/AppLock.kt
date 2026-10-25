@@ -426,8 +426,8 @@ private fun PinLockScreen() {
                 OutlinedButton(
                     onClick = ::askFingerprint,
                     shape = KeyShape,
-                    border = BorderStroke(1.dp, CtrlColors.Accent),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = CtrlColors.Accent),
+                    border = BorderStroke(1.dp, CtrlColors.AccentText),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = CtrlColors.AccentText),
                     modifier = Modifier.heightIn(min = 56.dp),
                 ) {
                     Icon(Icons.Outlined.Fingerprint, null, Modifier.size(24.dp))
@@ -612,7 +612,7 @@ private fun PinPadScreen(
             )
             Spacer(Modifier.height(28.dp))
             Box(Modifier.height(20.dp).offset { IntOffset(shake.roundToInt(), 0) }, contentAlignment = Alignment.Center) {
-                if (checking) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = CtrlColors.Accent)
+                if (checking) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = CtrlColors.AccentText)
                 else Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     repeat(maxOf(pin.length, LockVault.PIN_MIN)) { i ->
                         val cell = Modifier.size(14.dp).clip(PinCellShape)
