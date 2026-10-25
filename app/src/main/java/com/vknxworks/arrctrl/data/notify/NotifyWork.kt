@@ -31,18 +31,23 @@ import kotlin.coroutines.cancellation.CancellationException
 class CheckWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val c = applicationContext.container
-        // Sealed with the app lock and ArrCtrl is locked: nothing can sign in until it's unlocked.
-        if (c.backgroundBlocked()) return Result.success()
-        // A push usually arrives the moment Radarr or Sonarr acts; give it a moment to write its history.
-        if (inputData.getBoolean(KEY_PUSH, false)) delay(3_000)
         try {
+            // Sealed with the app lock and ArrCtrl is locked: nothing can sign in until it's unlocked.
+            if (c.backgroundBlocked()) return Result.success()
+            // A push usually arrives the moment Radarr or Sonarr acts; give it a moment to write its history.
+            if (inputData.getBoolean(KEY_PUSH, false)) delay(3_000)
             NotifyChecker(c).check()
         } catch (e: CancellationException) {
             throw e
         } catch (_: Throwable) {
             // Never retry in a loop; the next check or push tries again.
         }
-        if (c.settings.current().let { it.notifyEnabled && it.notifyOngoing }) NotifySchedule.kickOngoing(applicationContext)
+        try {
+            if (c.settings.current().let { it.notifyEnabled && it.notifyOngoing }) NotifySchedule.kickOngoing(applicationContext)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Throwable) {
+        }
         return Result.success()
     }
 
@@ -55,12 +60,12 @@ class CheckWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
 class OngoingWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val c = applicationContext.container
-        val s = c.settings.current()
-        if (!s.notifyEnabled || !s.notifyOngoing || c.backgroundBlocked()) {
-            Notifications.cancelOngoing(applicationContext)
-            return Result.success()
-        }
         val active = try {
+            val s = c.settings.current()
+            if (!s.notifyEnabled || !s.notifyOngoing || c.backgroundBlocked()) {
+                Notifications.cancelOngoing(applicationContext)
+                return Result.success()
+            }
             Ongoing.update(applicationContext, s)
         } catch (e: CancellationException) {
             throw e

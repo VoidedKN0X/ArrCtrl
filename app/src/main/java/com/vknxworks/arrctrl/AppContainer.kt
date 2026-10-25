@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -33,7 +34,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 /** Manual dependency container; one per process. */
 class AppContainer(val context: Context) {
-    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    /**
+     * Background work for the whole process. A failure in one job (a storage or network error nobody waits for)
+     * is dropped instead of crashing the app; every job that can fail in an expected way handles it itself.
+     */
+    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, _ -> })
 
     val settings = SettingsRepository(context, appScope)
     val http = Http()
@@ -83,6 +88,8 @@ class AppContainer(val context: Context) {
             com.vknxworks.arrctrl.data.settings.RecentPaths.prune(context, null)
             runCatching { WidgetStore.save(context, WidgetSnapshot(noCalendarServers = true, noDownloadServers = true)) }
         }
+        // Posters, fanart and covers from the removed servers shouldn't stay on the phone either.
+        runCatching { com.vknxworks.arrctrl.ui.servers.clearImageCaches(context) }
         vault.disable()
         AppLock.markUnlocked()
         runCatching { Widgets.redraw(context) }

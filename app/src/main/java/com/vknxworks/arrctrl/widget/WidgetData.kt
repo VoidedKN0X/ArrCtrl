@@ -170,14 +170,14 @@ class WidgetWorker(context: Context, params: WorkerParameters) : CoroutineWorker
             return Result.success()
         }
         // With the app lock sealing the API keys and ArrCtrl locked, the widgets keep their last data.
-        val snapshot = if (ctx.container.backgroundBlocked()) null else try {
-            WidgetStore.fetch(ctx)
+        val snapshot = try {
+            if (ctx.container.backgroundBlocked()) null else WidgetStore.fetch(ctx)
         } catch (e: CancellationException) {
             throw e
         } catch (_: Throwable) {
             null
         }
-        if (snapshot != null) WidgetStore.save(ctx, snapshot)
+        if (snapshot != null) runCatching { WidgetStore.save(ctx, snapshot) }
         Widgets.redraw(ctx)
         if (snapshot != null && snapshot.downloads.isNotEmpty() && Widgets.downloadsPlaced(ctx)) Widgets.refreshSoon(ctx)
         return Result.success()

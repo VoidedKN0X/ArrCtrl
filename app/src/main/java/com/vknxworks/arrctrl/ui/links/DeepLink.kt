@@ -23,6 +23,9 @@ object DeepLink {
         if (!uri.scheme.equals(SCHEME, ignoreCase = true)) return null
         if (uri.isOpaque) return null
         if (uri.userInfo != null || uri.port != -1 || uri.fragment != null) return null
+        // The authority must be exactly the host: "movie:abc" (an unreadable port, which Uri reports as none) is refused too.
+        val host = uri.host ?: return null
+        if (!uri.encodedAuthority.equals(host, ignoreCase = true)) return null
         if (!uri.path.isNullOrEmpty() && uri.path != "/") return null
         val names = runCatching { uri.queryParameterNames }.getOrNull() ?: return null
         /** The id, 0 when given empty (treated as missing), null when invalid or repeated. */
@@ -32,7 +35,7 @@ object DeepLink {
             if (values[0].isEmpty()) return 0
             return values[0].takeIf { ID.matches(it) }?.toLongOrNull()?.takeIf { it <= Int.MAX_VALUE }?.toInt()
         }
-        return when (uri.host?.lowercase()) {
+        return when (host.lowercase()) {
             "movie" -> {
                 if (names != setOf("tmdb")) return null
                 id("tmdb")?.takeIf { it > 0 }?.let { "link/movie/$it" }

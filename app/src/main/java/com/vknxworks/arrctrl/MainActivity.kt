@@ -28,6 +28,9 @@ import com.vknxworks.arrctrl.ui.theme.ArrCtrlTheme
 private const val BAR_DARK = 0xFF08080A.toInt()
 private const val BAR_LIGHT = 0xFFF5F5F1.toInt()
 
+/** What a notification, widget or the tile may open: a tab, System health, or one movie, series or artist. */
+private val OPEN_TARGET = Regex("^(activity|calendar|health|(movie|series|artist)/[A-Za-z0-9-]{1,64}/[1-9][0-9]{0,9})$")
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,9 +56,14 @@ class MainActivity : ComponentActivity() {
             // so Recents never shows what's behind the lock.
             val blankRecents = settings.hideRecents || c.vault.enabled
             LaunchedEffect(secure, blankRecents) {
-                if (secure) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-                else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
-                setRecentsScreenshotEnabled(!blankRecents)
+                // Locking as you leave changes these while the activity may already be closing; the system can
+                // refuse that for a finished activity, which must never crash the app.
+                if (isFinishing || isDestroyed) return@LaunchedEffect
+                runCatching {
+                    if (secure) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                    setRecentsScreenshotEnabled(!blankRecents)
+                }
             }
             ArrCtrlTheme(settings.theme, settings.dynamicColor) {
                 // Nothing of the app is shown (or kept on screen) while the app lock is locked.
@@ -76,8 +84,18 @@ class MainActivity : ComponentActivity() {
      */
     private fun handleIntent(intent: Intent?) {
         intent ?: return
+        // Another app's intent can carry extras that can't be read (BadParcelableException and friends):
+        // such an intent is ignored instead of crashing ArrCtrl.
+        try {
+            route(intent)
+        } catch (_: RuntimeException) {
+        }
+    }
+
+    private fun route(intent: Intent) {
         intent.getStringExtra(Notifications.EXTRA_OPEN)?.let { open ->
-            container.pendingOpen.value = open
+            // Only the targets ArrCtrl's own notifications, widgets and tile use; anything else is ignored.
+            if (OPEN_TARGET.matches(open)) container.pendingOpen.value = open
             return
         }
         if (intent.action == "android.service.quicksettings.action.QS_TILE_PREFERENCES") {

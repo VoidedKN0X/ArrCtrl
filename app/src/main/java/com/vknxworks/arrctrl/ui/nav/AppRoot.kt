@@ -93,6 +93,7 @@ import com.vknxworks.arrctrl.ui.music.AddArtistScreen
 import com.vknxworks.arrctrl.ui.music.ArtistScreen
 import com.vknxworks.arrctrl.ui.music.MusicScreen
 import com.vknxworks.arrctrl.ui.links.OpenLinkScreen
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun AppRoot() {
@@ -147,6 +148,8 @@ private fun MainScaffold() {
     val incoming by c.pendingTorrent.collectAsStateWithLifecycle()
     LaunchedEffect(incoming) {
         val t = incoming ?: return@LaunchedEffect
+        // Opened from another app straight after start-up: wait for the saved servers first.
+        c.servers.loaded.first { it }
         c.pendingTorrent.value = null
         navController.navigate(AddTorrentRoute(link = t.link, file = t.fileUri)) { launchSingleTop = true }
     }
@@ -155,6 +158,8 @@ private fun MainScaffold() {
     val open by c.pendingOpen.collectAsStateWithLifecycle()
     LaunchedEffect(open) {
         val o = open ?: return@LaunchedEffect
+        // A tap that started ArrCtrl: the screens look the server up by id, so wait until the servers are read.
+        c.servers.loaded.first { it }
         c.pendingOpen.value = null
         val parts = o.split('/')
         when (parts.firstOrNull()) {

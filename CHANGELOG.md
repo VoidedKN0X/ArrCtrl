@@ -4,6 +4,32 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.6.1 (2026-10-25)
+
+A clean-up and hardening release: fixes for crashes when leaving ArrCtrl, and stricter checks on what other apps can hand to it.
+
+### Fixed
+
+- **No more crash when you leave ArrCtrl with the app lock on.** With **Lock again** set to "As soon as you leave", pressing Back on the first screen or swiping ArrCtrl away from recent apps locked it while the screen was already closing, and the lock screen (or the fingerprint prompt) could then crash the app. ArrCtrl still locks straight away, but nothing new is drawn on a closing screen; the next time you open it, it starts on the lock screen as before.
+- **The fingerprint prompt is no longer started while ArrCtrl is closing**, which some phones refused with a crash.
+- **Tapping a notification or widget, or an arrctrl:// link, when ArrCtrl wasn't running** no longer shows "Server not found" or "No Radarr server" for a moment: ArrCtrl now waits until your servers are loaded before opening the movie, series, artist or link.
+- **Saving, removing or importing servers** shows an error message instead of closing ArrCtrl when it can't be saved (for example because ArrCtrl locked itself at that moment).
+- **Forgot PIN?** shows a message instead of closing ArrCtrl if removing your data fails.
+- **Closing the QR code scanner** straight after opening it, before the camera was ready, no longer leaves the camera running in the background or crashes ArrCtrl.
+- **Background checks, the ongoing download notification, the widgets and the Alt. speed tile** no longer crash ArrCtrl in the background when the phone's storage or Keystore briefly can't be read; they simply try again at the next check.
+
+### Security
+
+- **Stricter checks on what other apps send to ArrCtrl.** Requests to open a screen are only accepted for ArrCtrl's own targets (a tab, System health, or one movie, series or artist on one of your servers); anything else is ignored. Intents with extras that can't be read are ignored instead of crashing ArrCtrl.
+- **arrctrl:// links** with anything after the host other than the documented parameters (such as an unreadable port) are now refused too.
+- **Forgot PIN?** now also clears the posters, fanart and album covers cached on your phone, like removing a single server does.
+- An unused WorkManager diagnostics component that Android lets other apps call is no longer included.
+
+### Changed
+
+- The privacy section of the README now also mentions Lidarr: album covers and artist pictures come from your own Lidarr server, never straight from MusicBrainz or fanart.tv.
+- Internal clean-up: background jobs that can fail no longer stop the app.
+
 ## v1.6.0 (2026-10-25)
 
 Lidarr support: your music library, next to your movies and series.

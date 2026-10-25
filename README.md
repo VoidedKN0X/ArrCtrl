@@ -177,7 +177,7 @@ Turn it on: tap your profile picture › **Settings › Privacy and security ›
 
 **Telemetry-free.** ArrCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the servers you add.
 
-- Posters and backdrops come from your own Radarr and Sonarr servers, never straight from sites like TMDB.
+- Posters, backdrops and album covers come from your own Radarr, Sonarr and Lidarr servers, never straight from sites like TMDB, MusicBrainz or fanart.tv.
 - Instant notifications come through the ntfy app and your own ntfy server, and **Send a test wake-up** posts to your push address.
 - Help links in System health, and the GitHub and licence links in About, open in your browser only when you tap them.
 

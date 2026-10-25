@@ -15,6 +15,7 @@ import com.vknxworks.arrctrl.data.api.QbitApi
 import com.vknxworks.arrctrl.data.notify.Notifications
 import com.vknxworks.arrctrl.data.server.Server
 import com.vknxworks.arrctrl.data.server.ServiceType
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,7 +33,8 @@ import kotlinx.coroutines.withContext
  * a tap turns them all on, or all off when they already are.
  */
 class AltSpeedTileService : TileService() {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    // A failed check (storage, network) only leaves the tile as it was; it never crashes the system UI's binding.
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + CoroutineExceptionHandler { _, _ -> })
     private var job: Job? = null
 
     /** Each server's state; null when it couldn't be reached. */

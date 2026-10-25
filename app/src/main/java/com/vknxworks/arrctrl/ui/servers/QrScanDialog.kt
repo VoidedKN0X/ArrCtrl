@@ -101,7 +101,10 @@ private fun QrCamera(modifier: Modifier, onCode: (String) -> Unit) {
         var provider: ProcessCameraProvider? = null
         val reader = BarcodeReader(BarcodeReader.Options(formats = setOf(BarcodeReader.Format.QR_CODE), tryHarder = true))
         val done = AtomicBoolean(false)
+        // Closed before the camera was ready: never bind it afterwards (its analyzer would run on a shut-down executor).
+        val disposed = AtomicBoolean(false)
         providerFuture.addListener({
+            if (disposed.get()) return@addListener
             val p = runCatching { providerFuture.get() }.getOrNull() ?: return@addListener
             provider = p
             val preview = Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
@@ -114,6 +117,7 @@ private fun QrCamera(modifier: Modifier, onCode: (String) -> Unit) {
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
             analysis.setAnalyzer(executor) { image ->
+                if (disposed.get()) { image.close(); return@setAnalyzer }
                 val text = decode(reader, image)
                 image.close()
                 if (text != null && done.compareAndSet(false, true)) {
@@ -126,6 +130,7 @@ private fun QrCamera(modifier: Modifier, onCode: (String) -> Unit) {
             }
         }, ContextCompat.getMainExecutor(context))
         onDispose {
+            disposed.set(true)
             runCatching { provider?.unbindAll() }
             executor.shutdown()
         }

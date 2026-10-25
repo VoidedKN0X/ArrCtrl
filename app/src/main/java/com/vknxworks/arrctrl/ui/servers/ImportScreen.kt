@@ -57,7 +57,8 @@ import kotlinx.coroutines.launch
 fun ImportScreen() {
     // Pasted or scanned settings hold API keys and passwords: no screenshots or screen recording here.
     SecureWindow()
-    val c = LocalContext.current.container
+    val context = LocalContext.current
+    val c = context.container
     val nav = LocalNavigator.current
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboardManager.current
@@ -188,10 +189,16 @@ fun ImportScreen() {
                 colors = ctrlPrimaryButtonColors(),
                 onClick = {
                     scope.launch {
-                        ready.forEach { c.http.forget(it) }
-                        c.servers.import(ready)
-                        // The Servers list re-checks every server when the saved list changes.
-                        nav.back()
+                        try {
+                            ready.forEach { c.http.forget(it) }
+                            c.servers.import(ready)
+                            // The Servers list re-checks every server when the saved list changes.
+                            nav.back()
+                        } catch (e: kotlinx.coroutines.CancellationException) {
+                            throw e
+                        } catch (e: Throwable) {
+                            android.widget.Toast.makeText(context, failureText(context, e), android.widget.Toast.LENGTH_LONG).show()
+                        }
                     }
                 },
                 enabled = ready.isNotEmpty(),

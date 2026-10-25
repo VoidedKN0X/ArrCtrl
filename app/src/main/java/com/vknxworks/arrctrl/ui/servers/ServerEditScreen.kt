@@ -177,10 +177,16 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
     fun save() {
         val d = draft() ?: return
         scope.launch {
-            existing?.let { c.http.forget(it) }
-            c.servers.save(d)
-            c.status.check(d)
-            onDone()
+            try {
+                existing?.let { c.http.forget(it) }
+                c.servers.save(d)
+                c.status.check(d)
+                onDone()
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                android.widget.Toast.makeText(context, failureText(context, e), android.widget.Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -408,12 +414,18 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                 TextButton(onClick = {
                     confirmDelete = false
                     scope.launch {
-                        c.http.forget(existing)
-                        c.servers.remove(existing.id)
-                        com.vknxworks.arrctrl.data.settings.RecentPaths.prune(context, c.servers.current().map { it.id }.toSet())
-                        // Posters and fanart from that server shouldn't stay on the phone.
-                        clearImageCaches(context)
-                        onDone()
+                        try {
+                            c.http.forget(existing)
+                            c.servers.remove(existing.id)
+                            com.vknxworks.arrctrl.data.settings.RecentPaths.prune(context, c.servers.current().map { it.id }.toSet())
+                            // Posters and fanart from that server shouldn't stay on the phone.
+                            runCatching { clearImageCaches(context) }
+                            onDone()
+                        } catch (e: kotlinx.coroutines.CancellationException) {
+                            throw e
+                        } catch (e: Throwable) {
+                            android.widget.Toast.makeText(context, failureText(context, e), android.widget.Toast.LENGTH_LONG).show()
+                        }
                     }
                 }) { Text(stringResource(R.string.remove)) }
             },

@@ -914,6 +914,7 @@
     <string name="lock_pin_too_easy">Too easy to guess. Try a less obvious PIN.</string>
     <string name="lock_pin_mismatch">The PINs didn\'t match. Start again.</string>
     <string name="lock_save_failed">Couldn\'t save the PIN. Try again.</string>
+    <string name="lock_forgot_failed">Couldn\'t remove your data. Try again.</string>
     <string name="lock_ok">OK</string>
     <string name="lock_next">Next</string>
     <string name="lock_done">Done</string>

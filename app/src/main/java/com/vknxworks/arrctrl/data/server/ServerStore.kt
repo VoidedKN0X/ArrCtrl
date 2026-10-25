@@ -50,11 +50,21 @@ class ServerStore(private val context: Context, scope: CoroutineScope, private v
     private val _servers = MutableStateFlow<List<Server>>(emptyList())
     val servers: StateFlow<List<Server>> = _servers.asStateFlow()
 
+    /** True once the saved servers have been read after start-up, so [servers] is no longer the empty placeholder. */
+    private val _loaded = MutableStateFlow(false)
+    val loaded: StateFlow<Boolean> = _loaded.asStateFlow()
+
     init {
         scope.launch {
-            context.appDataStore.data.map { it[key] }.distinctUntilChanged().collect { raw ->
-                lastRaw = raw
-                _servers.value = decode(raw)
+            try {
+                context.appDataStore.data.map { it[key] }.distinctUntilChanged().collect { raw ->
+                    lastRaw = raw
+                    _servers.value = decode(raw)
+                    _loaded.value = true
+                }
+            } finally {
+                // Even if storage can't be read, screens waiting for the list must not wait forever.
+                _loaded.value = true
             }
         }
     }
@@ -82,6 +92,7 @@ class ServerStore(private val context: Context, scope: CoroutineScope, private v
         context.appDataStore.edit { it.remove(key) }
         lastRaw = null
         _servers.value = emptyList()
+        _loaded.value = true
     }
 
     /** Reads the stored list directly; for background work, where [servers] may not have loaded yet. */

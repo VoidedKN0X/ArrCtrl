@@ -270,9 +270,17 @@ fun lockCovering(vault: LockVault): Boolean = (vault.enabled && !AppLock.unlocke
  */
 @Composable
 fun AppLockGate(content: @Composable () -> Unit) {
-    val c = LocalContext.current.container
+    val context = LocalContext.current
+    val c = context.container
     val vault = c.vault
     if (vault.enabled && !AppLock.unlocked) {
+        // Leaving the app (Back on the first screen, swiping it from recents) can lock it while the activity is
+        // already finishing. Nothing new is drawn on a dying window then; the next start opens on the lock screen.
+        val activity = context.findActivity()
+        if (activity != null && (activity.isFinishing || activity.isDestroyed)) {
+            Box(Modifier.fillMaxSize().background(CtrlColors.Background))
+            return
+        }
         PinLockScreen()
         return
     }
@@ -352,6 +360,8 @@ private fun PinLockScreen() {
 
     fun askFingerprint() {
         val a = activity ?: return
+        // No prompt for an activity that is closing: the system refuses it, and some phones crash on it.
+        if (a.isFinishing || a.isDestroyed) return
         val cipher = vault.biometricUnlockCipher() ?: run {
             message = if (!vault.biometricEnabled) context.getString(R.string.lock_fingerprint_changed) else null
             return
@@ -446,7 +456,15 @@ private fun PinLockScreen() {
             confirmButton = {
                 TextButton(onClick = {
                     forgetting = false
-                    scope.launch { c.forgetEverything() }
+                    scope.launch {
+                        try {
+                            c.forgetEverything()
+                        } catch (e: kotlinx.coroutines.CancellationException) {
+                            throw e
+                        } catch (_: Throwable) {
+                            message = context.getString(R.string.lock_forgot_failed)
+                        }
+                    }
                 }) { Text(stringResource(R.string.lock_forgot_confirm), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = { TextButton(onClick = { forgetting = false }) { Text(stringResource(R.string.cancel)) } },
