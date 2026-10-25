@@ -20,6 +20,10 @@ Wanted lists for Radarr and Sonarr, more qBittorrent controls, and links from Je
 - **Global speed limits** editor: tap the download speed card on Activity, or the new sliders button at the top of Activity. It shows qBittorrent's **normal** and **alternative** download and upload limits in KB/s (empty or 0 is unlimited) and which set is in use now, and saves both. With more than one qBittorrent server, chips pick the server. The Alt. speed button, tile and per-torrent limits work as before.
 - **arrctrl:// links** from other apps: `arrctrl://movie?tmdb=<id>` opens that movie in Radarr, and `arrctrl://series?tvdb=<id>&tmdb=<id>` opens that series in Sonarr (by its TVDB id, or by its TMDB id when there's no TVDB id). ArrCtrl looks on every Radarr or Sonarr server you have. When none of them has it, it opens **Add movie** or **Add series** already searched by that id, and opens the add sheet straight away when there's exactly one match; with more than one server you first pick which one to add it to. JellyCtrl and SeerrCtrl use these links for their "Open in ArrCtrl" buttons.
 
+### Fixed
+
+- Two of the new texts (the share limits help and the "couldn't create that folder" message) broke the build; fixed before release.
+
 ### Security
 
 - **arrctrl:// links are checked strictly and never act on their own.** Only `movie` with exactly one `tmdb` parameter and `series` with a `tvdb` and/or `tmdb` parameter are accepted; ids must be plain positive numbers, and links with any other part (path, port, user info, fragment, unknown or repeated parameters) are ignored. Web pages can't open them (the link isn't marked as browsable). A link only opens a screen: it never adds, searches or changes anything without you tapping, and with the app lock on nothing opens until you've unlocked ArrCtrl.

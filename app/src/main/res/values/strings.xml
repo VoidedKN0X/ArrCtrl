@@ -979,14 +979,14 @@
     <string name="torrent_location_forget">Forget this folder</string>
     <string name="torrent_location_move">Move</string>
     <string name="torrent_location_moving">Moving files</string>
-    <string name="torrent_location_cant_create">qBittorrent couldn't create that folder</string>
+    <string name="torrent_location_cant_create">qBittorrent couldn\'t create that folder</string>
     <string name="torrent_share_limits">Share limits</string>
     <string name="share_ratio">Ratio</string>
     <string name="share_seeding_time">Seeding time (minutes)</string>
     <string name="share_inactive_time">Inactive seeding time (minutes)</string>
     <string name="share_global">Global</string>
     <string name="share_custom">Set</string>
-    <string name="share_help">Global uses qBittorrent's own share limits. What happens when a limit is reached is set in qBittorrent.</string>
+    <string name="share_help">Global uses qBittorrent\'s own share limits. What happens when a limit is reached is set in qBittorrent.</string>
     <string name="speed_limits_title">Global speed limits</string>
     <string name="speed_limits_normal">Normal limits</string>
     <string name="speed_limits_alt">Alternative limits</string>
