@@ -4,6 +4,18 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.6.3 (2026-11-02)
+
+### Fixed
+
+- **Bottom sheets no longer show a stray grey box or outline.** The thin border around bottom sheets was drawn in the wrong place: a grey rectangle could cut across the open sheet (often right through the first row) and a loose rounded outline showed near the top of the screen. Sheets are now plain: the card colour (white in light mode, dark grey in dark mode) with 26dp rounded top corners and no outline, separated from the screen by the dimmed background. Their colour, drag handle and behaviour are unchanged. This fixes every bottom sheet in the app, including:
+  - choice sheets in Settings and the You page (lock timeout, notification check interval and similar pickers, Add server);
+  - the queue item sheet on Activity, the torrent actions and queue position sheets, and the speed limits sheet;
+  - the add sheets for movies, series and artists (quality profile, root folder, monitor options);
+  - the episode sheet on season pages, the manual import pickers, the artist page sheet;
+  - the Prowlarr search result and Bazarr detail sheets.
+- Dialogs keep their thin border (it was always drawn correctly there), and popup menus keep the look from 1.6.2.
+
 ## v1.6.2 (2026-11-02)
 
 ### Fixed
