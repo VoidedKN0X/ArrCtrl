@@ -34,10 +34,6 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **App lock** with its own PIN and optional fingerprint unlock; your API keys and passwords stay encrypted while the app is locked
 - **API keys and passwords are encrypted** on your phone with the Android Keystore, and the server and import screens always block screenshots. Optional **Hide in screenshots** and **Hide in recent apps** switches cover the rest of the app
 
-## Screenshots
-
-Coming soon.
-
 ## Requirements
 
 - Android 13 or newer, on a 64-bit ARM phone (nearly every phone from the last several years)
@@ -46,8 +42,8 @@ Coming soon.
 
 ## Install
 
-1. Download the latest `.apk` file from the [Releases page](https://github.com/VoidedKN0X/ArrCtrl/releases/latest).
-2. Open it on your phone. Android may ask you to allow installing apps from your browser or file manager.
+1. On your phone, open the [Releases page](https://github.com/VoidedKN0X/ArrCtrl/releases/latest), scroll down to **Assets** and tap the file that ends in `.apk` (for example `ArrCtrl-v1.6.3.apk`). The "Source code" zip and tar.gz files are not the app; you don't need them.
+2. Open the downloaded file. Android may ask you to allow installing apps from your browser or file manager.
 3. Updates install over the old version. Your settings and servers are kept.
 
 **Automatic updates:** on your phone, tap one of the buttons below.
@@ -58,6 +54,33 @@ Coming soon.
 <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/VoidedKN0X/ArrCtrl"><img src=".github/assets/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a> <a href="https://voidedkn0x.github.io/CtrlF-Droid/"><img src=".github/assets/badge_ctrlf-droid.png" alt="Get it from our F-Droid repo" height="80"></a>
 
 If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X/ArrCtrl` in Obtainium by hand.
+
+## Is it safe to install?
+
+- **Open source.** All of ArrCtrl's code is in this repo, under the GPL-3.0 license. You can read every line.
+- **Built by GitHub, not on a personal computer.** Every release on the [Releases page](https://github.com/VoidedKN0X/ArrCtrl/releases) is built by GitHub Actions straight from the code in this repo, using [the build workflow](.github/workflows/build.yml).
+- **Always signed with the same key.** Android refuses to install an update that is signed with a different key, so nobody else can push an "update" over your copy. The [CtrlF-Droid repo](https://voidedkn0x.github.io/CtrlF-Droid/) only accepts APKs signed with this key too. Its SHA-256 certificate fingerprint is:
+
+  ```
+  EF:DF:6A:A1:18:80:D2:85:68:2D:55:9C:48:4E:E7:02:28:24:26:A5:82:A8:10:AF:FC:C7:E8:1D:53:B7:16:CE
+  ```
+
+  Advanced users can compare it with [AppVerifier](https://github.com/soupslurpr/AppVerifier).
+
+**Permissions** ArrCtrl asks for:
+
+| Permission | What it's for |
+| --- | --- |
+| Internet | Talking to your own servers (and your ntfy server for **Send a test wake-up**). Nothing else. |
+| Network state | Waiting for a connection before background checks and widget refreshes. |
+| Camera | Only for scanning a server-settings QR code, asked for when you tap **Scan QR**. |
+| Notifications | Notifications about your downloads, asked for when you turn them on. |
+| Fingerprint | Optional fingerprint unlock for the app lock. |
+| Ignore battery optimisations | Lets the Notifications screen ask Android not to delay ArrCtrl's checks. Nothing changes unless you say OK. |
+
+Android's WorkManager library, which runs the background checks and widget refreshes, adds a few standard permissions of its own (to keep the phone awake while a check runs and to restart checks after a reboot).
+
+See [Privacy](#privacy) for what ArrCtrl does and doesn't send.
 
 ## Getting started
 
@@ -181,6 +204,10 @@ Turn it on: tap your profile picture › **Settings › Privacy and security ›
 - Instant notifications come through the ntfy app and your own ntfy server, and **Send a test wake-up** posts to your push address.
 - Help links in System health, and the GitHub and licence links in About, open in your browser only when you tap them.
 
+## How ArrCtrl is made
+
+ArrCtrl is a one-person project by VoidedKN0X (VKNXWorks). Much of the code is written with the help of AI (Claude, by Anthropic). I decide what the app does, review the changes and use the app myself. Every change is listed in the [changelog](CHANGELOG.md), and you can read every line of code here.
+
 ## Build from source
 
 You need [Android Studio](https://developer.android.com/studio), or JDK 17 and the Android SDK.
@@ -203,6 +230,10 @@ Or open the folder in Android Studio and press **Run** with your phone connected
 
 ArrCtrl is free and open source. If it's useful to you, you can support development on [GitHub Sponsors](https://github.com/sponsors/VoidedKN0X). In the app, the About section at the bottom of the **You** page (tap your profile picture) has **Support ArrCtrl** and **Report a bug**, which opens the [issue tracker](https://github.com/VoidedKN0X/ArrCtrl/issues). Starring the repo helps too.
 
+Found a bug or have an idea? [Open an issue](https://github.com/VoidedKN0X/ArrCtrl/issues/new/choose) and pick **Bug report** or **Feature request**; the form asks for what's needed.
+
+Found a security problem? Please don't open a public issue; see [SECURITY.md](SECURITY.md).
+
 ## The Ctrl series
 
 Native Android apps for self-hosted services and everyday tools, all with the same Material You design.
@@ -223,11 +254,16 @@ Native Android apps for self-hosted services and everyday tools, all with the sa
 | [PaperCtrl](https://github.com/VoidedKN0X/PaperCtrl) | Scan and browse documents on Paperless-ngx |
 | [PrintCtrl](https://github.com/VoidedKN0X/PrintCtrl) | Bambu Lab printers through Bambuddy, and Spoolman spools |
 | [ProxCtrl](https://github.com/VoidedKN0X/ProxCtrl) | Manage your Proxmox VE server |
+| [RideCtrl](https://github.com/VoidedKN0X/RideCtrl) | Offline maintenance, fuel and mod log for your vehicles |
 | [SeerrCtrl](https://github.com/VoidedKN0X/SeerrCtrl) | Request movies and shows on Seerr / Jellyseerr |
+| [SynapseCtrl](https://github.com/VoidedKN0X/SynapseCtrl) | Administer your Matrix Synapse server |
 | [TrueCtrl](https://github.com/VoidedKN0X/TrueCtrl) | Monitor and manage your TrueNAS server |
+| [WrtCtrl](https://github.com/VoidedKN0X/WrtCtrl) | Manage your OpenWrt router |
 
 ## License
 
 ArrCtrl is licensed under the [GNU General Public License v3.0](LICENSE). © VKNXWorks
+
+ArrCtrl is an independent app and isn't made by or affiliated with the Radarr, Sonarr, Lidarr, Prowlarr, Bazarr, qBittorrent, autobrr or Cleanuparr projects.
 
 The Space Grotesk and JetBrains Mono fonts are licensed under the SIL Open Font License 1.1; see `FONT-LICENSE-SpaceGrotesk.txt` and `FONT-LICENSE-JetBrainsMono.txt`.

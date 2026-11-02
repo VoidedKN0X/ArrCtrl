@@ -1,0 +1,66 @@
+name: Bug report
+description: Something in ArrCtrl doesn't work as it should
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+
+        **Before you post:** remove server addresses, API keys, passwords, push addresses and other personal info from your text, logs and screenshots. Everything here is public.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the Movies tab
+        2. Tap a movie
+        3. Tap Search
+        4. See the error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+  - type: input
+    id: app-version
+    attributes:
+      label: ArrCtrl version
+      placeholder: "Profile picture > bottom of the page, e.g. 1.6.3"
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android version and phone
+      placeholder: "Android 15, Pixel 8"
+    validations:
+      required: true
+  - type: input
+    id: server-version
+    attributes:
+      label: Server software and version
+      description: Which service the problem is with (Radarr, Sonarr, Lidarr, Prowlarr, Bazarr, qBittorrent, autobrr or Cleanuparr) and its version.
+      placeholder: "Radarr 5.26, qBittorrent 5.1"
+  - type: dropdown
+    id: installed-from
+    attributes:
+      label: Installed from
+      options:
+        - GitHub Releases
+        - Obtainium
+        - CtrlF-Droid
+        - Built it myself
+  - type: textarea
+    id: logs
+    attributes:
+      label: Screenshots or logs
+      description: Optional. Remember to remove addresses, keys and passwords first.

@@ -4,6 +4,14 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Project updates (2026-11-02)
+
+No new app version: these changes are to the repo and its documentation only.
+
+- **New SECURITY.md** explaining how to report a security problem privately (through GitHub's **Report a vulnerability**), which versions get fixes, what counts as a security problem, and the release signing key's SHA-256 fingerprint.
+- **Issue forms**: **New issue** now offers a **Bug report** form (what happened, steps, ArrCtrl, Android and server versions, where you installed it from, with a reminder to remove addresses, API keys and passwords) and a **Feature request** form. Blank issues are off, and there's a link for reporting security problems privately.
+- **README**: the empty Screenshots section is gone; the Install steps now say exactly which file to tap on the Releases page (the `.apk` under **Assets**, not the "Source code" files); a new **Is it safe to install?** section covers open source, GitHub Actions builds, the signing key fingerprint and every permission in plain words; a new **How ArrCtrl is made** section; the Support section points to the issue forms and SECURITY.md; the Ctrl series table lists every current app; and the License section says ArrCtrl isn't affiliated with the projects it works with.
+
 ## v1.6.3 (2026-11-02)
 
 ### Fixed
