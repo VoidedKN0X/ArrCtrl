@@ -4,6 +4,16 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.6.2 (2026-11-02)
+
+### Fixed
+
+- **Popup menus no longer show a grey box.** The menus that open from a ⋮ button used Android's default shadow, which was drawn as a grey, square-edged box around the menu (most visible in light mode). They now use the flat Signal look: the card colour (white in light mode, dark grey in dark mode), 16dp rounded corners, a thin border and no shadow. Menu text uses the normal text colour, icons the grey secondary colour, and unavailable items are greyed out. This applies to:
+  - the **⋮ menu on a season page** (Monitor/Unmonitor season, Monitor all episodes, Unmonitor all episodes);
+  - the **⋮ menu in the selection bar** on Movies and Series while items are selected (Select all, Change quality profile).
+
+  Nothing about what the menus do has changed.
+
 ## v1.6.1 (2026-10-25)
 
 A clean-up and hardening release: fixes for crashes when leaving ArrCtrl, and stricter checks on what other apps can hand to it.

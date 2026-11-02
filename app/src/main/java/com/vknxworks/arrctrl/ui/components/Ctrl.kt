@@ -589,3 +589,88 @@ fun ctrlSegmentedColors(): androidx.compose.material3.SegmentedButtonColors = an
     inactiveContentColor = CtrlColors.Muted,
     inactiveBorderColor = CtrlColors.ControlBorder,
 )
+
+// ---------- Popup menus ----------
+
+private val MenuShape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+
+/**
+ * Popup menu in Signal style: flat surface, 16dp corners, 1dp card border and no shadow or tonal tint
+ * (Material's shadow is drawn inside the popup window and shows as a grey box).
+ */
+@Composable
+fun CtrlDropdownMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    offset: androidx.compose.ui.unit.DpOffset = androidx.compose.ui.unit.DpOffset(0.dp, 0.dp),
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    androidx.compose.material3.DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        modifier = modifier,
+        offset = offset,
+        shape = MenuShape,
+        containerColor = CtrlColors.Surface,
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
+        border = androidx.compose.foundation.BorderStroke(1.dp, CtrlColors.CardBorder),
+        content = content,
+    )
+}
+
+/** The exposed (anchored to a field) variant of [CtrlDropdownMenu], with the same look. */
+@Composable
+fun androidx.compose.material3.ExposedDropdownMenuBoxScope.CtrlExposedDropdownMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    ExposedDropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+        modifier = modifier,
+        shape = MenuShape,
+        containerColor = CtrlColors.Surface,
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
+        border = androidx.compose.foundation.BorderStroke(1.dp, CtrlColors.CardBorder),
+        content = content,
+    )
+}
+
+/** Menu item colours from the current palette; [destructive] items use the error colour. */
+@Composable
+fun ctrlMenuItemColors(destructive: Boolean = false): androidx.compose.material3.MenuItemColors =
+    androidx.compose.material3.MenuDefaults.itemColors(
+        textColor = if (destructive) CtrlColors.Error else CtrlColors.Text,
+        leadingIconColor = if (destructive) CtrlColors.Error else CtrlColors.Muted,
+        trailingIconColor = CtrlColors.Muted,
+        disabledTextColor = CtrlColors.Stopped,
+        disabledLeadingIconColor = CtrlColors.Stopped,
+        disabledTrailingIconColor = CtrlColors.Stopped,
+    )
+
+/** A row in a [CtrlDropdownMenu]. */
+@Composable
+fun CtrlDropdownMenuItem(
+    text: @Composable () -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    enabled: Boolean = true,
+    destructive: Boolean = false,
+) {
+    androidx.compose.material3.DropdownMenuItem(
+        text = text,
+        onClick = onClick,
+        modifier = modifier,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        enabled = enabled,
+        colors = ctrlMenuItemColors(destructive),
+    )
+}

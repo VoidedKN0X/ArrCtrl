@@ -1,5 +1,7 @@
 package com.vknxworks.arrctrl.ui.series
 
+import com.vknxworks.arrctrl.ui.components.CtrlDropdownMenu
+import com.vknxworks.arrctrl.ui.components.CtrlDropdownMenuItem
 import com.vknxworks.arrctrl.ui.theme.CtrlColors
 import com.vknxworks.arrctrl.ui.theme.CtrlShapes
 import com.vknxworks.arrctrl.ui.components.CtrlAlertDialog
@@ -38,8 +40,6 @@ import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -147,10 +147,10 @@ fun SeasonScreen(serverId: String, seriesId: Int, season: Int) {
                 }
                 Box {
                     IconButton(onClick = { menu = true }) { Icon(Icons.Outlined.MoreVert, stringResource(R.string.more_actions)) }
-                    DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                    CtrlDropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                         val s = series
                         if (s != null && seasonInfo != null) {
-                            DropdownMenuItem(
+                            CtrlDropdownMenuItem(
                                 text = { Text(stringResource(if (seasonInfo.monitored) R.string.season_unmonitor else R.string.season_monitor)) },
                                 onClick = {
                                     menu = false
@@ -162,11 +162,11 @@ fun SeasonScreen(serverId: String, seriesId: Int, season: Int) {
                         }
                         val eps = episodes.orEmpty()
                         if (eps.isNotEmpty()) {
-                            DropdownMenuItem(
+                            CtrlDropdownMenuItem(
                                 text = { Text(stringResource(R.string.season_monitor_all_episodes)) },
                                 onClick = { menu = false; act(R.string.saved) { api.setEpisodesMonitored(eps.map { it.id }, true) } },
                             )
-                            DropdownMenuItem(
+                            CtrlDropdownMenuItem(
                                 text = { Text(stringResource(R.string.season_unmonitor_all_episodes)) },
                                 onClick = { menu = false; act(R.string.saved) { api.setEpisodesMonitored(eps.map { it.id }, false) } },
                             )

@@ -13,8 +13,6 @@ import androidx.compose.material.icons.outlined.HighQuality
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.SelectAll
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,13 +57,13 @@ fun SelectionBar(count: Int, onClose: () -> Unit, onSelectAll: () -> Unit, onAct
         }
         Box {
             IconButton(onClick = { menu = true }) { Icon(Icons.Outlined.MoreVert, stringResource(R.string.more_actions)) }
-            DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                DropdownMenuItem(
+            CtrlDropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                CtrlDropdownMenuItem(
                     text = { Text(stringResource(R.string.selection_all)) },
                     leadingIcon = { Icon(Icons.Outlined.SelectAll, null) },
                     onClick = { menu = false; onSelectAll() },
                 )
-                DropdownMenuItem(
+                CtrlDropdownMenuItem(
                     text = { Text(stringResource(R.string.bulk_profile)) },
                     leadingIcon = { Icon(Icons.Outlined.HighQuality, null) },
                     onClick = { menu = false; onAction(SelectionAction.PROFILE) },
