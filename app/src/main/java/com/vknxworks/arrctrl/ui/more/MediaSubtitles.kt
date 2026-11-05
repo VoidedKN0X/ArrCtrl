@@ -328,6 +328,7 @@ fun MediaSubtitlesScreen(bazarrId: String, radarrId: Int?, seriesId: Int?, episo
             }
             deleting?.let { s ->
                 CtrlAlertDialog(
+                    shielded = true,
                     onDismissRequest = { deleting = null },
                     title = { Text(stringResource(R.string.subs_delete_title, subLabel(s.name, s.hi, s.forced, hiText, forcedText))) },
                     text = { Text(s.fileName.orEmpty(), style = MaterialTheme.typography.bodySmall) },

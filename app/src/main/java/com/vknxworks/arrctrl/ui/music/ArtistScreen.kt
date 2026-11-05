@@ -336,6 +336,7 @@ fun ArtistScreen(serverId: String, artistId: Int) {
         var exclude by remember { mutableStateOf(false) }
         val deleted = stringResource(R.string.artist_deleted)
         CtrlAlertDialog(
+            shielded = true,
             onDismissRequest = { confirmDelete = false },
             title = { Text(stringResource(R.string.movie_delete_title, a.name)) },
             text = {

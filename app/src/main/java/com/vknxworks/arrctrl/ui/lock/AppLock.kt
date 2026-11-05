@@ -465,6 +465,7 @@ private fun PinLockScreen() {
     )
     if (forgetting) {
         CtrlAlertDialog(
+            shielded = true,
             onDismissRequest = { forgetting = false },
             title = { Text(stringResource(R.string.lock_forgot_title)) },
             text = { Text(stringResource(R.string.lock_forgot_body)) },

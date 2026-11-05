@@ -356,6 +356,7 @@ private fun ProvidersTab(server: Server, api: BazarrApi) {
     if (confirmReset) {
         val done = stringResource(R.string.bazarr_providers_reset_done)
         CtrlAlertDialog(
+            shielded = true,
             onDismissRequest = { confirmReset = false },
             title = { Text(stringResource(R.string.bazarr_reset_providers_title)) },
             text = { Text(stringResource(R.string.bazarr_reset_providers_body)) },

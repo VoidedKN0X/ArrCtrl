@@ -130,6 +130,7 @@ fun CheckIcon(check: ServerStatus.Check?) {
 @Composable
 fun CertDialog(host: String, fingerprint: String, changed: Boolean, onTrust: () -> Unit, onCancel: () -> Unit) {
     CtrlAlertDialog(
+        shielded = true,
         onDismissRequest = onCancel,
         icon = { Icon(Icons.Outlined.GppMaybe, null) },
         title = { Text(stringResource(if (changed) R.string.cert_changed_title else R.string.cert_trust_title)) },

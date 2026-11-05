@@ -226,6 +226,7 @@ private fun QueueSheet(q: QueueItem, model: ActivityModel, onDismiss: () -> Unit
         var skipSearch by remember { mutableStateOf(false) }
         val done = stringResource(R.string.queue_removed)
         CtrlAlertDialog(
+            shielded = true,
             onDismissRequest = { confirmRemove = false },
             title = { Text(stringResource(R.string.queue_remove_title, q.title)) },
             text = {

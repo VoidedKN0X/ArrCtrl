@@ -301,6 +301,7 @@ fun MovieScreen(serverId: String, movieId: Int) {
         var exclude by remember { mutableStateOf(false) }
         val deleted = stringResource(R.string.movie_deleted)
         CtrlAlertDialog(
+            shielded = true,
             onDismissRequest = { confirmDelete = false },
             title = { Text(stringResource(R.string.movie_delete_title, mv.title)) },
             text = {
@@ -325,6 +326,7 @@ fun MovieScreen(serverId: String, movieId: Int) {
 
     if (confirmDeleteFile && mv.file != null) {
         CtrlAlertDialog(
+            shielded = true,
             onDismissRequest = { confirmDeleteFile = false },
             title = { Text(stringResource(R.string.movie_delete_file_title)) },
             text = { Text(mv.file.relativePath ?: mv.title) },

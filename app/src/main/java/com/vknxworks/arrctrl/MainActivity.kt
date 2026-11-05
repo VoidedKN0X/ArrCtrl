@@ -13,6 +13,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.core.content.IntentCompat
 import androidx.compose.runtime.LaunchedEffect
 import com.vknxworks.arrctrl.ui.components.ScreenPrivacy
+import com.vknxworks.arrctrl.ui.components.shield
 import com.vknxworks.arrctrl.ui.lock.AppLockGate
 import com.vknxworks.arrctrl.ui.lock.lockCovering
 import androidx.compose.runtime.getValue
@@ -64,6 +65,15 @@ class MainActivity : ComponentActivity() {
                     else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                     setRecentsScreenshotEnabled(!blankRecents)
                 }
+            }
+            // The lock screen, PIN screens and screens with an API key or password: no other app's floating window over
+            // them. Lifted again when they close, so overlays keep working in the rest of the app. Only the lock and PIN
+            // screens are also hidden from apps misusing accessibility (password managers keep working elsewhere).
+            val lockShown = lockCovering(c.vault)
+            val shielded = ScreenPrivacy.forced > 0 || lockShown
+            LaunchedEffect(shielded, lockShown) {
+                if (isFinishing || isDestroyed) return@LaunchedEffect
+                window.shield(shielded, hideFromAccessibility = lockShown)
             }
             ArrCtrlTheme(settings.theme, settings.dynamicColor) {
                 // Nothing of the app is shown (or kept on screen) while the app lock is locked.

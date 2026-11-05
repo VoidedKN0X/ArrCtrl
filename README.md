@@ -66,6 +66,7 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
   ```
 
   Advanced users can compare it with [AppVerifier](https://github.com/soupslurpr/AppVerifier).
+- **Check a download.** Each release's notes end with the APK's SHA-256, so you can check the file you downloaded (`sha256sum ArrCtrl-vX.Y.Z.apk`). With the [GitHub CLI](https://cli.github.com/), `gh attestation verify ArrCtrl-vX.Y.Z.apk -R VoidedKN0X/ArrCtrl` proves the APK was built by this repo's build workflow from the tagged commit. The signing-certificate fingerprint above stays the check Android and AppVerifier use.
 
 **Permissions** ArrCtrl asks for:
 
@@ -75,6 +76,7 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
 | Network state (`ACCESS_NETWORK_STATE`) | Waiting for a connection before background checks and widget refreshes. |
 | Camera (`CAMERA`) | Only for scanning a server-settings QR code, asked for when you tap **Scan QR**. The code is read on the phone. |
 | Notifications (`POST_NOTIFICATIONS`) | Notifications about your downloads, asked for when you turn them on. |
+| Hide floating windows (`HIDE_OVERLAY_WINDOWS`) | Hide other apps' floating windows over the PIN screen, and over the lock screen and confirmations, only while they show. Granted at install, without a prompt. |
 | Fingerprint (`USE_BIOMETRIC`) | Optional fingerprint unlock for the app lock. |
 | Ignore battery optimisations (`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`) | Lets the **Battery** row on the Notifications screen ask Android not to delay ArrCtrl's checks, so notifications arrive on time. Nothing changes unless you say OK in Android's own dialog. |
 | Run at startup (`RECEIVE_BOOT_COMPLETED`) | Putting the background checks and widget refreshes back on schedule after the phone restarts. Added by Android's background work library (WorkManager). |
@@ -233,6 +235,8 @@ You need [Android Studio](https://developer.android.com/studio), or JDK 17 and t
 3. The APK is in `app/build/outputs/apk/debug/`. Copy it to your phone and install it.
 
 Or open the folder in Android Studio and press **Run** with your phone connected.
+
+**Dependency verification:** every library and Gradle plugin the build downloads is checked against its SHA-256 in `gradle/verification-metadata.xml`, and the build stops if one doesn't match. When you add or update a dependency or plugin, run the **Dependency verification metadata** workflow from the Actions tab, check the diff of the file it prints, and commit the new `gradle/verification-metadata.xml` in the same push.
 
 ## Support the project
 

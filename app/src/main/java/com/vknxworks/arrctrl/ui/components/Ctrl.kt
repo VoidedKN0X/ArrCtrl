@@ -430,7 +430,10 @@ fun CtrlTextField(
 
 // ---------- Dialogs and sheets ----------
 
-/** Alert dialog: surface fill, 26dp corners, hairline border. */
+/**
+ * Alert dialog: surface fill, 26dp corners, hairline border. [shielded] for destructive and security
+ * confirmations: no other app's floating window over it while it shows (see [shield]).
+ */
 @Composable
 fun CtrlAlertDialog(
     onDismissRequest: () -> Unit,
@@ -440,10 +443,14 @@ fun CtrlAlertDialog(
     icon: @Composable (() -> Unit)? = null,
     title: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
+    shielded: Boolean = false,
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        confirmButton = confirmButton,
+        confirmButton = {
+            if (shielded) ShieldDialogWindow()
+            confirmButton()
+        },
         modifier = modifier.border(1.dp, CtrlColors.CardBorder, CtrlShapes.Dialog),
         dismissButton = dismissButton,
         icon = icon,

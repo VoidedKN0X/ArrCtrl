@@ -382,6 +382,7 @@ private fun BulkDialog(action: SelectionAction, model: MoviesModel, onDismiss: (
             var files by remember { mutableStateOf(false) }
             var exclude by remember { mutableStateOf(false) }
             CtrlAlertDialog(
+                shielded = true,
                 onDismissRequest = onDismiss,
                 title = { Text(androidx.compose.ui.res.pluralStringResource(R.plurals.movies_delete_title, ids.size, ids.size)) },
                 text = {

@@ -407,6 +407,7 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
 
     if (confirmDelete && existing != null) {
         CtrlAlertDialog(
+            shielded = true,
             onDismissRequest = { confirmDelete = false },
             title = { Text(stringResource(R.string.remove_server_title, existing.name)) },
             text = { Text(stringResource(R.string.remove_server_body)) },

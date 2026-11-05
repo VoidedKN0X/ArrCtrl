@@ -282,6 +282,38 @@ object ScreenPrivacy {
 }
 
 /**
+ * Shields a window while a PIN, lock, secret or confirmation screen shows on it: other apps' floating windows
+ * (overlays such as chat heads) are hidden over it, so they can't cover or imitate it. [on] = false lifts it
+ * again, so overlays keep working everywhere else in the app.
+ *
+ * [hideFromAccessibility] (lock and PIN screens only) also hides the content, on Android 14+, from apps that
+ * misuse accessibility access; real accessibility tools such as TalkBack keep working. It stays off for screens
+ * with API keys and passwords, so password managers that fill through accessibility keep working there.
+ */
+fun android.view.Window.shield(on: Boolean, hideFromAccessibility: Boolean = false) {
+    runCatching { setHideOverlayWindows(on) }
+    if (android.os.Build.VERSION.SDK_INT >= 34) {
+        runCatching {
+            decorView.setAccessibilityDataSensitive(
+                if (on && hideFromAccessibility) android.view.View.ACCESSIBILITY_DATA_SENSITIVE_YES
+                else android.view.View.ACCESSIBILITY_DATA_SENSITIVE_AUTO,
+            )
+        }
+    }
+}
+
+/** Shields the dialog it's called from (a destructive or security confirmation) for as long as it shows. */
+@Composable
+fun ShieldDialogWindow() {
+    val view = androidx.compose.ui.platform.LocalView.current
+    androidx.compose.runtime.DisposableEffect(view) {
+        val window = (view.parent as? androidx.compose.ui.window.DialogWindowProvider)?.window
+        window?.shield(true)
+        onDispose { window?.shield(false) }
+    }
+}
+
+/**
  * Blocks screenshots, screen recording and casting while it's on screen. For screens that show API keys,
  * passwords or pasted server settings.
  */

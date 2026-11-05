@@ -406,6 +406,7 @@ private fun EpisodeSheet(
 
     if (confirmDelete && file != null) {
         CtrlAlertDialog(
+            shielded = true,
             onDismissRequest = { confirmDelete = false },
             title = { Text(stringResource(R.string.movie_delete_file_title)) },
             text = { Text(file?.relativePath ?: e.code) },

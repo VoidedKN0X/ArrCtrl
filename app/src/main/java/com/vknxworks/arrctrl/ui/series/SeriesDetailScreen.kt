@@ -313,6 +313,7 @@ fun SeriesDetailScreen(serverId: String, seriesId: Int) {
         var exclude by remember { mutableStateOf(false) }
         val deleted = stringResource(R.string.series_deleted)
         CtrlAlertDialog(
+            shielded = true,
             onDismissRequest = { confirmDelete = false },
             title = { Text(stringResource(R.string.movie_delete_title, s.title)) },
             text = {

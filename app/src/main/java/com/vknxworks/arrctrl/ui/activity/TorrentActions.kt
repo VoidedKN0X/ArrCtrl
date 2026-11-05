@@ -166,6 +166,7 @@ fun DeleteTorrentDialog(t: Torrent, onDismiss: () -> Unit, onDeleted: () -> Unit
     val scope = rememberCoroutineScope()
     var withFiles by remember { mutableStateOf(false) }
     CtrlAlertDialog(
+        shielded = true,
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.torrent_delete_title)) },
         text = {

@@ -4,6 +4,22 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.6.6 (2026-11-05)
+
+More protection for the PIN screen and confirmations, and a way to check that a download really comes from this repo. Nothing works differently in day-to-day use.
+
+### Security
+
+- **No floating windows over the PIN screen:** while the lock screen, a PIN screen or a screen with an API key or password is open, and while a delete, remove or "Forgot PIN?" confirmation or the certificate check shows, other apps' floating windows (chat heads, overlays) are hidden, so they can't cover or imitate it. They come back as soon as it closes and keep working everywhere else in ArrCtrl. This uses Android's "hide overlay windows" permission, which is granted at install without a prompt.
+- **PIN screens hidden from accessibility misuse (Android 14+):** the lock screen and PIN screens are hidden from apps that use accessibility access to read the screen. Real accessibility tools such as TalkBack keep working, and password managers can still fill the server sign-in fields.
+- **Shared torrent files must belong to the sender (Android 15+):** when another app opens or shares a `.torrent` file with ArrCtrl, Android now checks that the app is allowed to read that file itself, so no app can use ArrCtrl to reach a file it has no access to. Opening and sharing torrents and magnet links works as before.
+- **Stricter about other apps' requests (Android 16+):** ArrCtrl now only accepts requests from other apps that match what it declares, such as the launcher, magnet and torrent links, shares, links from JellyCtrl and SeerrCtrl, the Quick Settings tile and ntfy.
+- **Every library checked:** the build now refuses any library or build plugin whose SHA-256 doesn't match the one recorded in the repo.
+
+### Project
+
+- **Check a download:** this is the first release with GitHub build provenance. The release notes end with the APK's SHA-256, and `gh attestation verify ArrCtrl-v1.6.6.apk -R VoidedKN0X/ArrCtrl` proves the APK was built by this repo's workflow from the tagged commit. The README explains both, next to the signing-certificate fingerprint.
+
 ## Project updates (2026-11-05)
 
 No app changes in this push, so no new version.

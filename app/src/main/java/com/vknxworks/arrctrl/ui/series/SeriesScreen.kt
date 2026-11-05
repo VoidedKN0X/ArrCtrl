@@ -395,6 +395,7 @@ private fun SelectionActionDialog(action: SelectionAction, model: SeriesModel, o
             var files by remember { mutableStateOf(false) }
             var exclude by remember { mutableStateOf(false) }
             CtrlAlertDialog(
+                shielded = true,
                 onDismissRequest = onDismiss,
                 title = { Text(pluralStringResource(R.plurals.series_delete_title, ids.size, ids.size)) },
                 text = {

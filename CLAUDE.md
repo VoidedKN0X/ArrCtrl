@@ -8,6 +8,10 @@
 - Read a service's API (OpenAPI spec, docs or source) before writing or changing its client. Don't guess endpoint names or field shapes.
 - No Firebase, Google Play Services or other proprietary dependencies: the app must stay buildable for F-Droid.
 
+## Dependency verification
+
+Gradle checks every library and plugin download against its SHA-256 in `gradle/verification-metadata.xml` (checksums only, no PGP). When a dependency or plugin changes, run the `verification-metadata.yml` workflow (`gh api -X POST repos/VoidedKN0X/ArrCtrl/actions/workflows/verification-metadata.yml/dispatches -f ref=main`), decode the file from its log, check the diff (only Maven Central, Google's Maven and the Gradle plugin portal) and commit it in the same push. Never turn verification off or make it lenient.
+
 ## Releasing
 
 - A release is published only when `versionName` in `app/build.gradle.kts` is bumped. Bump `versionCode` by 1 at the same time.
