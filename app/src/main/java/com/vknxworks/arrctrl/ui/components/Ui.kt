@@ -292,13 +292,11 @@ object ScreenPrivacy {
  */
 fun android.view.Window.shield(on: Boolean, hideFromAccessibility: Boolean = false) {
     runCatching { setHideOverlayWindows(on) }
-    if (android.os.Build.VERSION.SDK_INT >= 34) {
-        runCatching {
-            decorView.setAccessibilityDataSensitive(
-                if (on && hideFromAccessibility) android.view.View.ACCESSIBILITY_DATA_SENSITIVE_YES
-                else android.view.View.ACCESSIBILITY_DATA_SENSITIVE_AUTO,
-            )
-        }
+    runCatching {
+        decorView.setAccessibilityDataSensitive(
+            if (on && hideFromAccessibility) android.view.View.ACCESSIBILITY_DATA_SENSITIVE_YES
+            else android.view.View.ACCESSIBILITY_DATA_SENSITIVE_AUTO,
+        )
     }
 }
 

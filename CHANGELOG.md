@@ -4,6 +4,14 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.6.7 (2026-11-05)
+
+ArrCtrl now needs Android 15 or newer.
+
+### Changed
+
+- **Needs Android 15 or newer.** Android 13 no longer gets security updates and Android 14's end early 2027, so ArrCtrl now supports Android 15, 16 and 17 only. On older phones the version you have keeps working, but it won't get updates.
+
 ## v1.6.6 (2026-11-05)
 
 More protection for the PIN screen and confirmations, and a way to check that a download really comes from this repo. Nothing works differently in day-to-day use.
