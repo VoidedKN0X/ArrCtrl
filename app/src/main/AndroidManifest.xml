@@ -13,6 +13,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Lets the Notifications screen ask Android to stop delaying ArrCtrl's checks. Nothing is changed without your OK. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- WorkManager adds the foreground-service permission for long jobs shown as a notification. ArrCtrl's checks and
+         widget refreshes are short jobs that never run as a foreground service, so it's removed (with the service below). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
 
     <!-- Package visibility for the "Play in JellyCtrl" and "Open in SeerrCtrl" buttons, and for ntfy,
          the only push app ArrCtrl uses. -->
@@ -153,6 +156,11 @@
         <!-- WorkManager's diagnostics receiver isn't used; drop it so ArrCtrl exposes nothing it doesn't need. -->
         <receiver
             android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
+            tools:node="remove" />
+
+        <!-- WorkManager's foreground service, for long jobs shown as a notification. ArrCtrl never uses it. -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
             tools:node="remove" />
 
         <!-- Don't let androidx.emoji2 look up a downloadable emoji font at start-up: emoji are drawn with the

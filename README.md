@@ -71,14 +71,16 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
 
 | Permission | What it's for |
 | --- | --- |
-| Internet | Talking to your own servers (and your ntfy server for **Send a test wake-up**). Nothing else. |
-| Network state | Waiting for a connection before background checks and widget refreshes. |
-| Camera | Only for scanning a server-settings QR code, asked for when you tap **Scan QR**. |
-| Notifications | Notifications about your downloads, asked for when you turn them on. |
-| Fingerprint | Optional fingerprint unlock for the app lock. |
-| Ignore battery optimisations | Lets the Notifications screen ask Android not to delay ArrCtrl's checks. Nothing changes unless you say OK. |
+| Internet (`INTERNET`) | Talking to your own servers (and your ntfy server when you tap **Send a test wake-up**). Nothing else. |
+| Network state (`ACCESS_NETWORK_STATE`) | Waiting for a connection before background checks and widget refreshes. |
+| Camera (`CAMERA`) | Only for scanning a server-settings QR code, asked for when you tap **Scan QR**. The code is read on the phone. |
+| Notifications (`POST_NOTIFICATIONS`) | Notifications about your downloads, asked for when you turn them on. |
+| Fingerprint (`USE_BIOMETRIC`) | Optional fingerprint unlock for the app lock. |
+| Ignore battery optimisations (`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`) | Lets the **Battery** row on the Notifications screen ask Android not to delay ArrCtrl's checks, so notifications arrive on time. Nothing changes unless you say OK in Android's own dialog. |
+| Run at startup (`RECEIVE_BOOT_COMPLETED`) | Putting the background checks and widget refreshes back on schedule after the phone restarts. Added by Android's background work library (WorkManager). |
+| Keep awake (`WAKE_LOCK`) | Keeping the phone awake for the few seconds a check runs. Added by WorkManager. |
 
-Android's WorkManager library, which runs the background checks and widget refreshes, adds a few standard permissions of its own (to keep the phone awake while a check runs and to restart checks after a reboot).
+`DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` is an internal permission Android adds to every app built for Android 13 and newer; it keeps ArrCtrl's own broadcasts private. ArrCtrl has no location, microphone, contacts, storage or foreground-service permission.
 
 See [Privacy](#privacy) for what ArrCtrl does and doesn't send.
 
@@ -198,11 +200,15 @@ Turn it on: tap your profile picture › **Settings › Privacy and security ›
 
 ## Privacy
 
-**Telemetry-free.** ArrCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the servers you add.
+**Telemetry-free and Google-free.** ArrCtrl has no analytics, crash reporting, usage stats, ads or tracking of any kind, and no Google libraries or services.
 
-- Posters, backdrops and album covers come from your own Radarr, Sonarr and Lidarr servers, never straight from sites like TMDB, MusicBrainz or fanart.tv.
-- Instant notifications come through the ntfy app and your own ntfy server, and **Send a test wake-up** posts to your push address.
-- Help links in System health, and the GitHub and licence links in About, open in your browser only when you tap them.
+Everything ArrCtrl connects to:
+
+- **The servers you add**, at exactly the address you entered. API keys and passwords are only ever sent to their own server, and a redirect to any other address (another site, another port, or from https down to plain http) is refused before anything is sent there.
+- **Your ntfy server**, only when you tap **Send a test wake-up** on the Notifications screen. Instant notifications themselves arrive through the ntfy app; ArrCtrl only receives a wake-up call from it.
+- **Nothing else.** Posters, backdrops and album covers come from your own Radarr, Sonarr and Lidarr servers, never straight from sites like TMDB, MusicBrainz or fanart.tv, and QR codes are read on the phone.
+
+Help links in System health, **Install ntfy** (f-droid.org) and the GitHub and licence links in About open in your browser only when you tap them.
 
 ## How ArrCtrl is made
 
@@ -241,23 +247,31 @@ Native Android apps for self-hosted services and everyday tools, all with the sa
 | App | What it's for |
 | --- | --- |
 | [AdCtrl](https://github.com/VoidedKN0X/AdCtrl) | Control your AdGuard Home DNS server |
-| **ArrCtrl** (this app) | Radarr, Sonarr, Lidarr, Prowlarr, Bazarr, qBittorrent, autobrr and Cleanuparr in one app |
+| **ArrCtrl** (this app) | Radarr, Sonarr, Prowlarr, Bazarr, qBittorrent, autobrr and Cleanuparr in one app |
 | [BeamCtrl](https://github.com/VoidedKN0X/BeamCtrl) | TV remote for phones with an IR blaster |
+| [CallCtrl](https://github.com/VoidedKN0X/CallCtrl) | Phone app: dialer, call history and in-call screen |
 | [ChatCtrl](https://github.com/VoidedKN0X/ChatCtrl) | Matrix chat client for matrix.org and self-hosted Synapse |
+| [ClockCtrl](https://github.com/VoidedKN0X/ClockCtrl) | Alarms, timers, stopwatch and world clock |
+| [ContactCtrl](https://github.com/VoidedKN0X/ContactCtrl) | Contacts: browse, edit, import and export |
 | [CraftyCtrl](https://github.com/VoidedKN0X/CraftyCtrl) | Manage Minecraft servers on Crafty Controller |
+| [DateCtrl](https://github.com/VoidedKN0X/DateCtrl) | Calendar for the calendars on your phone and your accounts |
 | [FilesCtrl](https://github.com/VoidedKN0X/FilesCtrl) | File manager with NFS, SMB, SFTP, FTP and WebDAV |
 | [FrigateCtrl](https://github.com/VoidedKN0X/FrigateCtrl) | Watch and review your Frigate NVR cameras |
 | [ImmichCtrl](https://github.com/VoidedKN0X/ImmichCtrl) | Photos and backup for your Immich server |
 | [JellyCtrl](https://github.com/VoidedKN0X/JellyCtrl) | Movies, shows, music and Live TV from Jellyfin |
+| [LijnCtrl](https://github.com/VoidedKN0X/LijnCtrl) | Live De Lijn bus and tram departures |
+| [MailCtrl](https://github.com/VoidedKN0X/MailCtrl) | Email for Gmail and Proton Mail |
 | [MemoCtrl](https://github.com/VoidedKN0X/MemoCtrl) | Notes on your Memos server |
 | [NaviCtrl](https://github.com/VoidedKN0X/NaviCtrl) | Music player for Navidrome servers |
 | [PaperCtrl](https://github.com/VoidedKN0X/PaperCtrl) | Scan and browse documents on Paperless-ngx |
 | [PrintCtrl](https://github.com/VoidedKN0X/PrintCtrl) | Bambu Lab printers through Bambuddy, and Spoolman spools |
 | [ProxCtrl](https://github.com/VoidedKN0X/ProxCtrl) | Manage your Proxmox VE server |
+| [RecorderCtrl](https://github.com/VoidedKN0X/RecorderCtrl) | Private, offline voice recorder |
 | [RideCtrl](https://github.com/VoidedKN0X/RideCtrl) | Offline maintenance, fuel and mod log for your vehicles |
 | [SeerrCtrl](https://github.com/VoidedKN0X/SeerrCtrl) | Request movies and shows on Seerr / Jellyseerr |
 | [SumCtrl](https://github.com/VoidedKN0X/SumCtrl) | Offline calculator, unit converter and work tools |
 | [SynapseCtrl](https://github.com/VoidedKN0X/SynapseCtrl) | Administer your Matrix Synapse server |
+| [TextCtrl](https://github.com/VoidedKN0X/TextCtrl) | Private SMS and MMS messaging |
 | [TrueCtrl](https://github.com/VoidedKN0X/TrueCtrl) | Monitor and manage your TrueNAS server |
 | [WrtCtrl](https://github.com/VoidedKN0X/WrtCtrl) | Manage your OpenWrt router |
 

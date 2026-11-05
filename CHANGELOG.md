@@ -4,6 +4,25 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.6.4 (2026-11-05)
+
+A privacy and security check-up: no more following redirects away from your server, and one permission fewer.
+
+### Security
+
+- **No request follows a redirect away from your server**: when a server or reverse proxy answered a normal read (a list, a poster, a status check) with a redirect to another address, ArrCtrl followed it without your API key. It no longer goes there at all: the request stops with "The server redirected to another address, so nothing was sent there", so another host can't learn your IP address or what ArrCtrl asked for. Changes, sign-ins and uploads were already stopped this way. Redirects from http to https on the same server still work.
+
+### Privacy
+
+- **One permission fewer**: ArrCtrl no longer has the "run foreground service" permission. Android's background work library added it for long jobs that show a notification, but ArrCtrl's checks and widget refreshes are short jobs that never need it, so it's gone, together with the library's unused foreground service.
+- **Fewer log messages**: release builds now strip debug and info log messages from the libraries ArrCtrl uses as well (ArrCtrl itself writes nothing to the system log).
+
+### Project
+
+- README: the permissions table lists every permission the app has with what it's for (including the ones Android's background work library adds), and the Privacy section lists everything ArrCtrl connects to.
+- README: the Ctrl series list now shows all 28 apps, with CallCtrl, ClockCtrl, ContactCtrl, DateCtrl, LijnCtrl, MailCtrl, RecorderCtrl and TextCtrl added.
+- The build now checks that the Gradle wrapper is an official Gradle release, that no Google Play services, Firebase, ML Kit, Play Core or Tink library ends up in the app, and that the APK is signed with ArrCtrl's release key before it's published. `.gitignore` also keeps `google-services.json` out of the repo.
+
 ## Project updates (2026-11-03)
 
 ### Project

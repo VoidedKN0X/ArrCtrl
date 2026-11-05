@@ -17,3 +17,10 @@
 # Push from ntfy: the receiver is created by Android from its class name.
 -keep class com.vknxworks.arrctrl.data.notify.PushReceiver { *; }
 -keep class com.vknxworks.arrctrl.data.notify.RaiseToForegroundService { *; }
+
+# Release builds drop debug and info logging entirely (ArrCtrl itself doesn't log; this also covers libraries).
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+}

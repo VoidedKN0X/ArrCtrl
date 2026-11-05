@@ -60,21 +60,16 @@ class Http {
 
 /**
  * Adds the server's credentials, but only to requests for that server's own host. This runs for every
- * hop of a redirect, so an API key never follows a redirect to another site, and never drops from
- * https to plain http. A redirect that leaves the server can't carry anything else either: a sign-in
- * form (qBittorrent password), an uploaded .torrent file or any other change is refused instead of being
- * re-sent (OkHttp re-sends the body on 307/308 redirects).
+ * hop of a redirect, and a redirect that leaves the server (another site, another port, or from https
+ * down to plain http) is refused before anything is sent there: no API key, sign-in form (qBittorrent
+ * password), uploaded .torrent file or other change, and not even a plain request that would tell
+ * another host your IP address and what ArrCtrl was asking for.
  */
 private class AuthInterceptor(private val server: Server) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val req = chain.request()
         val base = server.httpUrl ?: return chain.proceed(req)
-        if (!sameServer(base, req.url)) {
-            if (req.method != "GET" && req.method != "HEAD") {
-                throw RedirectBlockedException()
-            }
-            return chain.proceed(req)
-        }
+        if (!sameServer(base, req.url)) throw RedirectBlockedException()
         val key = server.apiKey
         if (key.isBlank()) return chain.proceed(req)
         return chain.proceed(req.newBuilder().header(server.type.authHeader, server.type.authValue(key)).build())
@@ -111,5 +106,5 @@ private class SessionJar(private val base: HttpUrl?) : CookieJar {
     }
 }
 
-/** A change was redirected to another address; it was stopped before anything was sent there. */
+/** A request was redirected to another address; it was stopped before anything was sent there. */
 class RedirectBlockedException : IOException("redirect to another host blocked")
