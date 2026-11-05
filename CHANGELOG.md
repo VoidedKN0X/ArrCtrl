@@ -4,6 +4,23 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.6.5 (2026-11-05)
+
+Widgets and the Alt. speed tile now respect the app lock, and addresses typed without `http://` or `https://` only default to plain HTTP on your own network or Tailscale.
+
+### Security
+
+- **Widgets hidden while ArrCtrl is locked**: the Upcoming and Downloads widgets kept showing your upcoming movies and episodes and your downloads while ArrCtrl was locked. They now only say "Locked" while the app lock is locked; tapping one opens ArrCtrl to its lock screen, and they show your data again as soon as you unlock. Background refreshes still keep the data up to date in the meantime.
+- **Alt. speed tile can't be used while ArrCtrl is locked**: with notifications on (which keep your logins unsealed so background checks can sign in), the tile still turned qBittorrent's alternative speed limits on and off while ArrCtrl was locked. It now says "ArrCtrl is locked" and a tap opens ArrCtrl to its lock screen, whatever the notification setting.
+- **Lock timeout checked by the widgets and tile**: with the app lock set to lock after 1, 5 or 15 minutes or 1 hour away, ArrCtrl only noticed the time had run out when you opened it again. The widgets and the tile now check first and lock ArrCtrl straight away once the time is up.
+- **Public addresses default to HTTPS**: an address typed without `http://` or `https://` got plain HTTP whenever it was an IP address, including public ones, which would send your API key unencrypted over the internet. Now only addresses on your own network or Tailscale get `http://` by default: private IPs like `192.168.x.x`, Tailscale IPs (`100.64.0.0` to `100.127.255.255` and `fd7a:115c:a1e0::` addresses) and names like `nas`, `nas.lan` or `nas.tailnet-name.ts.net`. Public IPs and other names get `https://`. Typing `http://` yourself still works, and servers you already added are unchanged. This also applies to addresses in an imported server list.
+- **Widgets only take updates from Android**: the two widget components could be sent messages by other apps on the phone; they now only accept them from Android's widget system. The widgets work as before.
+- **One less way in for other apps**: removed a component from AndroidX's profile installer that let other apps ask ArrCtrl to rewrite its app-start performance profile. ArrCtrl never needed it; start-up works as before.
+
+### Project
+
+- README: explains that plain HTTP works on local addresses and Tailscale, which addresses get `http://` by default, and that the widgets and tile only say ArrCtrl is locked while it's locked.
+
 ## v1.6.4 (2026-11-05)
 
 A privacy and security check-up: no more following redirects away from your server, and one permission fewer.

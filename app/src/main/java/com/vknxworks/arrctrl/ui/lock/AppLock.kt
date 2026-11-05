@@ -130,6 +130,8 @@ object AppLock {
     private var backgroundAt = 0L
     private var expectReturnAt = 0L
 
+    @Volatile private var inForeground = false
+
     /**
      * The app itself is opening another app (file picker, browser, JellyCtrl, SeerrCtrl, ntfy, share sheet, Android settings). That trip doesn't count as leaving, so you
      * don't have to unlock again when you come back.
@@ -142,6 +144,7 @@ object AppLock {
     private var exemptTrip = false
 
     fun onBackground(enabled: Boolean, timeoutMillis: Long) {
+        inForeground = false
         if (authenticating) return
         backgroundAt = SystemClock.elapsedRealtime()
         // Only right after the app opened something itself; leaving later still counts.
@@ -152,6 +155,7 @@ object AppLock {
     }
 
     fun onForeground(enabled: Boolean, timeoutMillis: Long) {
+        inForeground = true
         val since = backgroundAt
         val exempt = exemptTrip
         backgroundAt = 0L
@@ -162,6 +166,17 @@ object AppLock {
         // A trip the app started still locks if you stay away long: after 5 minutes, or the chosen time if longer.
         val limit = if (exempt) maxOf(timeoutMillis, EXEMPT_TRIP_MAX) else timeoutMillis
         if (SystemClock.elapsedRealtime() - since >= limit) lock()
+    }
+
+    /**
+     * Locks now when ArrCtrl has been away for longer than the lock timeout. Leaving the app only notes
+     * the time and [onForeground] locks when it comes back on screen, so the widgets and the Quick
+     * Settings tile, which work without ArrCtrl on screen, call this first (as in AdCtrl).
+     */
+    fun lockIfExpired(enabled: Boolean, timeoutMillis: Long) {
+        if (!enabled || !unlocked || inForeground || backgroundAt <= 0 || timeoutMillis < 0) return
+        val limit = if (exemptTrip) maxOf(timeoutMillis, EXEMPT_TRIP_MAX) else timeoutMillis
+        if (SystemClock.elapsedRealtime() - backgroundAt >= limit) lock()
     }
 
     private const val EXEMPT_TRIP_MAX = 5 * 60_000L

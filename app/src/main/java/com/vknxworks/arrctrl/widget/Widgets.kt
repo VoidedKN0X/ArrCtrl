@@ -48,6 +48,8 @@ import com.vknxworks.arrctrl.data.api.Format
 import com.vknxworks.arrctrl.data.notify.Notifications
 import com.vknxworks.arrctrl.ui.theme.WidgetDark
 import com.vknxworks.arrctrl.ui.theme.WidgetLight
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -99,6 +101,31 @@ private fun WidgetFrame(context: Context, title: String, updatedAt: Long, open: 
     }
 }
 
+/**
+ * ArrCtrl is locked (checked on the main thread, locking first when the lock timeout ran out). The
+ * background refresh may keep caching data, but the widgets never show it until ArrCtrl is unlocked.
+ */
+private suspend fun appLocked(context: Context): Boolean =
+    runCatching { withContext(Dispatchers.Main) { context.container.lockedNow() } }.getOrDefault(true)
+
+/** Opens ArrCtrl (to its lock screen) without any target. */
+private fun openAppIntent(context: Context): Intent =
+    Intent(context, MainActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+
+/** Shown instead of a widget's content while ArrCtrl is locked: no titles, counts or times. Tap opens ArrCtrl. */
+@Composable
+private fun LockedWidget(context: Context) {
+    Column(
+        GlanceModifier.fillMaxSize().background(GlanceTheme.colors.widgetBackground).cornerRadius(24.dp)
+            .padding(horizontal = 14.dp, vertical = 10.dp).clickable(actionStartActivity(openAppIntent(context))),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(context.getString(R.string.widget_locked), style = TextStyle(color = GlanceTheme.colors.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Bold), maxLines = 1)
+        Text(context.getString(R.string.widget_locked_subtitle), style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 12.sp), maxLines = 2)
+    }
+}
+
 @Composable
 private fun Message(text: String) {
     Box(GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -110,10 +137,12 @@ private fun Message(text: String) {
 
 class UpcomingWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val snapshot = WidgetStore.load(context)
+        val locked = appLocked(context)
+        val snapshot = if (locked) WidgetSnapshot() else WidgetStore.load(context)
         val colors = widgetColors(context)
         provideContent {
-            if (colors != null) GlanceTheme(colors) { Upcoming(context, snapshot) } else GlanceTheme { Upcoming(context, snapshot) }
+            val body: @Composable () -> Unit = { if (locked) LockedWidget(context) else Upcoming(context, snapshot) }
+            if (colors != null) GlanceTheme(colors) { body() } else GlanceTheme { body() }
         }
     }
 }
@@ -200,10 +229,12 @@ private fun UpcomingRow(context: Context, u: UpcomingItem) {
 
 class DownloadsWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val snapshot = WidgetStore.load(context)
+        val locked = appLocked(context)
+        val snapshot = if (locked) WidgetSnapshot() else WidgetStore.load(context)
         val colors = widgetColors(context)
         provideContent {
-            if (colors != null) GlanceTheme(colors) { Downloads(context, snapshot) } else GlanceTheme { Downloads(context, snapshot) }
+            val body: @Composable () -> Unit = { if (locked) LockedWidget(context) else Downloads(context, snapshot) }
+            if (colors != null) GlanceTheme(colors) { body() } else GlanceTheme { body() }
         }
     }
 }

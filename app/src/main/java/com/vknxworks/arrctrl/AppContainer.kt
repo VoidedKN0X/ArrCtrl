@@ -59,6 +59,18 @@ class AppContainer(val context: Context) {
      */
     suspend fun backgroundBlocked(): Boolean = vault.enabled && !vault.isOpen && servers.anySealed()
 
+    /**
+     * The app lock is on and ArrCtrl is locked. Locks first when the lock timeout ran out while ArrCtrl
+     * was away (see [AppLock.lockIfExpired]), because the widgets and the Quick Settings tile work
+     * without ArrCtrl on screen. They then only say that ArrCtrl is locked, whether or not the secrets
+     * are sealed (with notifications on they aren't, so background checks can still sign in).
+     * Main thread only.
+     */
+    fun lockedNow(): Boolean {
+        AppLock.lockIfExpired(vault.enabled, settings.settings.value.lockTimeout.millis)
+        return vault.enabled && !AppLock.unlocked
+    }
+
     /** Turns the app lock on with [pin]. */
     suspend fun enableLock(pin: String) {
         // Unlocked first, so the lock screen doesn't flash up while the PIN is being saved.
@@ -101,6 +113,9 @@ class AppContainer(val context: Context) {
         vault.close()
         servers.reload()
         http.forgetAll()
+        // The widgets now only say that ArrCtrl is locked.
+        appScope.launch { if (Widgets.anyPlaced(context)) Widgets.redraw(context) }
+        AltSpeedTileService.refresh(context)
     }
 
     fun onUnlocked() {
@@ -109,7 +124,11 @@ class AppContainer(val context: Context) {
         appScope.launch {
             // Notifications may have been turned on or off since the secrets were last sealed.
             runCatching { servers.applySealing() }
-            if (Widgets.anyPlaced(context)) Widgets.refreshNow(context)
+            if (Widgets.anyPlaced(context)) {
+                // Show the saved data again right away (also offline), then fetch fresh data.
+                Widgets.redraw(context)
+                Widgets.refreshNow(context)
+            }
         }
         AltSpeedTileService.refresh(context)
     }

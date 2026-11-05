@@ -867,6 +867,8 @@
     <string name="widget_no_downloads_server">Add Radarr, Sonarr, Lidarr or qBittorrent in ArrCtrl</string>
     <string name="widget_nothing_upcoming">Nothing in the next %1$d days</string>
     <string name="widget_nothing_downloading">Nothing downloading</string>
+    <string name="widget_locked">Locked</string>
+    <string name="widget_locked_subtitle">ArrCtrl is locked · tap to open</string>
     <string name="tile_alt_speed">Alt. speed</string>
     <string name="tile_on">On</string>
     <string name="tile_off">Off</string>
@@ -932,7 +934,7 @@
     <string name="lock_again_15m">After 15 minutes away</string>
     <string name="lock_again_1h">After 1 hour away</string>
     <string name="lock_again_restart">Only when the app restarts</string>
-    <string name="app_lock_footer_background">Notifications are on, so background checks can still sign in while ArrCtrl is locked: your API keys and passwords are then only encrypted with the Android Keystore, as without the app lock, and widgets and the tile keep working. Turn off notifications to keep them sealed with your PIN too. ArrCtrl has no analytics or tracking.</string>
+    <string name="app_lock_footer_background">Notifications are on, so background checks can still sign in while ArrCtrl is locked: your API keys and passwords are then only encrypted with the Android Keystore, as without the app lock. Widgets and the tile still only say ArrCtrl is locked until you unlock it. Turn off notifications to keep them sealed with your PIN too. ArrCtrl has no analytics or tracking.</string>
     <string name="tile_locked">ArrCtrl is locked</string>
     <!-- Errors, units and small formats -->
     <string name="error_locked">ArrCtrl is locked. Unlock it and try again.</string>

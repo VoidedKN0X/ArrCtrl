@@ -31,6 +31,7 @@ import kotlinx.coroutines.withContext
  * Quick Settings tile for qBittorrent's alternative speed limits ("turtle mode").
  * Like the button on the Torrents tab, it covers every qBittorrent server: on when all of them are on;
  * a tap turns them all on, or all off when they already are.
+ * While ArrCtrl is locked the tile only says so, and a tap opens ArrCtrl to its lock screen.
  */
 class AltSpeedTileService : TileService() {
     // A failed check (storage, network) only leaves the tile as it was; it never crashes the system UI's binding.
@@ -89,7 +90,8 @@ class AltSpeedTileService : TileService() {
         super.onStartListening()
         job?.cancel()
         job = scope.launch {
-            if (applicationContext.container.backgroundBlocked()) {
+            val c = applicationContext.container
+            if (c.lockedNow() || c.backgroundBlocked()) {
                 renderLocked()
                 return@launch
             }
@@ -108,8 +110,9 @@ class AltSpeedTileService : TileService() {
     private fun toggle() {
         job?.cancel()
         job = scope.launch {
-            // The app lock sealed the logins and ArrCtrl is locked: open it, to its lock screen.
-            if (applicationContext.container.backgroundBlocked()) {
+            // ArrCtrl is locked (also when the logins aren't sealed): open it, to its lock screen.
+            val c = applicationContext.container
+            if (c.lockedNow() || c.backgroundBlocked()) {
                 openApp()
                 return@launch
             }

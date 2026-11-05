@@ -87,7 +87,7 @@ See [Privacy](#privacy) for what ArrCtrl does and doesn't send.
 ## Getting started
 
 1. Tap your profile picture at the top right of any tab, then **Add a server** on the **You** page.
-2. Pick the service and enter its address, e.g. `http://192.168.1.10:7878` or `https://radarr.example.com`. Add the path too if it runs under one behind a reverse proxy (`https://example.com/radarr`).
+2. Pick the service and enter its address, e.g. `http://192.168.1.10:7878` or `https://radarr.example.com`. Plain `http://` works for local addresses and over Tailscale. Without `http://` or `https://`, local and Tailscale addresses (like `192.168.1.10`, `100.101.102.103`, `nas.lan` or `nas.tailnet-name.ts.net`) get `http://`, and everything else, including public IP addresses, gets `https://`; type `http://` yourself to use plain HTTP anyway. Add the path too if it runs under one behind a reverse proxy (`https://example.com/radarr`).
 3. Enter the API key (in the web UI under Settings → General → Security for Radarr, Sonarr, Lidarr, Prowlarr and Bazarr). For qBittorrent use your Web UI username and password, or an API key on qBittorrent 5.2 or newer.
 4. Tap **Test**, then **Save**. If the server uses a self-signed certificate, tap **Review certificate**, check the fingerprint and trust it. ArrCtrl then accepts that exact certificate from that server only.
 
@@ -119,7 +119,7 @@ Instead of typing eight API keys on your phone, put them in one JSON block and e
 | Field | Needed | What it is |
 | --- | --- | --- |
 | `type` | yes | `radarr`, `sonarr`, `lidarr`, `prowlarr`, `bazarr`, `qbittorrent`, `autobrr` or `cleanuparr` |
-| `url` | yes | The server address. Without `http://` or `https://`, IP addresses and local names get `http://`, anything else `https://` |
+| `url` | yes | The server address. Without `http://` or `https://`, local and Tailscale addresses (private IPs, `100.64.0.0/10`, `fd7a:115c:a1e0::/48`, single-word names and `.local`, `.lan`, `.home`, `.internal`, `.home.arpa`, `.ts.net` names) get `http://`, anything else `https://` |
 | `apiKey` | yes, except qBittorrent | The service's API key. For qBittorrent, an API key replaces username and password |
 | `username`, `password` | qBittorrent only | Your qBittorrent Web UI login, when not using an API key |
 | `name` | no | Shown in the app. Defaults to the service name, numbered when there's more than one |
@@ -183,6 +183,8 @@ Long-press your home screen → Widgets → ArrCtrl. Both refresh every 30 minut
 
 The **Alt. speed** tile (pull down Quick Settings → edit → drag it in) turns qBittorrent's alternative speed limits on or off for all your qBittorrent servers, like the button on the Torrents tab. On the phone's lock screen it asks you to unlock the phone first. Long-press it to open the Torrents tab.
 
+While ArrCtrl's app lock is locked, the widgets only say **Locked** and the tile says **ArrCtrl is locked**; tapping either opens ArrCtrl to its lock screen. They show your data again once you unlock.
+
 ## App lock
 
 Turn it on: tap your profile picture › **Settings › Privacy and security › App lock**. It's off until you turn it on.
@@ -194,7 +196,7 @@ Turn it on: tap your profile picture › **Settings › Privacy and security ›
 - **Lock again:** as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Picking a `.torrent` file, opening JellyCtrl or SeerrCtrl, a help link, ntfy, the share sheet and Android's notification and battery settings don't count as leaving, unless you stay away for more than 5 minutes.
 - **Change app PIN** asks for your current PIN first, and turning the app lock off asks for the PIN too.
 - **Forgot your PIN?** It can't be recovered, because it encrypts your API keys and passwords. The lock screen offers to remove your servers with their API keys and passwords, and what the widgets and notifications remembered, so you can add them again; nothing changes on your servers.
-- **Notifications and the app lock:** background checks and instant notifications need to sign in while ArrCtrl is locked. With notifications on, your API keys and passwords stay encrypted with the Android Keystore only, as without the app lock, and notifications, widgets and the Alt. speed tile keep working. Turn notifications off to keep them encrypted with your PIN too; widgets then keep showing what they last loaded and the tile opens ArrCtrl, until you unlock.
+- **Notifications and the app lock:** background checks and instant notifications need to sign in while ArrCtrl is locked. With notifications on, your API keys and passwords stay encrypted with the Android Keystore only, as without the app lock, and notifications keep working. Turn notifications off to keep them encrypted with your PIN too. Either way, while ArrCtrl is locked the widgets only say **Locked** and the Alt. speed tile opens ArrCtrl instead of changing anything, until you unlock.
 
 **Hide in screenshots** and **Hide in recent apps** (the last two switches in the same section, also without the app lock, both off by default): the first keeps ArrCtrl out of screenshots and screen recordings (and blanks its recent-apps preview), the second shows a blank card for ArrCtrl in the recent-apps view while screenshots still work. With the app lock on, the recent-apps view always shows a blank card. The server and import screens, the lock screen and the PIN screens are always kept out of screenshots.
 
