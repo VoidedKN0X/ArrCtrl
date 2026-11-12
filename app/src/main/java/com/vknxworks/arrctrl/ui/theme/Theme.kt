@@ -18,6 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -207,18 +208,13 @@ private fun widgetScheme(scheme: ColorScheme, p: CtrlPalette) = scheme.copy(
 internal val WidgetDark = widgetScheme(Dark, CtrlColors.Dark)
 internal val WidgetLight = widgetScheme(Light, CtrlColors.Light)
 
-private fun spaceGroteskSemiBold() = Font(
-    R.font.space_grotesk_variable,
-    FontWeight.SemiBold,
-    variationSettings = FontVariation.Settings(FontVariation.weight(600)),
-)
 
 /** Space Grotesk: all UI text and headings. */
 val SpaceGrotesk = FontFamily(
-    Font(R.font.space_grotesk_regular, FontWeight.Normal),
-    Font(R.font.space_grotesk_medium, FontWeight.Medium),
-    spaceGroteskSemiBold(),
-    Font(R.font.space_grotesk_bold, FontWeight.Bold),
+    groteskFont(400),
+    groteskFont(500),
+    groteskFont(600),
+    groteskFont(700),
 )
 
 /** JetBrains Mono: numbers, data readouts, section labels and the wordmark. */
@@ -319,3 +315,14 @@ fun ArrCtrlTheme(choice: ThemeChoice = ThemeChoice.SYSTEM, dynamic: Boolean = fa
         MaterialTheme(colorScheme = if (dark) Dark else Light, typography = AppTypography, shapes = AppShapes, content = content)
     }
 }
+
+/**
+ * Space Grotesk at [weight], from the one variable font file (300 to 700): one file covers every weight the
+ * app uses, instead of a separate file for each.
+ */
+@OptIn(ExperimentalTextApi::class)
+private fun groteskFont(weight: Int) = Font(
+    R.font.space_grotesk,
+    FontWeight(weight),
+    variationSettings = FontVariation.Settings(FontVariation.weight(weight)),
+)
