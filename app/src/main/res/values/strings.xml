@@ -602,6 +602,8 @@
     <string name="calendar_digital">Digital</string>
     <string name="calendar_physical">Physical</string>
     <string name="calendar_premiere">Premiere</string>
+    <string name="calendar_server_hide">%1$s is shown. Tap to leave it out of the calendar</string>
+    <string name="calendar_server_show">%1$s is left out. Tap to show it in the calendar</string>
 
     <!-- More tools -->
     <string name="tool_no_server">No %1$s server yet</string>

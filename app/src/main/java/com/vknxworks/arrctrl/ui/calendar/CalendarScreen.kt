@@ -56,6 +56,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -88,7 +90,12 @@ import java.time.format.TextStyle
 import java.time.temporal.WeekFields
 import java.util.Locale
 
-private enum class KindFilter(val label: Int) { ALL(R.string.calendar_both), MOVIES(R.string.tab_movies), SERIES(R.string.tab_series), MUSIC(R.string.music) }
+private val KindFilter.label: Int get() = when (this) {
+    KindFilter.ALL -> R.string.calendar_both
+    KindFilter.MOVIES -> R.string.tab_movies
+    KindFilter.SERIES -> R.string.tab_series
+    KindFilter.MUSIC -> R.string.music
+}
 
 /** Days the agenda shows at first, and how many more each "Show more" adds. */
 private const val AGENDA_STEP = 28L
@@ -131,6 +138,12 @@ fun CalendarScreen() {
         .let { if (it == KindFilter.MUSIC && !hasLidarr) KindFilter.ALL else it }
     val monitoredOnly = settings.calendarMonitoredOnly
     val month = settings.calendarMonth
+    val mediaServers = servers.filter { it.type.isMediaArr }
+    // Ids of servers that no longer exist don't count, so removing a server can't hide everything.
+    // If every server left is hidden (say the others were removed), show them all again.
+    val hidden: Set<String> = settings.calendarHiddenServers.filterTo(HashSet()) { id -> mediaServers.any { it.id == id } }
+        .let { h -> if (mediaServers.all { it.id in h }) emptySet() else h }
+    val visibleServers = CalendarRules.visibleServers(servers, hidden)
 
     val today = remember { LocalDate.now() }
     var agendaStart by rememberSaveable { mutableStateOf(today.toEpochDay()) }
@@ -143,26 +156,17 @@ fun CalendarScreen() {
 
     // The range on screen: the agenda window, or every day the month grid shows (including spill-over days).
     val (from, to) = if (month) {
-        val first = ym.atDay(1)
-        val gridStart = first.minusDays(((first.dayOfWeek.value - firstDayOfWeek.value + 7) % 7).toLong())
-        gridStart to gridStart.plusDays(41)
+        CalendarRules.monthGrid(ym, firstDayOfWeek)
     } else {
         LocalDate.ofEpochDay(agendaStart) to today.plusDays(agendaDays)
     }
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    LaunchedEffect(from, to, monitoredOnly, servers) {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) { runCatching { model.load(from, to, monitoredOnly, force = true) } }
+    LaunchedEffect(from, to, monitoredOnly, visibleServers) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) { runCatching { model.load(visibleServers, from, to, monitoredOnly, force = true) } }
     }
 
-    val shown = model.entries.filter {
-        when (kind) {
-            KindFilter.ALL -> true
-            KindFilter.MOVIES -> it.kind == EntryKind.MOVIE
-            KindFilter.SERIES -> it.kind == EntryKind.EPISODE
-            KindFilter.MUSIC -> it.kind == EntryKind.ALBUM
-        }
-    }
+    val shown = CalendarRules.filter(model.entries, kind, hidden)
     val multiServer = servers.count { it.type.isMediaArr } > 2 || servers.count { it.type == ServiceType.LIDARR } > 1 ||
         servers.count { it.type == ServiceType.RADARR } > 1 || servers.count { it.type == ServiceType.SONARR } > 1
 
@@ -205,11 +209,39 @@ fun CalendarScreen() {
                 label = { Text(stringResource(R.string.calendar_monitored_only)) },
             )
         }
+        // One chip per Radarr, Sonarr and Lidarr server, when there's more than one: tap to leave a server out.
+        if (mediaServers.size > 1) {
+            Row(
+                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                mediaServers.forEach { s ->
+                    val visible = s.id !in hidden
+                    // The last server shown can't be switched off, so the calendar never goes blank by accident.
+                    val onlyOne = visible && mediaServers.count { it.id !in hidden } == 1
+                    val desc = stringResource(if (visible) R.string.calendar_server_hide else R.string.calendar_server_show, s.name)
+                    CtrlFilterChip(
+                        selected = visible,
+                        enabled = !onlyOne,
+                        onClick = {
+                            scope.launch {
+                                c.settings.update { st ->
+                                    val now = st.calendarHiddenServers.filterTo(HashSet()) { id -> mediaServers.any { it.id == id } }
+                                    st.copy(calendarHiddenServers = if (s.id in now) now - s.id else now + s.id)
+                                }
+                            }
+                        },
+                        label = { Text(s.name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                        modifier = Modifier.semantics { contentDescription = desc },
+                    )
+                }
+            }
+        }
         Legend()
 
         PullToRefreshBox(
             isRefreshing = refreshing,
-            onRefresh = { scope.launch { refreshing = true; runCatching { model.load(from, to, monitoredOnly, force = true) }; refreshing = false } },
+            onRefresh = { scope.launch { refreshing = true; runCatching { model.load(visibleServers, from, to, monitoredOnly, force = true) }; refreshing = false } },
             modifier = Modifier.weight(1f).fillMaxWidth(),
         ) {
             if (month) {
@@ -285,7 +317,7 @@ private fun AgendaView(
     onMore: () -> Unit,
     onOpen: (CalendarEntry) -> Unit,
 ) {
-    val byDay = entries.groupBy { it.day }.toSortedMap()
+    val byDay = CalendarRules.byDay(entries)
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = 24.dp + LocalBottomClearance.current)) {
         items(model.errors.entries.toList(), key = { "err-" + it.key.id }) { (s, r) -> ServerErrorCard(s, r) }
         item(key = "earlier") {

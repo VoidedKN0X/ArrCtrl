@@ -5,16 +5,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.vknxworks.arrctrl.AppContainer
+import com.vknxworks.arrctrl.data.api.Album
+import com.vknxworks.arrctrl.data.api.Episode
+import com.vknxworks.arrctrl.data.api.LidarrApi
+import com.vknxworks.arrctrl.data.api.Movie
+import com.vknxworks.arrctrl.data.api.RadarrApi
+import com.vknxworks.arrctrl.data.api.Series
+import com.vknxworks.arrctrl.data.api.SonarrApi
 import com.vknxworks.arrctrl.data.api.toTestResult
+import com.vknxworks.arrctrl.data.net.Http
 import com.vknxworks.arrctrl.data.net.TestResult
 import com.vknxworks.arrctrl.data.server.Server
 import com.vknxworks.arrctrl.data.server.ServiceType
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
+import java.time.YearMonth
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -25,6 +36,9 @@ enum class MovieRelease { CINEMA, DIGITAL, PHYSICAL }
 
 /** How an entry is coloured: already have it, should have it by now, still to come, or not wanted. */
 enum class EntryStatus { DOWNLOADED, MISSING, UPCOMING, UNMONITORED }
+
+/** The Calendar tab's type filter. */
+enum class KindFilter { ALL, MOVIES, SERIES, MUSIC }
 
 data class CalendarEntry(
     val server: Server,
@@ -48,99 +62,78 @@ data class CalendarEntry(
 }
 
 /**
- * Fetches calendar entries from Radarr and Sonarr servers. Shared by the Calendar tab and the Upcoming widget.
- * A server that fails is returned in the error map; the others still count.
+ * The calendar's date handling and merge rules, kept free of Android so they can be unit-tested.
+ *
+ * - Episodes air at a moment in time (Sonarr's `airDateUtc`): they're shown at that time, on that day, in
+ *   the phone's time zone.
+ * - Movie release dates (Radarr's `inCinemas`, `digitalRelease`, `physicalRelease`) and album release dates
+ *   are whole days that the servers store as midnight UTC, so they're shown on that calendar date in every
+ *   time zone (otherwise anyone west of UTC would see them a day early).
  */
-class CalendarLoader(private val c: AppContainer) {
-    private val zone: ZoneId get() = ZoneId.systemDefault()
+object CalendarRules {
+    /** Ask the servers for a day either side, so time zones never drop an entry at the edges. */
+    fun requestWindow(from: LocalDate, to: LocalDate, zone: ZoneId): Pair<Instant, Instant> =
+        from.minusDays(1).atStartOfDay(zone).toInstant() to to.plusDays(2).atStartOfDay(zone).toInstant()
 
-    /** Entries on [from]..[to] (inclusive), sorted by time, plus the servers that failed. */
-    suspend fun load(servers: List<Server>, from: LocalDate, to: LocalDate, monitoredOnly: Boolean): Pair<List<CalendarEntry>, Map<Server, TestResult>> = coroutineScope {
-        // Ask for a day either side so time zones don't drop anything at the edges.
-        val start = from.minusDays(1).atStartOfDay(zone).toInstant().toString()
-        val end = to.plusDays(2).atStartOfDay(zone).toInstant().toString()
-        val unmonitored = !monitoredOnly
-        val jobs = servers.filter { it.type.isMediaArr }.map { s ->
-            async {
-                s to runCatching {
-                    when (s.type) {
-                        ServiceType.RADARR -> movies(s, start, end, unmonitored)
-                        ServiceType.LIDARR -> albums(s, start, end, unmonitored)
-                        else -> episodes(s, start, end, unmonitored)
-                    }
-                }
-            }
-        }
-        val results = jobs.awaitAll()
-        results.forEach { (_, r) -> r.exceptionOrNull()?.let { if (it is CancellationException) throw it } }
-        val entries = results.flatMap { (_, r) -> r.getOrNull().orEmpty() }
-            .filter { !it.day.isBefore(from) && !it.day.isAfter(to) }
-            .sortedWith(compareBy<CalendarEntry> { it.at }.thenBy { it.title.lowercase() })
-        entries to results.mapNotNull { (s, r) -> r.exceptionOrNull()?.let { s to it.toTestResult() } }.toMap()
-    }
+    /** The day a whole-day release date (stored at midnight UTC) belongs to. */
+    fun releaseDay(at: Instant): LocalDate = at.atZone(ZoneOffset.UTC).toLocalDate()
 
-    private suspend fun movies(s: Server, start: String, end: String, unmonitored: Boolean): List<CalendarEntry> {
-        val now = Instant.now()
-        return c.radarr(s).calendar(start, end, unmonitored).flatMap { m ->
-            listOfNotNull(
-                m.inCinemas?.let { it to MovieRelease.CINEMA },
-                m.digitalRelease?.let { it to MovieRelease.DIGITAL },
-                m.physicalRelease?.let { it to MovieRelease.PHYSICAL },
-            ).map { (at, kind) ->
-                CalendarEntry(
-                    server = s,
-                    kind = EntryKind.MOVIE,
-                    at = at,
-                    // Release dates are whole days (stored at midnight UTC): show them on that date everywhere.
-                    day = at.atZone(ZoneId.of("UTC")).toLocalDate(),
-                    title = m.title,
-                    subtitle = m.year?.toString(),
-                    status = when {
-                        m.hasFile -> EntryStatus.DOWNLOADED
-                        !m.monitored -> EntryStatus.UNMONITORED
-                        // Only a home release makes a movie downloadable; a cinema date in the past isn't "missing".
-                        kind != MovieRelease.CINEMA && at.isBefore(now) -> EntryStatus.MISSING
-                        else -> EntryStatus.UPCOMING
-                    },
-                    release = kind,
-                    movieId = m.id,
-                )
-            }
-        }
-    }
+    /** The day an episode airs on, in the phone's time zone. */
+    fun airDay(at: Instant, zone: ZoneId): LocalDate = at.atZone(zone).toLocalDate()
 
-    private suspend fun albums(s: Server, start: String, end: String, unmonitored: Boolean): List<CalendarEntry> {
-        val now = Instant.now()
-        return c.lidarr(s).calendar(start, end, unmonitored).mapNotNull { a ->
-            val at = a.releaseDate ?: return@mapNotNull null
+    fun movieEntries(s: Server, movies: List<Movie>, now: Instant): List<CalendarEntry> = movies.flatMap { m ->
+        listOfNotNull(
+            m.inCinemas?.let { it to MovieRelease.CINEMA },
+            m.digitalRelease?.let { it to MovieRelease.DIGITAL },
+            m.physicalRelease?.let { it to MovieRelease.PHYSICAL },
+        ).map { (at, kind) ->
             CalendarEntry(
                 server = s,
-                kind = EntryKind.ALBUM,
+                kind = EntryKind.MOVIE,
                 at = at,
-                // Release dates are whole days, like Radarr's.
-                day = at.atZone(ZoneId.of("UTC")).toLocalDate(),
-                title = a.artist?.name ?: a.title,
-                subtitle = listOfNotNull(a.title.takeIf { a.artist != null }, a.albumType).joinToString(" · ").ifBlank { null },
+                day = releaseDay(at),
+                title = m.title,
+                subtitle = m.year?.toString(),
                 status = when {
-                    a.complete -> EntryStatus.DOWNLOADED
-                    !a.monitored || a.artist?.monitored == false -> EntryStatus.UNMONITORED
-                    at.isBefore(now) -> EntryStatus.MISSING
+                    m.hasFile -> EntryStatus.DOWNLOADED
+                    !m.monitored -> EntryStatus.UNMONITORED
+                    // Only a home release makes a movie downloadable; a cinema date in the past isn't "missing".
+                    kind != MovieRelease.CINEMA && at.isBefore(now) -> EntryStatus.MISSING
                     else -> EntryStatus.UPCOMING
                 },
-                artistId = a.artistId,
+                release = kind,
+                movieId = m.id,
             )
         }
     }
 
-    private suspend fun episodes(s: Server, start: String, end: String, unmonitored: Boolean): List<CalendarEntry> {
-        val now = Instant.now()
-        return c.sonarr(s).calendar(start, end, unmonitored).mapNotNull { (e, series) ->
+    fun albumEntries(s: Server, albums: List<Album>, now: Instant): List<CalendarEntry> = albums.mapNotNull { a ->
+        val at = a.releaseDate ?: return@mapNotNull null
+        CalendarEntry(
+            server = s,
+            kind = EntryKind.ALBUM,
+            at = at,
+            day = releaseDay(at),
+            title = a.artist?.name ?: a.title,
+            subtitle = listOfNotNull(a.title.takeIf { a.artist != null }, a.albumType).joinToString(" · ").ifBlank { null },
+            status = when {
+                a.complete -> EntryStatus.DOWNLOADED
+                !a.monitored || a.artist?.monitored == false -> EntryStatus.UNMONITORED
+                at.isBefore(now) -> EntryStatus.MISSING
+                else -> EntryStatus.UPCOMING
+            },
+            artistId = a.artistId,
+        )
+    }
+
+    fun episodeEntries(s: Server, episodes: List<Pair<Episode, Series?>>, now: Instant, zone: ZoneId): List<CalendarEntry> =
+        episodes.mapNotNull { (e, series) ->
             val at = e.airDate ?: return@mapNotNull null
             CalendarEntry(
                 server = s,
                 kind = EntryKind.EPISODE,
                 at = at,
-                day = at.atZone(zone).toLocalDate(),
+                day = airDay(at, zone),
                 title = series?.title ?: "#${e.seriesId}",
                 subtitle = listOfNotNull(e.code.ifBlank { null }, e.title).joinToString(" · ").ifBlank { null },
                 status = when {
@@ -155,8 +148,85 @@ class CalendarLoader(private val c: AppContainer) {
                 premiere = e.number == 1,
             )
         }
+
+    /**
+     * Merges every server's entries into one list: only days in [from]..[to], one copy of each entry (the same
+     * server listed twice, or an overlapping answer, doesn't show it twice), sorted by time, then title, then
+     * server name, so the order is stable between refreshes.
+     */
+    fun merge(perServer: List<List<CalendarEntry>>, from: LocalDate, to: LocalDate): List<CalendarEntry> =
+        perServer.asSequence().flatten()
+            .filter { !it.day.isBefore(from) && !it.day.isAfter(to) }
+            .distinctBy { it.key }
+            .sortedWith(
+                compareBy<CalendarEntry> { it.at }
+                    .thenBy { it.title.lowercase() }
+                    .thenBy { it.subtitle.orEmpty() }
+                    .thenBy { it.server.name.lowercase() },
+            )
+            .toList()
+
+    /** The type filter and the per-server filter together. */
+    fun filter(entries: List<CalendarEntry>, kind: KindFilter, hiddenServers: Set<String>): List<CalendarEntry> =
+        entries.filter { e ->
+            e.server.id !in hiddenServers && when (kind) {
+                KindFilter.ALL -> true
+                KindFilter.MOVIES -> e.kind == EntryKind.MOVIE
+                KindFilter.SERIES -> e.kind == EntryKind.EPISODE
+                KindFilter.MUSIC -> e.kind == EntryKind.ALBUM
+            }
+        }
+
+    /** Which servers the calendar asks: Radarr, Sonarr and Lidarr ones the filter doesn't hide. */
+    fun visibleServers(servers: List<Server>, hiddenServers: Set<String>): List<Server> =
+        servers.filter { it.type.isMediaArr && it.id !in hiddenServers }
+
+    /** First and last day of the six-week month grid for [ym], starting on [firstDayOfWeek]. */
+    fun monthGrid(ym: YearMonth, firstDayOfWeek: DayOfWeek): Pair<LocalDate, LocalDate> {
+        val first = ym.atDay(1)
+        val start = first.minusDays(((first.dayOfWeek.value - firstDayOfWeek.value + 7) % 7).toLong())
+        return start to start.plusDays(41)
     }
 
+    /** Entries per day, each day's list in the merged order. */
+    fun byDay(entries: List<CalendarEntry>): Map<LocalDate, List<CalendarEntry>> = entries.groupBy { it.day }.toSortedMap()
+}
+
+/**
+ * Fetches calendar entries from Radarr, Sonarr and Lidarr servers. Shared by the Calendar tab and the Upcoming
+ * widget. A server that fails is returned in the error map; the others still count.
+ */
+class CalendarLoader(
+    private val http: Http,
+    private val zoneOf: () -> ZoneId = { ZoneId.systemDefault() },
+    private val clock: () -> Instant = { Instant.now() },
+) {
+    constructor(c: AppContainer) : this(c.http)
+
+    /** Entries on [from]..[to] (inclusive), merged and sorted, plus the servers that failed. */
+    suspend fun load(servers: List<Server>, from: LocalDate, to: LocalDate, monitoredOnly: Boolean): Pair<List<CalendarEntry>, Map<Server, TestResult>> = coroutineScope {
+        val zone = zoneOf()
+        val now = clock()
+        val (startAt, endAt) = CalendarRules.requestWindow(from, to, zone)
+        val start = startAt.toString()
+        val end = endAt.toString()
+        val unmonitored = !monitoredOnly
+        val jobs = servers.filter { it.type.isMediaArr }.map { s ->
+            async {
+                s to runCatching {
+                    when (s.type) {
+                        ServiceType.RADARR -> CalendarRules.movieEntries(s, RadarrApi(http, s).calendar(start, end, unmonitored), now)
+                        ServiceType.LIDARR -> CalendarRules.albumEntries(s, LidarrApi(http, s).calendar(start, end, unmonitored), now)
+                        else -> CalendarRules.episodeEntries(s, SonarrApi(http, s).calendar(start, end, unmonitored), now, zone)
+                    }
+                }
+            }
+        }
+        val results = jobs.awaitAll()
+        results.forEach { (_, r) -> r.exceptionOrNull()?.let { if (it is CancellationException) throw it } }
+        val entries = CalendarRules.merge(results.map { (_, r) -> r.getOrNull().orEmpty() }, from, to)
+        entries to results.mapNotNull { (s, r) -> r.exceptionOrNull()?.let { s to it.toTestResult() } }.toMap()
+    }
 }
 
 /**
@@ -171,17 +241,19 @@ class CalendarModel(private val c: AppContainer) : ViewModel() {
     var loading by mutableStateOf(false); private set
     var loaded by mutableStateOf(false); private set
     private var loadedRange: Triple<LocalDate, LocalDate, Boolean>? = null
+    private var loadedServers: List<Server>? = null
 
-    /** Loads [from]..[to] (inclusive). Skipped when that exact range is already on screen, unless [force]. */
-    suspend fun load(from: LocalDate, to: LocalDate, monitoredOnly: Boolean, force: Boolean = false) {
+    /** Loads [from]..[to] (inclusive) from [servers]. Skipped when that exact range is already on screen, unless [force]. */
+    suspend fun load(servers: List<Server>, from: LocalDate, to: LocalDate, monitoredOnly: Boolean, force: Boolean = false) {
         val range = Triple(from, to, monitoredOnly)
-        if (!force && range == loadedRange && loaded) return
+        if (!force && range == loadedRange && servers == loadedServers && loaded) return
         loading = true
         try {
-            val (e, err) = loader.load(c.servers.servers.value, from, to, monitoredOnly)
+            val (e, err) = loader.load(servers, from, to, monitoredOnly)
             entries = e
             errors = err
             loadedRange = range
+            loadedServers = servers
             loaded = true
         } finally {
             loading = false

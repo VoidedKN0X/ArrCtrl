@@ -17,7 +17,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Movies and Series**: your Radarr and Sonarr libraries with automatic and interactive search, monitoring, quality profiles, renaming and bulk edits
 - **Music**: your Lidarr artists and albums, with add, search, monitoring and profiles (shown only when you have a Lidarr server)
 - **Wanted**: Radarr, Sonarr and Lidarr's missing and cutoff-unmet lists, with search for one item, a selection or everything
-- **Calendar** with upcoming movies, episodes and album releases
+- **Calendar** with upcoming episodes (at their air time, in your phone's time zone), movies (cinema, digital and physical release dates) and album releases, as an agenda or a month grid, filtered by type, by server and by monitored status; tap an entry to open it
 - **Activity**: the Radarr, Sonarr and Lidarr queues (with manual import for Radarr and Sonarr), your qBittorrent torrents with full controls, and their history
 - **qBittorrent extras**: move a torrent's files (set location, with recent folders), per-torrent share limits, and the global normal and alternative speed limits
 - **Add torrents** from magnet links and `.torrent` files, straight from the share sheet

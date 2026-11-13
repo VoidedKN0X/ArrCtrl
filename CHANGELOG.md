@@ -4,6 +4,15 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.7.0 (2026-11-13)
+
+### New
+
+- **Calendar filter per server:** when you have more than one Radarr, Sonarr or Lidarr server, the Calendar shows a chip for each one under the type filter. Tap a server's chip to leave it out (say, your 4K Radarr, which has the same movies as your normal one) and tap it again to bring it back. ArrCtrl remembers your choice, and the server you leave out isn't asked at all, so the Calendar loads faster. The last server shown can't be switched off, so the Calendar never goes blank by accident.
+
+### Changed
+
+- **The Calendar's order is steadier:** entries at the same time are now sorted by title, then by server, so they no longer swap places between refreshes, and the same entry can't show up twice when two answers overlap.
 ## v1.6.9 (2026-11-13)
 
 A security and privacy check-up. Nothing works differently, and you don't need to add your servers again.

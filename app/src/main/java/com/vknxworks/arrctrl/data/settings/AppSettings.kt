@@ -56,6 +56,8 @@ data class AppSettings(
     /** Calendar: ALL, MOVIES or SERIES. */
     val calendarKind: String = "ALL",
     val calendarMonitoredOnly: Boolean = true,
+    /** Calendar: ids of the Radarr, Sonarr and Lidarr servers it leaves out. */
+    val calendarHiddenServers: Set<String> = emptySet(),
     /** System health warns when a disk has less than this percentage free. */
     val diskWarnPercent: Int = 10,
     /** Master switch for notifications. Off until you turn it on. */
@@ -96,6 +98,7 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         val calMonth = booleanPreferencesKey("calendar_month")
         val calKind = stringPreferencesKey("calendar_kind")
         val calMonitored = booleanPreferencesKey("calendar_monitored_only")
+        val calHidden = stringSetPreferencesKey("calendar_hidden_servers")
         val diskWarn = intPreferencesKey("disk_warn_percent")
         val notify = booleanPreferencesKey("notify_enabled")
         val notifyInterval = intPreferencesKey("notify_interval")
@@ -139,6 +142,7 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         calendarMonth = this[K.calMonth] ?: false,
         calendarKind = this[K.calKind] ?: "ALL",
         calendarMonitoredOnly = this[K.calMonitored] ?: true,
+        calendarHiddenServers = this[K.calHidden] ?: emptySet(),
         diskWarnPercent = this[K.diskWarn] ?: 10,
         notifyEnabled = this[K.notify] ?: false,
         notifyInterval = this[K.notifyInterval] ?: 30,
@@ -172,6 +176,7 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             p[K.calMonth] = s.calendarMonth
             p[K.calKind] = s.calendarKind
             p[K.calMonitored] = s.calendarMonitoredOnly
+            p[K.calHidden] = s.calendarHiddenServers
             p[K.diskWarn] = s.diskWarnPercent
             p[K.notify] = s.notifyEnabled
             p[K.notifyInterval] = s.notifyInterval

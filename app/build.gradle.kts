@@ -22,8 +22,8 @@ android {
         minSdk = 35
         targetSdk = 36
         // Bump both to publish a new release (see CHANGELOG.md).
-        versionCode = 40
-        versionName = "1.6.9"
+        versionCode = 41
+        versionName = "1.7.0"
         // 64-bit ARM phones only (arm64-v8a), like every Ctrl app.
         ndk { abiFilters += listOf("arm64-v8a") }
     }
@@ -134,4 +134,7 @@ dependencies {
     // Home screen widgets (Upcoming, Downloads).
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
+
+    // Unit tests only (not in the app): JUnit 4.
+    testImplementation(libs.junit)
 }
