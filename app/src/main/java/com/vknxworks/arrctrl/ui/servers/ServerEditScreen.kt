@@ -237,13 +237,18 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
                     modifier = Modifier.fillMaxWidth(),
                 )
                 if (normalised != null && normalised.startsWith("http://")) {
+                    // Plain HTTP to an address that isn't on your own network or tailnet: a stronger, red warning,
+                    // because the API key or password would cross the internet unencrypted. Still allowed (some
+                    // setups reach a home server through a public IP), but never quietly.
+                    val overInternet = normalised.toHttpUrlOrNull()?.host?.let { !Urls.isLocalHost(it) } ?: false
+                    val tint = if (overInternet) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.NoEncryption, null, Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(Icons.Outlined.NoEncryption, null, Modifier.size(18.dp), tint = tint)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            stringResource(R.string.http_warning),
+                            stringResource(if (overInternet) R.string.http_warning_public else R.string.http_warning),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = tint,
                         )
                     }
                 }

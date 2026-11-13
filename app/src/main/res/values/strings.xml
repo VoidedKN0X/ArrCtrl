@@ -113,6 +113,7 @@
     <string name="field_required">Required</string>
     <string name="server_not_encrypted">Not encrypted (HTTP)</string>
     <string name="http_warning">Not encrypted (HTTP). Fine on your home network, but use https if you connect over the internet.</string>
+    <string name="http_warning_public">Not encrypted (HTTP), and this isn\'t an address on your home network or tailnet: your API key or password would cross the internet where anyone on the way can read it. Use https for this server.</string>
     <string name="qbit_login">Username and password</string>
     <string name="qbit_api_key">API key</string>
     <string name="key_help_arr">In the web UI: Settings → General → Security → API Key</string>

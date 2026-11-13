@@ -4,6 +4,21 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v1.6.9 (2026-11-13)
+
+A security and privacy check-up. Nothing works differently, and you don't need to add your servers again.
+
+### Security
+
+- **A clear warning for plain HTTP over the internet:** when you type an `http://` address that isn't on your home network or tailnet (a public IP or domain), the server screen now shows a red warning that your API key or password would cross the internet unencrypted. Addresses on your own network keep the usual quiet note, and nothing is blocked.
+- **API keys and passwords in the phone's security chip:** on phones with StrongBox (a separate security chip, such as Titan M on Pixels), the key that encrypts your saved API keys and passwords is now made inside that chip, and falls back to the normal Android Keystore on phones without one. This applies when the key is first made (a new install, or after clearing ArrCtrl's data); what you already saved stays encrypted with the key it has.
+- **Reading a self-signed certificate is stricter:** when ArrCtrl reads a server's certificate to show you its fingerprint, it now stops the connection as soon as the certificate arrives instead of finishing it. Nothing was ever sent before, and trusting a certificate works exactly as before.
+- **Checked build tools:** the build now also checks the SHA-256 of the Gradle build tool it downloads, as it already did for every library.
+
+### Performance
+
+- Reading a saved API key no longer opens the Android Keystore again each time.
+- **Send a test notification** reuses ArrCtrl's existing connections instead of starting a new network client each time.
 ## v1.6.8 (2026-11-12)
 
 ### Changed

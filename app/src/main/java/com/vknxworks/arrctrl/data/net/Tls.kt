@@ -37,6 +37,8 @@ object Tls {
     /**
      * Connects to [base] and returns the certificate the server presents. Only the TLS handshake runs:
      * no HTTP request is made, so no API key, cookie or password is ever sent to an unverified server.
+     * The handshake is also aborted as soon as the certificate arrives (it is never accepted), so no
+     * connection to an unverified server is ever completed.
      */
     suspend fun fetchLeaf(base: String): X509Certificate = withContext(Dispatchers.IO) {
         val u = base.toHttpUrl()
@@ -46,7 +48,10 @@ object Tls {
             override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {
                 throw CertificateException("Not a server")
             }
-            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) { captured = chain }
+            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
+                captured = chain
+                throw CapturedException()
+            }
             override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
         }
         val ctx = SSLContext.getInstance("TLS").apply { init(null, arrayOf<TrustManager>(capture), null) }
@@ -54,12 +59,18 @@ object Tls {
         try {
             raw.connect(InetSocketAddress(u.host, u.port), 15_000)
             raw.soTimeout = 15_000
-            (ctx.socketFactory.createSocket(raw, u.host, u.port, true) as SSLSocket).use { it.startHandshake() }
+            (ctx.socketFactory.createSocket(raw, u.host, u.port, true) as SSLSocket).use {
+                // Fails on purpose once the certificate is captured; any other failure is passed on.
+                try { it.startHandshake() } catch (e: Exception) { if (captured == null) throw e }
+            }
         } finally {
             runCatching { raw.close() }
         }
         captured?.firstOrNull() ?: throw CertificateException("The server didn't present a certificate")
     }
+
+    /** Ends [fetchLeaf]'s handshake once the certificate has been read. */
+    private class CapturedException : CertificateException("certificate captured")
 
     private fun systemTrustManager(): X509TrustManager =
         TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())

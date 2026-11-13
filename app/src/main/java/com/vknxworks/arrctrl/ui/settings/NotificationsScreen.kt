@@ -72,7 +72,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.concurrent.TimeUnit
@@ -353,7 +352,8 @@ private fun PushRows(s: AppSettings, tick: Int, update: ((AppSettings) -> AppSet
                 // Posts to your own push address only (no keys or server details), exactly as your servers will.
                 val ok = withContext(Dispatchers.IO) {
                     runCatching {
-                        val client = OkHttpClient.Builder().callTimeout(15, TimeUnit.SECONDS).build()
+                        // The shared connection pool and threads (no server's keys or certificate pin), not a new client each time.
+                        val client = context.container.http.base.newBuilder().callTimeout(15, TimeUnit.SECONDS).build()
                         client.newCall(Request.Builder().url(endpoint).post(context.getString(R.string.notify_push_test_message).toRequestBody("text/plain".toMediaType())).build()).execute().use { it.isSuccessful }
                     }.getOrDefault(false)
                 }

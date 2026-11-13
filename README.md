@@ -32,7 +32,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **The Ctrl / Signal look**: high-contrast and shared by every Ctrl app, dark or light following your phone's theme, with Space Grotesk and JetBrains Mono type
 - **Self-signed certificates** trusted per server, by fingerprint
 - **App lock** with its own PIN and optional fingerprint unlock; your API keys and passwords stay encrypted while the app is locked
-- **API keys and passwords are encrypted** on your phone with the Android Keystore, and the server and import screens always block screenshots. Optional **Hide in screenshots** and **Hide in recent apps** switches cover the rest of the app
+- **API keys and passwords are encrypted** on your phone with the Android Keystore (in the StrongBox security chip when the phone has one), and the server and import screens always block screenshots. Optional **Hide in screenshots** and **Hide in recent apps** switches cover the rest of the app
 
 ## Requirements
 
@@ -89,7 +89,7 @@ See [Privacy](#privacy) for what ArrCtrl does and doesn't send.
 ## Getting started
 
 1. Tap your profile picture at the top right of any tab, then **Add a server** on the **You** page.
-2. Pick the service and enter its address, e.g. `http://192.168.1.10:7878` or `https://radarr.example.com`. Plain `http://` works for local addresses and over Tailscale. Without `http://` or `https://`, local and Tailscale addresses (like `192.168.1.10`, `100.101.102.103`, `nas.lan` or `nas.tailnet-name.ts.net`) get `http://`, and everything else, including public IP addresses, gets `https://`; type `http://` yourself to use plain HTTP anyway. Add the path too if it runs under one behind a reverse proxy (`https://example.com/radarr`).
+2. Pick the service and enter its address, e.g. `http://192.168.1.10:7878` or `https://radarr.example.com`. Plain `http://` works for local addresses and over Tailscale. Without `http://` or `https://`, local and Tailscale addresses (like `192.168.1.10`, `100.101.102.103`, `nas.lan` or `nas.tailnet-name.ts.net`) get `http://`, and everything else, including public IP addresses, gets `https://`; type `http://` yourself to use plain HTTP anyway (ArrCtrl then shows a red warning if the address isn't on your own network or tailnet). Add the path too if it runs under one behind a reverse proxy (`https://example.com/radarr`).
 3. Enter the API key (in the web UI under Settings → General → Security for Radarr, Sonarr, Lidarr, Prowlarr and Bazarr). For qBittorrent use your Web UI username and password, or an API key on qBittorrent 5.2 or newer.
 4. Tap **Test**, then **Save**. If the server uses a self-signed certificate, tap **Review certificate**, check the fingerprint and trust it. ArrCtrl then accepts that exact certificate from that server only.
 
