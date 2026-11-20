@@ -143,7 +143,11 @@ class RadarrApi(private val http: Http, val server: Server) {
     private val client get() = http.client(server)
     private fun url(path: String) = server.api(path)
 
-    suspend fun movies(): List<Movie> = Api.json(client, Api.get(url("/movie"))).objects().mapNotNull(::movie)
+    // The whole library can be thousands of entries: turned into the app's own objects off the main thread.
+    suspend fun movies(): List<Movie> {
+        val json = Api.json(client, Api.get(url("/movie")))
+        return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) { json.objects().mapNotNull(::movie) }
+    }
 
     suspend fun movie(id: Int): Movie? = (Api.json(client, Api.get(url("/movie/$id"))) as? JsonObject)?.let(::movie)
 

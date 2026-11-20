@@ -134,7 +134,11 @@ fun SeriesScreen() {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) { runCatching { model.load() } }
     }
 
-    val visible = model.visible(sort, settings.seriesSortDescending)
+    // Filtering and sorting the whole library only when something it depends on changed, not on every redraw.
+    val descending = settings.seriesSortDescending
+    val visible = remember(model.series, model.query, model.filter, model.downloading, sort, descending) {
+        model.visible(sort, descending)
+    }
     val selecting = model.selection.isNotEmpty()
     fun toggle(id: Int) { model.selection = if (id in model.selection) model.selection - id else model.selection + id }
     fun open(s: Series) { if (selecting) toggle(s.id) else nav.navigate(SeriesDetailRoute(s.server.id, s.id)) }

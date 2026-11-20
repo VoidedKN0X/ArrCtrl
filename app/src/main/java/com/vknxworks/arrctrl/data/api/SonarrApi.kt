@@ -135,7 +135,11 @@ class SonarrApi(private val http: Http, val server: Server) {
     private val client get() = http.client(server)
     private fun url(path: String) = server.api(path)
 
-    suspend fun allSeries(): List<Series> = Api.json(client, Api.get(url("/series"))).objects().mapNotNull(::series)
+    // The whole library can be thousands of entries: turned into the app's own objects off the main thread.
+    suspend fun allSeries(): List<Series> {
+        val json = Api.json(client, Api.get(url("/series")))
+        return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) { json.objects().mapNotNull(::series) }
+    }
 
     suspend fun series(id: Int): Series? = (Api.json(client, Api.get(url("/series/$id"))) as? JsonObject)?.let(::series)
 

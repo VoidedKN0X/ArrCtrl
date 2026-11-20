@@ -30,18 +30,42 @@ class Http {
 
     private val jars = ConcurrentHashMap<String, SessionJar>()
 
+    /**
+     * The client built for each saved server, kept so its connections (and for a pinned certificate its
+     * TLS setup) are reused instead of being set up again for every call. An entry is only used while the
+     * server is exactly as it was when the client was built (address, API key, sign-in, pinned certificate)
+     * and its qBittorrent session is still the current one; otherwise a new client is built, as before.
+     */
+    private class Built(val server: Server, val jar: SessionJar, val client: OkHttpClient)
+
+    private val clients = ConcurrentHashMap<String, Built>()
+
     /** Client for a saved server; its qBittorrent session is kept between calls. */
-    fun client(server: Server): OkHttpClient = build(server, jars.getOrPut(server.id + "|" + server.url) { SessionJar(server.httpUrl) })
+    fun client(server: Server): OkHttpClient {
+        val key = server.id + "|" + server.url
+        val jar = jars.getOrPut(key) { SessionJar(server.httpUrl) }
+        val cached = clients[key]
+        if (cached != null && cached.jar === jar && cached.server == server) return cached.client
+        val client = build(server, jar)
+        clients[key] = Built(server, jar, client)
+        // The session was forgotten (lock, edit, removal) while this client was being built: don't keep it.
+        if (jars[key] !== jar) clients.remove(key)
+        return client
+    }
 
     /** Client for a draft (connection test before saving): a fresh session every time. */
     fun draftClient(server: Server): OkHttpClient = build(server, SessionJar(server.httpUrl))
 
-    /** Forgets every qBittorrent session (the app locked, or every server was removed). */
-    fun forgetAll() = jars.clear()
+    /** Forgets every qBittorrent session and saved client (the app locked, or every server was removed). */
+    fun forgetAll() {
+        jars.clear()
+        clients.clear()
+    }
 
-    /** Forgets a server's qBittorrent session, e.g. after its password changed or it was removed. */
+    /** Forgets a server's qBittorrent session and saved client, e.g. after its password changed or it was removed. */
     fun forget(server: Server) {
         jars.keys.filter { it.startsWith(server.id + "|") }.forEach { jars.remove(it) }
+        clients.keys.filter { it.startsWith(server.id + "|") }.forEach { clients.remove(it) }
     }
 
     private fun build(server: Server, jar: SessionJar): OkHttpClient {

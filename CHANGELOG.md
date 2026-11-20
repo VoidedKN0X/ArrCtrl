@@ -15,6 +15,12 @@ Not released yet: these changes are built by CI but have no version number. They
 - **The Glance widget library is no longer part of the app** (`androidx.glance`), since nothing uses it any more. That makes the app a little smaller.
 - The app lock texts in Settings and on the "Forgot PIN?" screen no longer mention widgets or the tile.
 
+### Changed
+
+- **Faster and lighter talking to your servers.** ArrCtrl used to set up a brand-new connection handler for every single request and every poster. For a server with a trusted self-signed certificate that meant a full new secure connection each time, including for every poster in a grid and for the Torrents tab's refresh every two seconds. The handler for each server is now kept and reused, so connections stay open between requests: lists and posters load faster and the phone does less work. Nothing about sign-in changes: the kept handler is thrown away whenever a server is edited, removed or imported over, when its API key, password or trusted certificate changes, when ArrCtrl locks, and on "Forgot PIN?", and a fresh one is built from the new settings. Connection tests for a server you haven't saved yet still start from scratch every time.
+- **Smoother Movies and Series tabs with large libraries.** The library was filtered and sorted again on every redraw of the screen (for example each time a selection or the refresh spinner changed). It is now only redone when the library, the search text, the filter, the downloading list or the sort order actually changes. The result on screen is the same.
+- **Loading a big library no longer stutters the screen.** Turning Radarr's, Sonarr's and Lidarr's full library answers into the app's lists now happens on a background thread instead of the thread that draws the screen.
+
 ## Project updates (2026-11-19)
 
 ### Project

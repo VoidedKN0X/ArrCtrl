@@ -127,7 +127,11 @@ fun MoviesScreen() {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) { runCatching { model.load() } }
     }
 
-    val visible = model.visible(sort, settings.moviesSortDescending)
+    // Filtering and sorting the whole library only when something it depends on changed, not on every redraw.
+    val descending = settings.moviesSortDescending
+    val visible = remember(model.movies, model.query, model.filter, model.downloading, sort, descending) {
+        model.visible(sort, descending)
+    }
     val selecting = model.selection.isNotEmpty()
     fun open(m: Movie) {
         if (selecting) toggle(model, m.id) else nav.navigate(MovieRoute(m.server.id, m.id))
