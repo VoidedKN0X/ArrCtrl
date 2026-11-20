@@ -28,6 +28,34 @@ object Api {
         }
     }
 
+    /**
+     * [json] for the few answers that can be many megabytes (a whole movie, series or artist library): the
+     * JSON is read from the connection as it arrives instead of first being kept as one long text. Only an
+     * answer that is UTF-8 and starts with `[` or `{` is read this way; anything else (another character
+     * set, a byte order mark, leading blanks, an empty or non-JSON answer) goes exactly the way [json] does.
+     */
+    suspend fun jsonLarge(client: OkHttpClient, request: Request): JsonElement? = withContext(Dispatchers.IO) {
+        client.newCall(request).execute().use { r ->
+            check(r)
+            val body = r.body
+            if (body == null) {
+                null
+            } else {
+                val charset = body.contentType()?.charset()
+                val source = body.source()
+                // Looks at the first byte without taking it, so the ordinary way below still gets everything.
+                val streamed = (charset == null || charset == Charsets.UTF_8) && source.request(1) &&
+                    source.buffer[0L].let { it == '['.code.toByte() || it == '{'.code.toByte() }
+                if (streamed) {
+                    parseJsonStream(source.inputStream())
+                } else {
+                    val text = body.string()
+                    if (text.isBlank()) null else runCatching { ApiJson.parseToJsonElement(text) }.getOrNull()
+                }
+            }
+        }
+    }
+
     suspend fun text(client: OkHttpClient, request: Request): String = withContext(Dispatchers.IO) {
         client.newCall(request).execute().use { r ->
             check(r)

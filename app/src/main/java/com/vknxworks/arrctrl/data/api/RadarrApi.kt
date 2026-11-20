@@ -145,7 +145,7 @@ class RadarrApi(private val http: Http, val server: Server) {
 
     // The whole library can be thousands of entries: turned into the app's own objects off the main thread.
     suspend fun movies(): List<Movie> {
-        val json = Api.json(client, Api.get(url("/movie")))
+        val json = Api.jsonLarge(client, Api.get(url("/movie")))
         return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) { json.objects().mapNotNull(::movie) }
     }
 

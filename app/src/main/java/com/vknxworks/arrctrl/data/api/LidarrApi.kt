@@ -98,7 +98,7 @@ class LidarrApi(private val http: Http, val server: Server) {
 
     // The whole library can be thousands of entries: turned into the app's own objects off the main thread.
     suspend fun artists(): List<Artist> {
-        val json = Api.json(client, Api.get(url("/artist")))
+        val json = Api.jsonLarge(client, Api.get(url("/artist")))
         return kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) { json.objects().mapNotNull(::artist) }
     }
 
