@@ -131,10 +131,6 @@ dependencies {
     // Notifications: periodic checks, and instant wake-ups through ntfy (spoken to directly, no push library).
     implementation(libs.androidx.work.runtime)
 
-    // Home screen widgets (Upcoming, Downloads).
-    implementation(libs.glance.appwidget)
-    implementation(libs.glance.material3)
-
     // Unit tests only (not in the app): JUnit 4.
     testImplementation(libs.junit)
 }

@@ -12,7 +12,6 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.vknxworks.arrctrl.data.net.ServerCallFactory
 import com.vknxworks.arrctrl.data.notify.NotifySchedule
 import com.vknxworks.arrctrl.data.notify.Notifications
-import com.vknxworks.arrctrl.widget.Widgets
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -35,11 +34,17 @@ class ArrCtrlApp : Application(), SingletonImageLoader.Factory {
                 AppLock.onBackground(container.vault.enabled, container.settings.settings.value.lockTimeout.millis)
             }
         })
-        // Widgets on the home screen: make sure their refresh is scheduled, and freshen them when the app starts.
+        // The home screen widgets are gone: stop the refresh jobs an earlier version scheduled and delete
+        // the titles and download names it had saved for them.
         container.appScope.launch {
-            if (Widgets.anyPlaced(this@ArrCtrlApp)) {
-                Widgets.schedule(this@ArrCtrlApp)
-                Widgets.refreshNow(this@ArrCtrlApp)
+            runCatching {
+                val work = androidx.work.WorkManager.getInstance(this@ArrCtrlApp)
+                work.cancelUniqueWork("arrctrl-widgets")
+                work.cancelUniqueWork("arrctrl-widgets-now")
+            }
+            runCatching {
+                java.io.File(filesDir, "widgets.json").delete()
+                java.io.File(filesDir, "widgets.json.tmp").delete()
             }
         }
         // Keep background checks, ongoing updates and the registration with ntfy in line with the settings.

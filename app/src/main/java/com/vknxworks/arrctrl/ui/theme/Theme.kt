@@ -192,22 +192,6 @@ internal fun schemeFor(p: CtrlPalette): ColorScheme {
 internal val Dark = schemeFor(CtrlColors.Dark)
 internal val Light = schemeFor(CtrlColors.Light)
 
-/**
- * Home screen widgets: the same schemes, but with surface-coloured containers so the widget
- * background (which Glance takes from a container colour) stays plain instead of accent.
- */
-private fun widgetScheme(scheme: ColorScheme, p: CtrlPalette) = scheme.copy(
-    primaryContainer = p.surface,
-    onPrimaryContainer = p.text,
-    secondaryContainer = p.surface,
-    onSecondaryContainer = p.text,
-    tertiaryContainer = p.surface,
-    surfaceVariant = p.track,
-)
-
-internal val WidgetDark = widgetScheme(Dark, CtrlColors.Dark)
-internal val WidgetLight = widgetScheme(Light, CtrlColors.Light)
-
 
 /** Space Grotesk: all UI text and headings. */
 val SpaceGrotesk = FontFamily(

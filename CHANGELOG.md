@@ -4,6 +4,17 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+Not released yet: these changes are built by CI but have no version number. They ship with the next version.
+
+### Removed
+
+- **The home screen widgets are gone.** The Upcoming and Downloads widgets have been removed, together with their 30-minute background refresh. If you had one on your home screen, your launcher will show it as unavailable after the update and you can remove it. When the app next starts it cancels the refresh jobs the widgets had scheduled and deletes the list of titles and downloads they had saved on the phone.
+- **The Alt. speed quick settings tile is gone.** qBittorrent's alternative speed limits are still switched with the button on the Torrents tab, exactly as before. If the tile was in your Quick Settings panel, Android removes it after the update.
+- **The Glance widget library is no longer part of the app** (`androidx.glance`), since nothing uses it any more. That makes the app a little smaller.
+- The app lock texts in Settings and on the "Forgot PIN?" screen no longer mention widgets or the tile.
+
 ## Project updates (2026-11-19)
 
 ### Project

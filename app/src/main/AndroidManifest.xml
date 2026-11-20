@@ -16,8 +16,8 @@
     <uses-permission android:name="android.permission.HIDE_OVERLAY_WINDOWS" />
     <!-- Lets the Notifications screen ask Android to stop delaying ArrCtrl's checks. Nothing is changed without your OK. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <!-- WorkManager adds the foreground-service permission for long jobs shown as a notification. ArrCtrl's checks and
-         widget refreshes are short jobs that never run as a foreground service, so it's removed (with the service below). -->
+    <!-- WorkManager adds the foreground-service permission for long jobs shown as a notification. ArrCtrl's checks
+         are short jobs that never run as a foreground service, so it's removed (with the service below). -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
 
     <!-- Package visibility for the "Play in JellyCtrl" and "Open in SeerrCtrl" buttons, and for ntfy,
@@ -54,10 +54,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <!-- Long-pressing the Quick Settings tile opens the Torrents tab. -->
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
             </intent-filter>
             <!-- magnet: links from browsers and other apps (ArrCtrl can be set as the default). -->
             <intent-filter>
@@ -117,55 +113,6 @@
             <intent-filter>
                 <action android:name="org.unifiedpush.android.connector.RAISE_TO_FOREGROUND" />
             </intent-filter>
-        </service>
-
-        <!-- Home screen widgets (Glance). Not exported: only the system's widget host sends them updates. -->
-        <receiver
-            android:name=".widget.UpcomingWidgetReceiver"
-            android:exported="false"
-            android:label="@string/widget_upcoming">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
-                <action android:name="android.appwidget.action.APPWIDGET_DISABLED" />
-                <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
-                <action android:name="android.appwidget.action.APPWIDGET_OPTIONS_CHANGED" />
-                <action android:name="android.appwidget.action.APPWIDGET_RESTORED" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/upcoming_widget_info" />
-        </receiver>
-        <receiver
-            android:name=".widget.DownloadsWidgetReceiver"
-            android:exported="false"
-            android:label="@string/widget_downloads">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
-                <action android:name="android.appwidget.action.APPWIDGET_DISABLED" />
-                <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
-                <action android:name="android.appwidget.action.APPWIDGET_OPTIONS_CHANGED" />
-                <action android:name="android.appwidget.action.APPWIDGET_RESTORED" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/downloads_widget_info" />
-        </receiver>
-
-        <!-- Quick Settings tile: qBittorrent's alternative speed limits. -->
-        <service
-            android:name=".tile.AltSpeedTileService"
-            android:exported="true"
-            android:icon="@drawable/ic_tile_speed"
-            android:label="@string/tile_alt_speed"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
-                android:value="true" />
         </service>
 
         <!-- WorkManager's diagnostics receiver isn't used; drop it so ArrCtrl exposes nothing it doesn't need. -->

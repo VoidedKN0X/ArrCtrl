@@ -96,7 +96,6 @@ class ActivityModel(private val c: AppContainer) : ViewModel() {
                 if (current != target) c.qbit(s).toggleAltSpeed()
             }
         }
-        com.vknxworks.arrctrl.tile.AltSpeedTileService.refresh(c.context)
         refreshTorrents()
     }
 

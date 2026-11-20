@@ -193,8 +193,8 @@ object CalendarRules {
 }
 
 /**
- * Fetches calendar entries from Radarr, Sonarr and Lidarr servers. Shared by the Calendar tab and the Upcoming
- * widget. A server that fails is returned in the error map; the others still count.
+ * Fetches calendar entries from Radarr, Sonarr and Lidarr servers for the Calendar tab.
+ * A server that fails is returned in the error map; the others still count.
  */
 class CalendarLoader(
     private val http: Http,

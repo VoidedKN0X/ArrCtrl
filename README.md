@@ -10,7 +10,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 <a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/VoidedKN0X/ArrCtrl"><img src=".github/assets/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a> <a href="https://voidedkn0x.github.io/CtrlF-Droid/"><img src=".github/assets/badge_ctrlf-droid.png" alt="Get it from our F-Droid repo" height="80"></a>
 
-> **ArrCtrl 1.0.** Everything planned is in: Movies, Series, Calendar, Activity, the More tools, subtitles, notifications, widgets and the quick settings tile. Found a bug? [Open an issue](https://github.com/VoidedKN0X/ArrCtrl/issues). See the [changelog](CHANGELOG.md) for what's new.
+> **ArrCtrl 1.0.** Everything planned is in: Movies, Series, Calendar, Activity, the More tools, subtitles and notifications. Found a bug? [Open an issue](https://github.com/VoidedKN0X/ArrCtrl/issues). See the [changelog](CHANGELOG.md) for what's new.
 
 ## Features
 
@@ -25,7 +25,6 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Prowlarr** indexers and cross-indexer search, **Bazarr** subtitles, **autobrr** filters and releases, **Cleanuparr** stats and jobs
 - **System health** for every server in one place, with low disk space warnings
 - **Notifications**: background checks, plus instant push through [ntfy](https://f-droid.org/packages/io.heckel.ntfy/) and your own ntfy server
-- **Widgets** for upcoming releases and active downloads, and a quick settings tile for qBittorrent's alternative speed limits
 - **Every service is optional**, and you can add more than one of each (a second Radarr for 4K, say)
 - **Import all your servers at once** by pasting one block of settings or scanning it as a QR code
 - **Play in JellyCtrl** and **Open in SeerrCtrl** buttons when those apps are installed, and `arrctrl://` links that let JellyCtrl and SeerrCtrl open a movie or series in ArrCtrl (or add it)
@@ -73,13 +72,13 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
 | Permission | What it's for |
 | --- | --- |
 | Internet (`INTERNET`) | Talking to your own servers (and your ntfy server when you tap **Send a test wake-up**). Nothing else. |
-| Network state (`ACCESS_NETWORK_STATE`) | Waiting for a connection before background checks and widget refreshes. |
+| Network state (`ACCESS_NETWORK_STATE`) | Waiting for a connection before background checks. |
 | Camera (`CAMERA`) | Only for scanning a server-settings QR code, asked for when you tap **Scan QR**. The code is read on the phone. |
 | Notifications (`POST_NOTIFICATIONS`) | Notifications about your downloads, asked for when you turn them on. |
 | Hide floating windows (`HIDE_OVERLAY_WINDOWS`) | Hide other apps' floating windows over the PIN screen, and over the lock screen and confirmations, only while they show. Granted at install, without a prompt. |
 | Fingerprint (`USE_BIOMETRIC`) | Optional fingerprint unlock for the app lock. |
 | Ignore battery optimisations (`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`) | Lets the **Battery** row on the Notifications screen ask Android not to delay ArrCtrl's checks, so notifications arrive on time. Nothing changes unless you say OK in Android's own dialog. |
-| Run at startup (`RECEIVE_BOOT_COMPLETED`) | Putting the background checks and widget refreshes back on schedule after the phone restarts. Added by Android's background work library (WorkManager). |
+| Run at startup (`RECEIVE_BOOT_COMPLETED`) | Putting the background checks back on schedule after the phone restarts. Added by Android's background work library (WorkManager). |
 | Keep awake (`WAKE_LOCK`) | Keeping the phone awake for the few seconds a check runs. Added by WorkManager. |
 
 `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` is an internal permission Android adds to every app built for Android 13 and newer; it keeps ArrCtrl's own broadcasts private. ArrCtrl has no location, microphone, contacts, storage or foreground-service permission.
@@ -176,17 +175,6 @@ If your ntfy server needs a login to publish, add the username and password (or 
 
 Android limits apps in the background to save battery. The Notifications screen shows whether ArrCtrl is restricted and lets you lift it. Some phones go further on their own: OPPO and OnePlus (ColorOS), Xiaomi, Samsung and Huawei can stop apps in the background regardless. On those, open ArrCtrl's **App settings** from the same screen and allow background activity and auto-launch. Do the same for the ntfy app, since it has to stay connected for instant notifications; the Notifications screen warns when ntfy is battery-restricted.
 
-### Widgets and the quick settings tile
-
-- **Upcoming** shows movies and episodes coming in the next two weeks, by day, with episode air times. A red dot means it's out and missing.
-- **Downloads** shows what's downloading, with progress, time left and the total qBittorrent speed.
-
-Long-press your home screen → Widgets → ArrCtrl. Both refresh every 30 minutes, when you open ArrCtrl and when you tap the refresh button; Downloads also refreshes every couple of minutes while something is downloading. Tap a row to open it in ArrCtrl. They use ArrCtrl's Signal colours, dark or light following your phone's theme.
-
-The **Alt. speed** tile (pull down Quick Settings → edit → drag it in) turns qBittorrent's alternative speed limits on or off for all your qBittorrent servers, like the button on the Torrents tab. On the phone's lock screen it asks you to unlock the phone first. Long-press it to open the Torrents tab.
-
-While ArrCtrl's app lock is locked, the widgets only say **Locked** and the tile says **ArrCtrl is locked**; tapping either opens ArrCtrl to its lock screen. They show your data again once you unlock.
-
 ## App lock
 
 Turn it on: tap your profile picture › **Settings › Privacy and security › App lock**. It's off until you turn it on.
@@ -197,8 +185,8 @@ Turn it on: tap your profile picture › **Settings › Privacy and security ›
 - **Wrong PINs:** after 5 tries you wait 30 seconds, doubling up to 15 minutes. Restarting the app or the phone, or changing the clock, doesn't skip the wait.
 - **Lock again:** as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Picking a `.torrent` file, opening JellyCtrl or SeerrCtrl, a help link, ntfy, the share sheet and Android's notification and battery settings don't count as leaving, unless you stay away for more than 5 minutes.
 - **Change app PIN** asks for your current PIN first, and turning the app lock off asks for the PIN too.
-- **Forgot your PIN?** It can't be recovered, because it encrypts your API keys and passwords. The lock screen offers to remove your servers with their API keys and passwords, and what the widgets and notifications remembered, so you can add them again; nothing changes on your servers.
-- **Notifications and the app lock:** background checks and instant notifications need to sign in while ArrCtrl is locked. With notifications on, your API keys and passwords stay encrypted with the Android Keystore only, as without the app lock, and notifications keep working. Turn notifications off to keep them encrypted with your PIN too. Either way, while ArrCtrl is locked the widgets only say **Locked** and the Alt. speed tile opens ArrCtrl instead of changing anything, until you unlock.
+- **Forgot your PIN?** It can't be recovered, because it encrypts your API keys and passwords. The lock screen offers to remove your servers with their API keys and passwords, and what the notifications remembered, so you can add them again; nothing changes on your servers.
+- **Notifications and the app lock:** background checks and instant notifications need to sign in while ArrCtrl is locked. With notifications on, your API keys and passwords stay encrypted with the Android Keystore only, as without the app lock, and notifications keep working. Turn notifications off to keep them encrypted with your PIN too.
 
 **Hide in screenshots** and **Hide in recent apps** (the last two switches in the same section, also without the app lock, both off by default): the first keeps ArrCtrl out of screenshots and screen recordings (and blanks its recent-apps preview), the second shows a blank card for ArrCtrl in the recent-apps view while screenshots still work. With the app lock on, the recent-apps view always shows a blank card. The server and import screens, the lock screen and the PIN screens are always kept out of screenshots.
 
