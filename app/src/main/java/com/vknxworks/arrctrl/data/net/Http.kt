@@ -12,6 +12,7 @@ import okhttp3.Response
 import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * HTTP for every server. One shared connection pool; each server gets a light client on top with
@@ -39,6 +40,20 @@ class Http {
     private class Built(val server: Server, val jar: SessionJar, val client: OkHttpClient)
 
     private val clients = ConcurrentHashMap<String, Built>()
+
+    /** Per server id: how many requests that can change something were started or finished (see [writeMark]). */
+    private val writes = ConcurrentHashMap<String, AtomicLong>()
+
+    /**
+     * A number that changes whenever a request other than GET or HEAD is sent to this server from the app
+     * (once when it starts, once when it ends, whatever the outcome). Two equal values mean nothing was
+     * added, edited, deleted or started on the server through ArrCtrl in between.
+     */
+    fun writeMark(serverId: String): Long = writes[serverId]?.get() ?: 0L
+
+    private fun noteWrite(serverId: String) {
+        writes.getOrPut(serverId) { AtomicLong() }.incrementAndGet()
+    }
 
     /** Client for a saved server; its qBittorrent session is kept between calls. */
     fun client(server: Server): OkHttpClient {
@@ -70,6 +85,21 @@ class Http {
 
     private fun build(server: Server, jar: SessionJar): OkHttpClient {
         val b = base.newBuilder().addNetworkInterceptor(AuthInterceptor(server))
+        // Counts the requests that can change something (see writeMark). The request itself is passed on untouched.
+        val id = server.id
+        b.addInterceptor { chain ->
+            val req = chain.request()
+            if (req.method == "GET" || req.method == "HEAD") {
+                chain.proceed(req)
+            } else {
+                noteWrite(id)
+                try {
+                    chain.proceed(req)
+                } finally {
+                    noteWrite(id)
+                }
+            }
+        }
         if (server.type.auth == AuthKind.QBITTORRENT) b.cookieJar(jar)
         val pin = server.certSha256
         val host = server.httpUrl?.host

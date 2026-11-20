@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.movies
 
+import android.os.SystemClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +10,7 @@ import com.vknxworks.arrctrl.data.api.Movie
 import com.vknxworks.arrctrl.data.api.Profile
 import com.vknxworks.arrctrl.data.api.Tag
 import com.vknxworks.arrctrl.data.api.toTestResult
+import com.vknxworks.arrctrl.data.net.Freshness
 import com.vknxworks.arrctrl.data.net.TestResult
 import com.vknxworks.arrctrl.data.server.Server
 import com.vknxworks.arrctrl.data.server.ServiceType
@@ -50,9 +52,23 @@ class MoviesModel(private val c: AppContainer) : ViewModel() {
     var filter by mutableStateOf(MovieFilter.ALL)
     var selection by mutableStateOf<Set<Int>>(emptySet())
 
+    private val freshness = Freshness(now = { SystemClock.elapsedRealtime() }, writes = { c.http.writeMark(it) })
+
+    /**
+     * For coming back to the tab: loads, unless this same server's library was loaded completely less than
+     * [Freshness.WINDOW_MS] ago and nothing was changed on that server from the app since. Pull to refresh
+     * and the reload after an action use [load], which always asks the server.
+     */
+    suspend fun loadIfStale() {
+        val s = server ?: return
+        if (loaded && error == null && loadedFor == s.id && freshness.isFresh(s.id, s)) return
+        load()
+    }
+
     /** Loads the library; profiles and tags too (they rarely change, but are cheap). */
     suspend fun load() = coroutineScope {
         val s = server ?: return@coroutineScope
+        val attempt = freshness.begin(s.id, s)
         if (loadedFor != s.id) {
             movies = emptyList(); loaded = false; error = null; selection = emptySet()
         }
@@ -64,11 +80,12 @@ class MoviesModel(private val c: AppContainer) : ViewModel() {
         val mr = m.await()
         mr.exceptionOrNull()?.let { if (it is CancellationException) throw it }
         mr.onSuccess { movies = it; error = null }.onFailure { error = it.toTestResult() }
-        q.await().onSuccess { downloading = it }
-        p.await().onSuccess { profiles = it }
-        t.await().onSuccess { tags = it }
+        val qr = q.await().onSuccess { downloading = it }
+        val pr = p.await().onSuccess { profiles = it }
+        val tr = t.await().onSuccess { tags = it }
         loadedFor = s.id
         loaded = true
+        if (mr.isSuccess && qr.isSuccess && pr.isSuccess && tr.isSuccess) freshness.complete(attempt)
     }
 
     fun profileName(id: Int): String? = profiles.firstOrNull { it.id == id }?.name

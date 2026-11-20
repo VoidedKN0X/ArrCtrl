@@ -4,6 +4,14 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+Built and checked by CI only: nothing here has been run on a phone yet.
+
+### Changed
+
+- **Coming straight back to Movies or Series no longer downloads the whole library again.** Every time one of these tabs came back into view (back from a movie's page, switching tabs, returning to the app), ArrCtrl fetched the complete library from Radarr or Sonarr, which is several megabytes for a few thousand titles. It now skips that when all of this is true: the same server's library, queue and profiles were loaded completely less than 30 seconds ago, the saved server hasn't been edited, and ArrCtrl hasn't sent that server anything that changes it since that load began (adding, editing, deleting, monitoring, starting a search or any other command, from any screen or notification). **Pull to refresh always reloads, and so does every change you make**, including the actions on a selection. What can be different: something that changed on the server without ArrCtrl (a download that finished, an edit made in the web interface) can take up to 30 seconds longer to show when you come back to the tab; pulling down shows it at once. Music is unchanged and still reloads every time.
+
 ## v1.9.0 (2026-11-20)
 
 **This release encrypts some of what the app stores on the phone. An older version cannot read it afterwards, so export or back up anything you need before you update (details below).** Built and checked by CI only: nothing in this release had been run on a phone when it was published.

@@ -1,5 +1,6 @@
 package com.vknxworks.arrctrl.ui.series
 
+import android.os.SystemClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,6 +9,7 @@ import com.vknxworks.arrctrl.AppContainer
 import com.vknxworks.arrctrl.data.api.Profile
 import com.vknxworks.arrctrl.data.api.Series
 import com.vknxworks.arrctrl.data.api.toTestResult
+import com.vknxworks.arrctrl.data.net.Freshness
 import com.vknxworks.arrctrl.data.net.TestResult
 import com.vknxworks.arrctrl.data.server.Server
 import com.vknxworks.arrctrl.data.server.ServiceType
@@ -37,8 +39,22 @@ class SeriesModel(private val c: AppContainer) : ViewModel() {
     var filter by mutableStateOf(SeriesFilter.ALL)
     var selection by mutableStateOf<Set<Int>>(emptySet())
 
+    private val freshness = Freshness(now = { SystemClock.elapsedRealtime() }, writes = { c.http.writeMark(it) })
+
+    /**
+     * For coming back to the tab: loads, unless this same server's library was loaded completely less than
+     * [Freshness.WINDOW_MS] ago and nothing was changed on that server from the app since. Pull to refresh
+     * and the reload after an action use [load], which always asks the server.
+     */
+    suspend fun loadIfStale() {
+        val s = server ?: return
+        if (loaded && error == null && loadedFor == s.id && freshness.isFresh(s.id, s)) return
+        load()
+    }
+
     suspend fun load() = coroutineScope {
         val s = server ?: return@coroutineScope
+        val attempt = freshness.begin(s.id, s)
         if (loadedFor != s.id) {
             series = emptyList(); loaded = false; error = null; selection = emptySet()
         }
@@ -49,10 +65,11 @@ class SeriesModel(private val c: AppContainer) : ViewModel() {
         val r = all.await()
         r.exceptionOrNull()?.let { if (it is CancellationException) throw it }
         r.onSuccess { series = it; error = null }.onFailure { error = it.toTestResult() }
-        q.await().onSuccess { downloading = it.first }
-        p.await().onSuccess { profiles = it }
+        val qr = q.await().onSuccess { downloading = it.first }
+        val pr = p.await().onSuccess { profiles = it }
         loadedFor = s.id
         loaded = true
+        if (r.isSuccess && qr.isSuccess && pr.isSuccess) freshness.complete(attempt)
     }
 
     fun profileName(id: Int): String? = profiles.firstOrNull { it.id == id }?.name

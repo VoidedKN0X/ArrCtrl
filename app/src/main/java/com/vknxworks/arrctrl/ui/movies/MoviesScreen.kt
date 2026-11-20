@@ -121,10 +121,11 @@ fun MoviesScreen() {
     var bulk by remember { mutableStateOf<SelectionAction?>(null) }
     val server = model.server ?: return
 
-    // Reload whenever the tab comes back into view (after editing, adding or deleting a movie).
+    // Reload whenever the tab comes back into view (after editing, adding or deleting a movie), unless the
+    // library was loaded a moment ago and nothing was changed from the app since (see MoviesModel.loadIfStale).
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(server.id, servers) {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) { runCatching { model.load() } }
+        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) { runCatching { model.loadIfStale() } }
     }
 
     // Filtering and sorting the whole library only when something it depends on changed, not on every redraw.
