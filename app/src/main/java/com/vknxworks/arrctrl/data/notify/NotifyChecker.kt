@@ -3,6 +3,7 @@ package com.vknxworks.arrctrl.data.notify
 import android.content.Context
 import com.vknxworks.arrctrl.AppContainer
 import com.vknxworks.arrctrl.R
+import com.vknxworks.arrctrl.container
 import com.vknxworks.arrctrl.data.api.Format
 import com.vknxworks.arrctrl.data.api.HistoryKind
 import com.vknxworks.arrctrl.data.api.QbitApi
@@ -17,7 +18,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotlin.coroutines.cancellation.CancellationException
 
 /**
@@ -27,7 +27,8 @@ import kotlin.coroutines.cancellation.CancellationException
 class NotifyChecker(private val c: AppContainer) {
     private val context: Context get() = c.context
     private val prefs = c.context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+    /** What was seen at the last check; encrypted on the phone ([SeenStore]). */
+    private val store = c.seen
 
     /** What was seen on one server at the last check. */
     @Serializable
@@ -40,8 +41,8 @@ class NotifyChecker(private val c: AppContainer) {
         val offline: Boolean = false,
     )
 
-    private fun load(id: String): Seen? = prefs.getString("seen_$id", null)?.let { runCatching { json.decodeFromString(Seen.serializer(), it) }.getOrNull() }
-    private fun save(id: String, s: Seen) = prefs.edit().putString("seen_$id", json.encodeToString(Seen.serializer(), s)).apply()
+    private fun load(id: String): Seen? = store.load(id)
+    private fun save(id: String, s: Seen) = store.save(id, s)
 
     /** Runs one check and posts what's new. Returns the alerts (already filtered by your settings). */
     suspend fun check(): List<Alert> {
@@ -51,7 +52,7 @@ class NotifyChecker(private val c: AppContainer) {
         val all = c.servers.current()
         // Forget servers that were removed.
         val ids = all.map { it.id }.toSet()
-        prefs.all.keys.filter { it.startsWith("seen_") && it.removePrefix("seen_") !in ids }.forEach { prefs.edit().remove(it).apply() }
+        store.retain(ids)
 
         val servers = all.filter { it.id !in settings.notifyMuted }
         val health = checkHealth(c, servers.filter { it.type != ServiceType.QBITTORRENT }).associateBy { it.server.id }
@@ -178,8 +179,7 @@ class NotifyChecker(private val c: AppContainer) {
 
         /** Starts every server from scratch, e.g. after notifications are turned on, so old events aren't reported. */
         fun reset(context: Context) {
-            val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            p.edit().apply { p.all.keys.filter { it.startsWith("seen_") }.forEach { remove(it) } }.apply()
+            context.container.seen.clear()
         }
     }
 }

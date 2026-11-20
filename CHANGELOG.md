@@ -4,6 +4,23 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+Built and checked by CI only: none of this has been run on a phone.
+
+### Security
+
+- **What the notification checks remember is now encrypted on the phone.** To know what's new, ArrCtrl remembers what it saw on each server at the last check: the hashes of torrents that were still downloading, the ids of downloads that needed attention, the health warnings it already told you about, the paths of disks that were low on space, and the number of the last history event. That used to sit in the app's `notify_state` preferences as readable text. It now lives in one file, `notify_seen.json`, encrypted with AES-256-GCM. The key is 32 random bytes kept in `data.key` in the app's private folder, itself encrypted by a key in the Android Keystore that can't be exported (in the StrongBox security chip when the phone has one). It needs no fingerprint or PIN and has nothing to do with the app lock, so background checks and instant notifications keep working with the screen locked. This protects the file when it's copied off the phone; it doesn't protect against something that can already run as ArrCtrl.
+- **Moving over is automatic.** The first check after the update reads the old entries, writes the encrypted file (to a temporary file, saved to disk, then put in place in one step), reads it back, decrypts it and compares it with what it meant to write. Only then are the old readable entries deleted. If writing the file ever fails, the data is kept in the preferences as before and it's tried again at the next check. Notifications shouldn't repeat or go missing because of the move.
+- **What is deliberately not encrypted, and why:**
+  - *The server list in the settings* (each server's name, address and user name; API keys and passwords were already encrypted): every screen and every background check reads it through the settings store, together with the app lock's sealing, and moving it wasn't safe to do without being able to run the app.
+  - *Recent "Set location" folders* for qBittorrent (up to 8 paths per server): the dialog reads them the moment it opens, on the screen's own thread, where asking the phone's secure hardware for a key isn't allowed.
+  - *The poster and cover cache*: read constantly while scrolling, and downloaded again whenever needed.
+  - *Settings and bookkeeping*: theme, sort orders, notification choices, your ntfy push address and registration, the times of the last check and push, and Android's own queue of scheduled checks (a SQLite database).
+  - ArrCtrl doesn't keep your library, queue, history or calendar on the phone: those are fetched from your servers every time.
+- **If the key can't be used** (for example the Keystore lost it): the encrypted file can't be opened, so it's deleted and every server gets a fresh starting point, exactly as when you first turn notifications on. You could miss notifications for things that happened since the last check; nothing else is affected and nothing is asked of you. From then on the file is written unencrypted, as the data was before this update.
+- **Going back to an older version:** ArrCtrl 1.8.0 and earlier don't know the new file, so they also start from a fresh starting point (no flood of old notifications, but events since the last check aren't reported). There's nothing to export first.
+
 ## v1.8.0 (2026-11-20)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.

@@ -31,7 +31,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **The Ctrl / Signal look**: high-contrast and shared by every Ctrl app, dark or light following your phone's theme, with Space Grotesk and JetBrains Mono type
 - **Self-signed certificates** trusted per server, by fingerprint
 - **App lock** with its own PIN and optional fingerprint unlock; your API keys and passwords stay encrypted while the app is locked
-- **API keys and passwords are encrypted** on your phone with the Android Keystore (in the StrongBox security chip when the phone has one), and the server and import screens always block screenshots. Optional **Hide in screenshots** and **Hide in recent apps** switches cover the rest of the app
+- **API keys and passwords are encrypted** on your phone with the Android Keystore (in the StrongBox security chip when the phone has one), and so is what the notification checks remember between checks (torrent hashes, download ids, health warnings), and the server and import screens always block screenshots. Optional **Hide in screenshots** and **Hide in recent apps** switches cover the rest of the app
 
 ## Requirements
 

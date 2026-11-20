@@ -15,7 +15,10 @@ import com.vknxworks.arrctrl.data.server.ServerStatus
 import com.vknxworks.arrctrl.data.server.ServerStore
 import com.vknxworks.arrctrl.data.settings.SettingsRepository
 import com.vknxworks.arrctrl.data.lock.LockVault
+import com.vknxworks.arrctrl.data.crypto.DataKeyStore
+import com.vknxworks.arrctrl.data.crypto.KeystoreWrapper
 import com.vknxworks.arrctrl.data.notify.NotifyChecker
+import com.vknxworks.arrctrl.data.notify.SeenStore
 import com.vknxworks.arrctrl.ui.lock.AppLock
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -48,6 +51,15 @@ class AppContainer(val context: Context) {
         sealPolicy = { vault.enabled && settings.current().let { !it.notifyEnabled && !it.pushEnabled } }
     }
     val status = ServerStatus(http, appScope)
+
+    /**
+     * The key that encrypts what the notification checks remember at rest. Separate from the key for API keys
+     * and passwords and from the app lock; it's first asked for on a background thread, by a check.
+     */
+    val dataKey = DataKeyStore(context.filesDir, KeystoreWrapper("arrctrl_data_at_rest"))
+
+    /** What the notification checks saw on each server last time. */
+    val seen = SeenStore(context, dataKey)
 
     /**
      * Background work (notification checks) can't read the API keys and passwords right
