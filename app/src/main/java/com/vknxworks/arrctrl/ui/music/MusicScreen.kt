@@ -194,13 +194,16 @@ fun MusicScreen() {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(server.id) { lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) { runCatching { load() } } }
 
-    val visible = artists.filter { a ->
-        (query.isBlank() || a.name.contains(query.trim(), ignoreCase = true)) && when (filter) {
-            ArtistFilter.ALL -> true
-            ArtistFilter.MONITORED -> a.monitored
-            ArtistFilter.UNMONITORED -> !a.monitored
-            ArtistFilter.MISSING -> a.monitored && a.trackCount > 0 && !a.complete
-            ArtistFilter.DOWNLOADING -> a.id in downloading
+    // Filtering every artist only when something it depends on changed, not on every redraw.
+    val visible = remember(artists, query, filter, downloading) {
+        artists.filter { a ->
+            (query.isBlank() || a.name.contains(query.trim(), ignoreCase = true)) && when (filter) {
+                ArtistFilter.ALL -> true
+                ArtistFilter.MONITORED -> a.monitored
+                ArtistFilter.UNMONITORED -> !a.monitored
+                ArtistFilter.MISSING -> a.monitored && a.trackCount > 0 && !a.complete
+                ArtistFilter.DOWNLOADING -> a.id in downloading
+            }
         }
     }
 
