@@ -57,7 +57,7 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
 ## Is it safe to install?
 
 - **Open source.** All of ArrCtrl's code is in this repo, under the GPL-3.0 license. You can read every line.
-- **Built by GitHub, not on a personal computer.** Every release on the [Releases page](https://github.com/VoidedKN0X/ArrCtrl/releases) is built by GitHub Actions straight from the code in this repo, using [the build workflow](.github/workflows/build.yml).
+- **Built by GitHub, not on a personal computer.** Every release on the [Releases page](https://github.com/VoidedKN0X/ArrCtrl/releases) is built by GitHub Actions straight from the code in this repo, using [the build workflow](.github/workflows/build.yml). The signing key is kept away from the build: one job builds the APK without any secrets, and a separate job that runs no code from this repo signs it and checks the signature against the fingerprint below.
 - **Always signed with the same key.** Android refuses to install an update that is signed with a different key, so nobody else can push an "update" over your copy. The [CtrlF-Droid repo](https://voidedkn0x.github.io/CtrlF-Droid/) only accepts APKs signed with this key too. Its SHA-256 certificate fingerprint is:
 
   ```

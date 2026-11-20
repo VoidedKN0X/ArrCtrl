@@ -14,6 +14,15 @@ Built and checked by CI only: nothing here has been run on a phone yet.
 - **Large libraries take less memory while loading.** The answer with your whole movie, series or artist library was first kept as one long text, then turned into a tree, then into the app's own list: three copies at once. The text copy is gone: the answer is now read into the tree as it arrives. Only these three library lists are read this way, and only when the answer is ordinary UTF-8 JSON; anything else is handled exactly as before, and a failed or interrupted download gives the same error as before.
 - **The Music list redraws with less work.** Filtering your artists (search text, the filter chips, what is downloading) was redone on every redraw of the screen; it's now only redone when one of those, or the list itself, changes. Movies and Series already worked this way. Nothing looks different.
 
+### Security
+
+- **The signing key is no longer available to the build.** Until now the release key and its passwords were present in the same GitHub Actions job that runs Gradle, so any build plugin or library could in principle have read them. The build job now has no secrets at all and produces an unsigned APK. A separate job, which checks out no code and runs no Gradle, signs it with `apksigner`, and then refuses to hand it on unless it is signed by exactly the certificate published in SECURITY.md and README.md and its contents are identical to what the build job made. Releases are signed with the same key and the same signature scheme (v2) as before, so updates install as usual. The app itself is unchanged by this.
+- **The build checks that the published fingerprint and the enforced one are the same.** If `build.yml`, SECURITY.md and README.md ever disagree about the signing certificate, the build fails.
+
+### Project
+
+- **Builds no longer use a saved Gradle cache.** Builds of Ctrl apps sometimes failed with "Dependency verification failed ... from repository Gradle Central Plugin Repository", and kept failing until the caches were deleted by hand. The cause (reproduced on DateCtrl): with a restored cache Gradle still fetches the plugin files from Maven Central on every build; when Maven Central can't be reached for a moment, Gradle takes the Kotlin plugin "marker" file from the Gradle plugin portal instead, the portal serves a different file under the same name, verification rightly refuses it, and the failed run then saved that state as the cache for every later run. Now every build and the weekly code scan start from a clean Gradle home, and the plugin portal is no longer a plugin source at all (`settings.gradle.kts`): everything the build needs is on Maven Central and Google's Maven. Dependency verification itself is unchanged and as strict as before. Builds take a minute or two longer.
+
 ## v1.9.0 (2026-11-20)
 
 **This release encrypts some of what the app stores on the phone. An older version cannot read it afterwards, so export or back up anything you need before you update (details below).** Built and checked by CI only: nothing in this release had been run on a phone when it was published.
