@@ -1073,4 +1073,16 @@
         <item quantity="one">%1$d voorwaarde</item>
         <item quantity="other">%1$d voorwaarden</item>
     </plurals>
+    <string name="torrent_tags">Tags</string>
+    <string name="torrent_tags_field">Tags</string>
+    <string name="movie_tags">Tags</string>
+    <string name="torrent_tab_info">Info</string>
+    <string name="torrent_tab_trackers">Trackers</string>
+    <string name="torrent_tab_peers">Peers</string>
+    <string name="detail_audio">Audio</string>
+    <string name="detail_video">Video</string>
+    <string name="episode_tba">Nog niet bekend</string>
+    <string name="albums">Albums</string>
+    <string name="calendar_album">Album</string>
+    <string name="notify_push_test_message">ArrCtrl-test</string>
 </resources>

@@ -1079,4 +1079,12 @@
         <item quantity="one">%1$d Bedingung</item>
         <item quantity="other">%1$d Bedingungen</item>
     </plurals>
+    <string name="torrent_tags">Tags</string>
+    <string name="torrent_tags_field">Tags</string>
+    <string name="movie_tags">Tags</string>
+    <string name="torrent_tab_info">Info</string>
+    <string name="torrent_tab_trackers">Tracker</string>
+    <string name="torrent_tab_peers">Peers</string>
+    <string name="detail_audio">Audio</string>
+    <string name="calendar_album">Album</string>
 </resources>

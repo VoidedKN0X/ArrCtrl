@@ -1,5 +1,8 @@
 package com.vknxworks.arrctrl.data.api
 
+import android.icu.text.MeasureFormat
+import android.icu.util.Measure
+import android.icu.util.MeasureUnit
 import java.time.Duration
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -19,17 +22,21 @@ object Format {
 
     fun speed(bytesPerSecond: Long?): String = if ((bytesPerSecond ?: 0) <= 0) "0 B/s" else bytes(bytesPerSecond) + "/s"
 
-    /** Seconds → "2h 05m", "4m 10s"; null for unknown or effectively infinite (qBittorrent uses 8640000). */
+    /**
+     * Seconds → "2h 5m", "4m 10s" in English, with the phone's own short units in other languages (ICU's
+     * narrow format); null for unknown or effectively infinite (qBittorrent uses 8640000).
+     */
     fun eta(seconds: Long?): String? {
         val s = seconds ?: return null
         if (s < 0 || s >= 8_640_000) return null
         val d = s / 86_400; val h = (s % 86_400) / 3600; val m = (s % 3600) / 60; val sec = s % 60
-        return when {
-            d > 0 -> "${d}d ${h}h"
-            h > 0 -> String.format(Locale.ROOT, "%dh %02dm", h, m)
-            m > 0 -> String.format(Locale.ROOT, "%dm %02ds", m, sec)
-            else -> "${sec}s"
+        val measures = when {
+            d > 0 -> arrayOf(Measure(d, MeasureUnit.DAY), Measure(h, MeasureUnit.HOUR))
+            h > 0 -> arrayOf(Measure(h, MeasureUnit.HOUR), Measure(m, MeasureUnit.MINUTE))
+            m > 0 -> arrayOf(Measure(m, MeasureUnit.MINUTE), Measure(sec, MeasureUnit.SECOND))
+            else -> arrayOf(Measure(sec, MeasureUnit.SECOND))
         }
+        return MeasureFormat.getInstance(Locale.getDefault(), MeasureFormat.FormatWidth.NARROW).formatMeasures(*measures)
     }
 
     /** Radarr/Sonarr "timeleft" ("1.02:03:04" or "02:03:04") → seconds. */

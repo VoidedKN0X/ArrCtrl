@@ -4,6 +4,13 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+### Fixed
+
+- **Download times use your language's short units.** Time left for downloads and torrents, and a torrent's active and seeding time, were always written with English letters (like "1d 4h" or "2h 05m"). They now use the phone's own short units, so French shows "1j 4h", German its own abbreviations. In English the minutes and seconds are no longer padded with a zero ("2h 5m").
+- **Missing labels in Dutch, French and German.** The torrent tabs (Info, Trackers, Peers), the Tags field and headings, "Audio" and "Album" had no entry in the translations; in Dutch also "Video", "Albums", the "TBA" date of an episode (now "Nog niet bekend") and the push test message. Most read the same as in English; French now says "Infos" and German "Tracker".
+
 ## v1.12.0 (2026-11-21)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.
