@@ -8,6 +8,10 @@ To publish a new version: bump `versionCode` and `versionName` in `app/build.gra
 
 Built and checked by CI only: nothing here has been run on a phone yet.
 
+### Fixed
+
+- **Fixed before release: the app would have crashed at start with the new build tools.** ArrCtrl uses WorkManager for its background work, and WorkManager stores its jobs in a small Room database that is created by name when the app starts. The shrinker (R8) in Android Gradle Plugin 9 is stricter than the old one and removed the constructor that needs, which makes the app stop right at launch (a known problem with Room 2.6.1 under Android Gradle Plugin 9). A keep rule for that constructor, the same one newer Room versions ship themselves, is now in `app/proguard-rules.pro`. No released version was affected: the new build tools have not been in any release. Built by CI only; not yet run on a phone.
+
 ### Changed
 
 - **Coming straight back to Movies or Series no longer downloads the whole library again.** Every time one of these tabs came back into view (back from a movie's page, switching tabs, returning to the app), ArrCtrl fetched the complete library from Radarr or Sonarr, which is several megabytes for a few thousand titles. It now skips that when all of this is true: the same server's library, queue and profiles were loaded completely less than 30 seconds ago, the saved server hasn't been edited, and ArrCtrl hasn't sent that server anything that changes it since that load began (adding, editing, deleting, monitoring, starting a search or any other command, from any screen or notification). **Pull to refresh always reloads, and so does every change you make**, including the actions on a selection. What can be different: something that changed on the server without ArrCtrl (a download that finished, an edit made in the web interface) can take up to 30 seconds longer to show when you come back to the tab; pulling down shows it at once. Music is unchanged and still reloads every time.
