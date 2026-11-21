@@ -271,7 +271,7 @@ private fun AppNavHost(navController: NavHostController) {
         composable<SettingsRoute> { SettingsScreen() }
         composable<ServerEditRoute> {
             val r = it.toRoute<ServerEditRoute>()
-            ServerEditScreen(r.id, r.type)
+            ServerEditScreen(r.id, r.type, r.name, r.url, r.username)
         }
         composable<ImportRoute> { ImportScreen() }
         composable<TorrentRoute> {

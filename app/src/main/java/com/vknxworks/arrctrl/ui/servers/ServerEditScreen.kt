@@ -79,7 +79,7 @@ import java.util.UUID
 
 /** Add a server of [typeId], or edit the saved server [id]. */
 @Composable
-fun ServerEditScreen(id: String?, typeId: String?) {
+fun ServerEditScreen(id: String?, typeId: String?, prefillName: String? = null, prefillUrl: String? = null, prefillUsername: String? = null) {
     val c = LocalContext.current.container
     val nav = LocalNavigator.current
     val existing = remember(id) { id?.let { c.servers.byId(it) } }
@@ -91,11 +91,11 @@ fun ServerEditScreen(id: String?, typeId: String?) {
         }
         return
     }
-    ServerForm(type, existing, onDone = nav::back)
+    ServerForm(type, existing, prefillName, prefillUrl, prefillUsername, onDone = nav::back)
 }
 
 @Composable
-private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit) {
+private fun ServerForm(type: ServiceType, existing: Server?, prefillName: String?, prefillUrl: String?, prefillUsername: String?, onDone: () -> Unit) {
     // API keys and passwords: no screenshots or screen recording while this screen is open.
     SecureWindow()
     val context = LocalContext.current
@@ -104,11 +104,11 @@ private fun ServerForm(type: ServiceType, existing: Server?, onDone: () -> Unit)
     val label = stringResource(type.label)
     val serverId = rememberSaveable { existing?.id ?: UUID.randomUUID().toString() }
 
-    var name by rememberSaveable { mutableStateOf(existing?.name.orEmpty()) }
-    var url by rememberSaveable { mutableStateOf(existing?.url.orEmpty()) }
+    var name by rememberSaveable { mutableStateOf(existing?.name ?: prefillName.orEmpty()) }
+    var url by rememberSaveable { mutableStateOf(existing?.url ?: prefillUrl.orEmpty()) }
     // Secrets stay out of saved instance state, which Android may keep after the app is gone.
     var apiKey by remember { mutableStateOf(existing?.apiKey.orEmpty()) }
-    var username by rememberSaveable { mutableStateOf(existing?.username.orEmpty()) }
+    var username by rememberSaveable { mutableStateOf(existing?.username ?: prefillUsername.orEmpty()) }
     var password by remember { mutableStateOf(existing?.password.orEmpty()) }
     var cert by rememberSaveable { mutableStateOf(existing?.certSha256.orEmpty()) }
     // The address a trusted certificate belongs to: it only counts for that exact scheme, host and port,

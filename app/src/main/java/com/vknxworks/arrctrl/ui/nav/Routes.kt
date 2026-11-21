@@ -14,8 +14,8 @@ import kotlinx.serialization.Serializable
 @Serializable data object SettingsRoute
 @Serializable data object NotificationsRoute
 
-/** Add ([type] set) or edit ([id] set) a server. */
-@Serializable data class ServerEditRoute(val id: String? = null, val type: String? = null)
+/** Add ([type] set) or edit ([id] set) a server. [name], [url] and [username] pre-fill a new server (from a restored backup); never a key or password. */
+@Serializable data class ServerEditRoute(val id: String? = null, val type: String? = null, val name: String? = null, val url: String? = null, val username: String? = null)
 @Serializable data object ImportRoute
 
 // Activity

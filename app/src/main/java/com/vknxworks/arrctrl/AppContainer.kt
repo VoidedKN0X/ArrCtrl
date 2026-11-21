@@ -141,6 +141,12 @@ class AppContainer(val context: Context) {
     /** A magnet link or .torrent file handed to the app (share sheet, magnet: link), waiting to be added. */
     val pendingTorrent = MutableStateFlow<IncomingTorrent?>(null)
 
+    /**
+     * The servers of the configuration backup restored last (this session only). Those that aren't set up on
+     * this phone are offered in Settings, each through the normal Add server screen.
+     */
+    val restoreOffers = MutableStateFlow<List<com.vknxworks.arrctrl.data.settings.BackupServer>>(emptyList())
+
     /** Where a tapped notification wants to go (see Alert.open), waiting for the UI. */
     val pendingOpen = MutableStateFlow<String?>(null)
 }

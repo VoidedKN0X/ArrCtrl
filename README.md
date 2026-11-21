@@ -27,6 +27,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Notifications**: background checks, plus instant push through [ntfy](https://f-droid.org/packages/io.heckel.ntfy/) and your own ntfy server
 - **Every service is optional**, and you can add more than one of each (a second Radarr for 4K, say)
 - **Import all your servers at once** by pasting one block of settings or scanning it as a QR code
+- **Encrypted backup** of ArrCtrl's own configuration (look, lists, calendar and your server list) in a password-protected file; API keys and passwords are never in it, so after a restore you enter those again
 - **Play in JellyCtrl** and **Open in SeerrCtrl** buttons when those apps are installed, and `arrctrl://` links that let JellyCtrl and SeerrCtrl open a movie or series in ArrCtrl (or add it)
 - **The Ctrl / Signal look**: high-contrast and shared by every Ctrl app, dark or light following your phone's theme, with Space Grotesk and JetBrains Mono type
 - **Self-signed certificates** trusted per server, by fingerprint

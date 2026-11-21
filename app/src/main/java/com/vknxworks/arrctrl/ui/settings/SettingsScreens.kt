@@ -271,6 +271,7 @@ fun SettingsScreen() {
                 )
             }
             PrivacyAndSecurityGroup(s)
+            BackupGroup()
         }
     }
 }

@@ -8,6 +8,10 @@ To publish a new version: bump `versionCode` and `versionName` in `app/build.gra
 
 Changes on `main` that aren't in a release yet. They ship with the next version.
 
+### New
+
+- **Encrypted backup of ArrCtrl's configuration.** **Settings > Backup** has **Back up configuration** and **Restore from a backup**. A backup is one small file, encrypted with a password you choose (at least 8 characters; AES-256-GCM with a key made from the password by PBKDF2). It holds ArrCtrl's own configuration: theme and colours, the layout and sort order of Movies and Series, the calendar view, the disk space warning, and your list of servers with their service, name, address and (for a qBittorrent sign-in) user name. **It never holds API keys, passwords, trusted certificate fingerprints, the app lock or its PIN, the privacy switches or the notification and ntfy settings**, so the file can't sign in anywhere even if someone has the password. Restoring asks for the password (a wrong one or a damaged file is refused, never half-read), then shows when and with which version the backup was made, what it replaces and which servers aren't on this phone yet, and asks before changing anything. It replaces only those settings; servers already here keep their keys and stay untouched. **No server is added by the restore itself**: the ones that are missing appear under **Servers from your backup**, and each opens the normal Add server screen with its name, address and user name filled in, where you enter the key and the usual checks (unencrypted address, self-signed certificate by fingerprint) apply. That list lasts until ArrCtrl closes. The encryption has unit tests; nothing was run on a phone.
+
 ### Project
 
 - **Checksum list regenerated without the old entries.** `gradle/verification-metadata.xml` was regenerated on CI with the fixed workflow and committed exactly as printed (its SHA-256 matches the log). It now lists only the 463 components the build downloads today; the leftovers from earlier library and build-tool versions are gone.
