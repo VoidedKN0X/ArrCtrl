@@ -24,6 +24,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Subtitles** through Bazarr on every movie and episode: see what's there, get any other language, or pick one yourself
 - **Prowlarr** indexers and cross-indexer search, **Bazarr** subtitles, **autobrr** filters and releases, **Cleanuparr** stats and jobs
 - **System health** for every server in one place, with low disk space warnings
+- **Quality profiles and custom formats**: edit a profile's allowed qualities, upgrade limit and custom format scores, and edit, add and delete custom formats and their conditions
 - **Statistics**: your libraries and downloads in numbers, per server and added up
 - **Backups, updates and logs** of your Radarr, Sonarr, Lidarr and Prowlarr servers: see and delete the server's backups and make a new one, see what's new and install an update when the server can update itself, and read the server's log
 - **Notifications**: background checks, plus instant push through [ntfy](https://f-droid.org/packages/io.heckel.ntfy/) and your own ntfy server

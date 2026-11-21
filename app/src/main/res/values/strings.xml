@@ -1152,4 +1152,56 @@
     <string name="stats_grabs">Grabs</string>
     <string name="stats_failed_queries">Failed searches</string>
     <string name="stats_top_indexer">Most grabs: %1$s (%2$s). Prowlarr counts these over the period it keeps history for.</string>
+    <!-- Quality profiles and custom formats -->
+    <string name="prof_title">Profiles and custom formats</string>
+    <string name="prof_role">Quality profiles and custom formats of Radarr, Sonarr and Lidarr</string>
+    <string name="prof_no_servers">No server for this yet</string>
+    <string name="prof_no_servers_body">Quality profiles and custom formats belong to Radarr, Sonarr and Lidarr. Add one under your profile picture.</string>
+    <string name="prof_quality_profiles">Quality profiles</string>
+    <string name="prof_custom_formats">Custom formats</string>
+    <string name="prof_quality_note">Tap a profile to change it. New profiles are made on the server\'s own web page.</string>
+    <string name="prof_upgrade_until_x">upgrades until %1$s</string>
+    <string name="prof_no_upgrades">no upgrades</string>
+    <string name="prof_save">Save</string>
+    <string name="prof_saved">Saved on the server</string>
+    <string name="prof_deleted">Deleted from the server</string>
+    <string name="prof_refused">The server didn\'t accept this:\n%1$s</string>
+    <string name="prof_name">Name</string>
+    <string name="prof_upgrades">Upgrades allowed</string>
+    <string name="prof_upgrades_sub">Replace a file with a better one until the chosen quality is reached</string>
+    <string name="prof_qualities">Qualities</string>
+    <string name="prof_qualities_hint">The switch allows a quality. The circle marks the quality to upgrade until. Best quality first.</string>
+    <string name="prof_problem_none">Allow at least one quality.</string>
+    <string name="prof_problem_cutoff">The quality to upgrade until is switched off. Mark another one with the circle.</string>
+    <string name="prof_format_scores">Custom format scores</string>
+    <string name="prof_format_scores_hint">A release\'s score is the sum of the scores of the custom formats it matches.</string>
+    <string name="prof_min_score">Minimum score</string>
+    <string name="prof_cutoff_score">Upgrade until score</string>
+    <string name="prof_min_upgrade_score">Minimum score increase for an upgrade</string>
+    <string name="prof_score">Score</string>
+    <string name="prof_no_formats">This server has no custom formats yet.</string>
+    <string name="prof_new_format">New custom format</string>
+    <string name="prof_formats_none">No custom formats yet.</string>
+    <string name="prof_include_renaming">Include when renaming</string>
+    <string name="prof_include_renaming_sub">Use this format\'s name in the {Custom Formats} part of file names</string>
+    <string name="prof_conditions">Conditions</string>
+    <string name="prof_conditions_hint">A release matches when every required condition matches and, of the rest, at least one of each kind.</string>
+    <string name="prof_conditions_none">Add at least one condition.</string>
+    <string name="prof_condition_name">Condition name</string>
+    <string name="prof_required">Required</string>
+    <string name="prof_negate">Negate</string>
+    <string name="prof_add_condition">Add a condition</string>
+    <string name="prof_remove_condition">Remove this condition</string>
+    <string name="prof_choose">Choose</string>
+    <string name="prof_delete_format">Delete custom format</string>
+    <string name="prof_delete_format_title">Delete this custom format?</string>
+    <string name="prof_delete_format_body">%1$s is deleted from the server for good, and its score disappears from every quality profile. This can\'t be undone.</string>
+    <plurals name="prof_allowed_count">
+        <item quantity="one">%1$d quality allowed</item>
+        <item quantity="other">%1$d qualities allowed</item>
+    </plurals>
+    <plurals name="prof_condition_count">
+        <item quantity="one">%1$d condition</item>
+        <item quantity="other">%1$d conditions</item>
+    </plurals>
 </resources>

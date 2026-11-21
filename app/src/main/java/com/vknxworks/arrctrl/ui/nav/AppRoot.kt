@@ -319,6 +319,7 @@ private fun AppNavHost(navController: NavHostController) {
         composable<AutobrrRoute> { AutobrrScreen() }
         composable<CleanuparrRoute> { CleanuparrScreen() }
         composable<HealthRoute> { HealthScreen() }
+        composable<ProfilesRoute> { com.vknxworks.arrctrl.ui.more.ProfilesScreen() }
         composable<StatsRoute> { com.vknxworks.arrctrl.ui.more.StatsScreen() }
         composable<MaintenanceRoute> { com.vknxworks.arrctrl.ui.more.MaintenanceScreen() }
         composable<OpenLinkRoute> {
