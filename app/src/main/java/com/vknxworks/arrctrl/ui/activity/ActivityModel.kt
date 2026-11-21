@@ -37,6 +37,9 @@ class ActivityModel(private val c: AppContainer) : ViewModel() {
     var queueErrors by mutableStateOf<Map<Server, TestResult>>(emptyMap()); private set
     var queueLoaded by mutableStateOf(false); private set
 
+    /** Live "the queue changed" signals from the servers, used while the Queue tab is on screen. */
+    val live = com.vknxworks.arrctrl.data.net.QueueLive(c.http)
+
     suspend fun refreshQueue() = coroutineScope {
         val results = arrServers.map { s -> async { s to runCatching { c.arr(s).queue() } } }.awaitAll()
         results.forEach { (_, r) -> r.exceptionOrNull()?.let { if (it is CancellationException) throw it } }

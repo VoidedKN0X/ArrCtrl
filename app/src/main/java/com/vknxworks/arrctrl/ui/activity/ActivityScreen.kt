@@ -72,6 +72,10 @@ import com.vknxworks.arrctrl.ui.nav.LocalNavigator
 import com.vknxworks.arrctrl.ui.servers.resultText
 import com.vknxworks.arrctrl.ui.theme.Gutter
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -109,24 +113,62 @@ fun ActivityScreen() {
     var tabName by rememberSaveable { mutableStateOf(tabs.first().name) }
     val tab = tabs.firstOrNull { it.name == tabName } ?: tabs.first()
 
-    // Poll only while the Activity tab is on screen and the app is in front.
+    // Only while the Activity tab is on screen and the app is in front.
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(servers, tab) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            while (true) {
-                try {
-                    if (hasQbit) model.refreshTorrents()
-                    when (tab) {
-                        ActivityTab.QUEUE -> model.refreshQueue()
-                        ActivityTab.HISTORY -> if (!model.historyLoaded) model.loadHistory(reset = true)
-                        ActivityTab.TORRENTS -> Unit
+            // qBittorrent has no way to tell the app something changed, so its torrents are asked for
+            // every few seconds as before.
+            if (hasQbit) {
+                launch {
+                    while (true) {
+                        try {
+                            model.refreshTorrents()
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (_: Throwable) {
+                            // Per-server errors are kept by the model; anything else just waits for the next round.
+                        }
+                        delay(if (tab == ActivityTab.TORRENTS) 2_000 else 5_000)
                     }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (_: Throwable) {
-                    // Per-server errors are kept by the model; anything else just waits for the next round.
                 }
-                delay(if (tab == ActivityTab.TORRENTS) 2_000 else 5_000)
+            }
+            when (tab) {
+                ActivityTab.QUEUE -> {
+                    // Radarr, Sonarr and Lidarr say when their queue changed, over the live connection their
+                    // own web pages use. While every one of them is connected the queue is only fetched when
+                    // one says so (and once every two minutes, in case a message was missed). A server
+                    // without a live connection is asked every 5 seconds, as before.
+                    val arr = model.arrServers
+                    launch { model.live.run(arr) }
+                    // Counts the "queue changed" messages, so one that arrives while a fetch is running isn't lost.
+                    val changes = MutableStateFlow(0)
+                    launch { model.live.changes.collect { changes.update { it + 1 } } }
+                    while (true) {
+                        val seen = changes.value
+                        try {
+                            model.refreshQueue()
+                        } catch (e: CancellationException) {
+                            throw e
+                        } catch (_: Throwable) {
+                        }
+                        val allLive = arr.isNotEmpty() && model.live.connected.value.containsAll(arr.map { it.id })
+                        // Until the connections are up (or when one can't be made): the usual 5 seconds, cut
+                        // short the moment a connected server reports a change.
+                        withTimeoutOrNull(if (allLive) LIVE_SAFETY_MS else 5_000L) { changes.first { it != seen } }
+                        // Servers often send a few messages in a row: one fetch for the lot.
+                        delay(LIVE_SETTLE_MS)
+                    }
+                }
+                ActivityTab.HISTORY -> {
+                    try {
+                        if (!model.historyLoaded) model.loadHistory(reset = true)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (_: Throwable) {
+                    }
+                }
+                ActivityTab.TORRENTS -> Unit
             }
         }
     }
@@ -293,3 +335,9 @@ private fun SpeedStrip(model: ActivityModel, onEditLimits: () -> Unit) {
 /** Shared by the tabs: turns any failure into the same wording the connection test uses. */
 @Composable
 fun errorText(e: Throwable, type: ServiceType): String = resultText(e.toTestResult(), type)
+
+/** With a live connection to every server: fetch the queue anyway this often, in case a message was missed. */
+private const val LIVE_SAFETY_MS = 120_000L
+
+/** After a "queue changed" message: wait this long so a burst of messages gives one fetch. */
+private const val LIVE_SETTLE_MS = 400L

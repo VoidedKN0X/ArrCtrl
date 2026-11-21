@@ -41,6 +41,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,12 +71,25 @@ import kotlinx.coroutines.launch
 fun QueueTab(model: ActivityModel) {
     var open by remember { mutableStateOf<QueueItem?>(null) }
     val multiServer = model.arrServers.size > 1
+    val connected by model.live.connected.collectAsStateWithLifecycle()
+    val arrIds = model.arrServers.map { it.id }
+    val allLive = arrIds.isNotEmpty() && connected.containsAll(arrIds)
 
     LazyColumn(
         Modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = 24.dp + LocalBottomClearance.current),
     ) {
         items(model.queueErrors.entries.toList(), key = { "err-" + it.key.id }) { (s, r) -> ServerErrorCard(s, r) }
+        if (allLive && model.queue.isNotEmpty()) {
+            // Every server is connected live: the list follows the servers instead of being fetched on a timer.
+            item(key = "live") {
+                Row(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    com.vknxworks.arrctrl.ui.components.StatusDot(com.vknxworks.arrctrl.ui.theme.CtrlColors.AccentText)
+                    Spacer(Modifier.width(8.dp))
+                    com.vknxworks.arrctrl.ui.components.CtrlLabel(stringResource(R.string.queue_live))
+                }
+            }
+        }
         if (model.queueLoaded && model.queue.isEmpty() && model.queueErrors.isEmpty()) {
             item(key = "empty") {
                 MessageView(Icons.Outlined.CheckCircle, stringResource(R.string.queue_empty_title), stringResource(R.string.queue_empty_body))
