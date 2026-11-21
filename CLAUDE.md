@@ -16,6 +16,23 @@
 - `SeenStore.load`/`save`/`retain` may ask the Keystore for the key: background threads only. `clear()` never does (it's called from the UI). Never replace an existing `data.key`, and never create a Keystore key on the decrypt path (`KeystoreAes.existing`).
 - `SealedFileTest` covers the format and the key rules (`./gradlew :app:testDebugUnitTest`; CI doesn't run unit tests).
 
+## Configuration backup (Settings > Backup)
+
+- `data/settings/BackupCrypto` (password, PBKDF2-HMAC-SHA256, AES-256-GCM; file marker `ARRCTRL-BACKUP1`) around `data/settings/ConfigBackup` (JSON). It holds look, list and calendar settings and the server list (type, name, address, user name).
+- Never put a secret or a security setting in it: no API keys, passwords, certificate fingerprints, PIN or lock settings, privacy switches, notification or ntfy settings. A restore only replaces those settings and never adds a server itself: missing servers are offered through the normal Add server screen (`ServerEditRoute` with `name`, `url`, `username`), so the key is typed there and the cleartext and certificate checks apply.
+- `BackupCryptoTest` covers the file format.
+
+## Server pages added in 1.11 (More tab)
+
+- `data/api/ArrSystemApi` + `ui/more/MaintenanceScreen`: backups, updates and logs of Radarr, Sonarr, Lidarr and Prowlarr. Restoring a server backup is deliberately not offered.
+- `data/api/ArrProfilesApi` + `data/api/ProfileEdits` + `ui/more/ProfilesScreen`: quality profile and custom format editing. Resources stay the server's own JSON and are changed with `ProfileEdits`, so unknown fields go back untouched (`ProfileEditsTest`).
+- `data/net/QueueLive` + `SignalRProtocol`: the live "queue changed" signal (SignalR on a WebSocket) for the Queue tab. It only lives while that tab is on screen; polling stays as the fallback.
+- `ui/more/StatsScreen`: counts from what the servers already report; nothing is stored.
+
+## Languages
+
+English (`values/strings.xml`) and Dutch (`values-nl/strings.xml`, Belgian Dutch, informal "je"). Android picks by the phone's language; there is no in-app switch. A new string needs both files.
+
 ## Dependency verification
 
 Gradle checks every library and plugin download against its SHA-256 in `gradle/verification-metadata.xml` (checksums only, no PGP). When a dependency or plugin changes, run the `verification-metadata.yml` workflow (`gh api -X POST repos/VoidedKN0X/ArrCtrl/actions/workflows/verification-metadata.yml/dispatches -f ref=main`), decode the file from its log, check the diff (only Maven Central and Google's Maven) and commit it in the same push. Never turn verification off or make it lenient.
