@@ -4,6 +4,12 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+### New
+
+- **ArrCtrl in French and German, following the phone's language.** The whole app is now also translated into French (polite "vous" form) and German (informal "du" form), so it covers English, Dutch, French and German. Android picks the language from your phone's settings and falls back to English for any other language, and Android 13 and later now also offer French and German under Settings › Apps › ArrCtrl › Language. Service names (Radarr, Sonarr, Lidarr, Prowlarr, Bazarr, qBittorrent, autobrr, Cleanuparr, ntfy), short technical labels (ratings such as IMDb and TVDB, percentages, speed arrows, Info/Trackers/Peers tabs, Tags) and the menu paths inside each service's own web page stay as they are, the same as in Dutch, and so do texts that come from your servers.
+
 ## v1.11.0 (2026-11-21)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.
