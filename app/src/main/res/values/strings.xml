@@ -1081,4 +1081,45 @@
         <item quantity="one">%1$d server isn\'t on this phone yet and will be offered to add:</item>
         <item quantity="other">%1$d servers aren\'t on this phone yet and will be offered to add:</item>
     </plurals>
+    <!-- Backups, updates and logs of a server -->
+    <string name="maint_title">Backups, updates and logs</string>
+    <string name="maint_role">Of your Radarr, Sonarr, Lidarr and Prowlarr servers</string>
+    <string name="maint_no_servers">No server for this yet</string>
+    <string name="maint_no_servers_body">Backups, updates and logs are shown for Radarr, Sonarr, Lidarr and Prowlarr. Add one under your profile picture.</string>
+    <string name="maint_backups">Backups</string>
+    <string name="maint_updates">Updates</string>
+    <string name="maint_logs">Logs</string>
+    <string name="maint_backup_now">Back up now</string>
+    <string name="maint_backup_starting">Starting the backup…</string>
+    <string name="maint_backup_started">Backup started on the server</string>
+    <string name="maint_backups_none">This server has no backups yet.</string>
+    <string name="maint_backups_note">These are the server\'s own backups of its database and settings, kept on the server. Restoring one replaces the server\'s whole database, so that is left to the server\'s own web page (System &gt; Backup).</string>
+    <string name="maint_backup_scheduled">Scheduled</string>
+    <string name="maint_backup_manual">Manual</string>
+    <string name="maint_backup_update">Before an update</string>
+    <string name="maint_backup_delete">Delete backup</string>
+    <string name="maint_backup_delete_title">Delete this backup?</string>
+    <string name="maint_backup_delete_body">%1$s is deleted from %2$s for good. This can\'t be undone.</string>
+    <string name="maint_running">Running version %1$s</string>
+    <string name="maint_branch">Branch: %1$s</string>
+    <string name="maint_up_to_date">The latest version is installed.</string>
+    <string name="maint_no_update">No update to install.</string>
+    <string name="maint_update_install">Install version %1$s</string>
+    <string name="maint_update_started">Installing version %1$s…</string>
+    <string name="maint_update_docker">Version %1$s is available. This server runs in Docker, so it is updated by pulling a new image, not from here.</string>
+    <string name="maint_update_external">Version %1$s is available. This server is updated outside the app itself (by its package manager or an external updater), not from here.</string>
+    <string name="maint_update_title">Update %1$s?</string>
+    <string name="maint_update_body">The server downloads and installs version %1$s and restarts. %2$s is unreachable for a minute or so, and downloads being imported at that moment wait until it is back. The server makes a backup of itself first.</string>
+    <string name="maint_update_confirm">Install update</string>
+    <string name="maint_update_toast">Update started. The server restarts when it is done.</string>
+    <string name="maint_installed">Installed</string>
+    <string name="maint_latest">Latest</string>
+    <string name="maint_changes_new">New</string>
+    <string name="maint_changes_fixed">Fixed</string>
+    <string name="maint_changes_none">Maintenance release: no changes listed.</string>
+    <string name="maint_log_all">Everything</string>
+    <string name="maint_log_info">Info and worse</string>
+    <string name="maint_log_warn">Warnings and errors</string>
+    <string name="maint_log_error">Errors</string>
+    <string name="maint_logs_none">No log entries. The server may have its log database turned off.</string>
 </resources>

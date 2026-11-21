@@ -319,6 +319,7 @@ private fun AppNavHost(navController: NavHostController) {
         composable<AutobrrRoute> { AutobrrScreen() }
         composable<CleanuparrRoute> { CleanuparrScreen() }
         composable<HealthRoute> { HealthScreen() }
+        composable<MaintenanceRoute> { com.vknxworks.arrctrl.ui.more.MaintenanceScreen() }
         composable<OpenLinkRoute> {
             val r = it.toRoute<OpenLinkRoute>()
             OpenLinkScreen(r.kind, r.tmdb, r.tvdb)
