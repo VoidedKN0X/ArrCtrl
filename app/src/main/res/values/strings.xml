@@ -1122,4 +1122,34 @@
     <string name="maint_log_warn">Warnings and errors</string>
     <string name="maint_log_error">Errors</string>
     <string name="maint_logs_none">No log entries. The server may have its log database turned off.</string>
+    <string name="queue_live">Live: updates as your servers report them</string>
+    <!-- Statistics -->
+    <string name="stats_title">Statistics</string>
+    <string name="stats_role">Your libraries and downloads in numbers</string>
+    <string name="stats_none">Nothing to count yet</string>
+    <string name="stats_none_body">Statistics are shown for Radarr, Sonarr, Lidarr, qBittorrent and Prowlarr. Add one under your profile picture.</string>
+    <string name="stats_total_on_disk">On disk, all libraries</string>
+    <string name="stats_libraries">Libraries</string>
+    <string name="stats_movies">Movies</string>
+    <string name="stats_series">Series</string>
+    <string name="stats_episodes">Episodes on disk</string>
+    <string name="stats_artists">Artists</string>
+    <string name="stats_albums">Albums</string>
+    <string name="stats_tracks">Tracks on disk</string>
+    <string name="stats_downloaded">Downloaded</string>
+    <string name="stats_missing">Missing</string>
+    <string name="stats_on_disk">On disk</string>
+    <string name="stats_monitored_note">%1$s monitored, %2$s not monitored. Missing counts monitored movies that are out but have no file.</string>
+    <string name="stats_series_note">%1$s continuing, %2$s ended, %3$s monitored. Missing counts aired, monitored episodes without a file.</string>
+    <string name="stats_artists_note">%1$s monitored. %2$s tracks of monitored albums have no file.</string>
+    <string name="stats_torrents">Torrents</string>
+    <string name="stats_torrents_size">Size of all torrents</string>
+    <string name="stats_all_time_down">Downloaded, all time</string>
+    <string name="stats_all_time_up">Uploaded, all time</string>
+    <string name="stats_ratio_note">All-time ratio %1$s. %2$s torrents are complete.</string>
+    <string name="stats_indexers">Indexers used</string>
+    <string name="stats_queries">Searches</string>
+    <string name="stats_grabs">Grabs</string>
+    <string name="stats_failed_queries">Failed searches</string>
+    <string name="stats_top_indexer">Most grabs: %1$s (%2$s). Prowlarr counts these over the period it keeps history for.</string>
 </resources>

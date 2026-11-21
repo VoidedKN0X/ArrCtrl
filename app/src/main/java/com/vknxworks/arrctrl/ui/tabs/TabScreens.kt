@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.HealthAndSafety
 import androidx.compose.material.icons.outlined.ManageSearch
@@ -124,6 +125,14 @@ fun MoreScreen() {
                     showChevron = true,
                     enabled = servers.isNotEmpty(),
                     onClick = { nav.navigate(HealthRoute) },
+                )
+                GroupRow(
+                    stringResource(R.string.stats_title),
+                    stringResource(R.string.stats_role),
+                    Icons.Outlined.BarChart,
+                    showChevron = true,
+                    enabled = servers.isNotEmpty(),
+                    onClick = { nav.navigate(com.vknxworks.arrctrl.ui.nav.StatsRoute) },
                 )
                 GroupRow(
                     stringResource(R.string.maint_title),

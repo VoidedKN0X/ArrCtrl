@@ -18,12 +18,13 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Music**: your Lidarr artists and albums, with add, search, monitoring and profiles (shown only when you have a Lidarr server)
 - **Wanted**: Radarr, Sonarr and Lidarr's missing and cutoff-unmet lists, with search for one item, a selection or everything
 - **Calendar** with upcoming episodes (at their air time, in your phone's time zone), movies (cinema, digital and physical release dates) and album releases, as an agenda or a month grid, filtered by type, by server and by monitored status; tap an entry to open it
-- **Activity**: the Radarr, Sonarr and Lidarr queues (with manual import for Radarr and Sonarr), your qBittorrent torrents with full controls, and their history
+- **Activity**: the Radarr, Sonarr and Lidarr queues (with manual import for Radarr and Sonarr), updated live as the servers report changes, your qBittorrent torrents with full controls, and their history
 - **qBittorrent extras**: move a torrent's files (set location, with recent folders), per-torrent share limits, and the global normal and alternative speed limits
 - **Add torrents** from magnet links and `.torrent` files, straight from the share sheet
 - **Subtitles** through Bazarr on every movie and episode: see what's there, get any other language, or pick one yourself
 - **Prowlarr** indexers and cross-indexer search, **Bazarr** subtitles, **autobrr** filters and releases, **Cleanuparr** stats and jobs
 - **System health** for every server in one place, with low disk space warnings
+- **Statistics**: your libraries and downloads in numbers, per server and added up
 - **Backups, updates and logs** of your Radarr, Sonarr, Lidarr and Prowlarr servers: see and delete the server's backups and make a new one, see what's new and install an update when the server can update itself, and read the server's log
 - **Notifications**: background checks, plus instant push through [ntfy](https://f-droid.org/packages/io.heckel.ntfy/) and your own ntfy server
 - **Every service is optional**, and you can add more than one of each (a second Radarr for 4K, say)
