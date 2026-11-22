@@ -36,7 +36,22 @@ object Format {
             m > 0 -> arrayOf(Measure(m, MeasureUnit.MINUTE), Measure(sec, MeasureUnit.SECOND))
             else -> arrayOf(Measure(sec, MeasureUnit.SECOND))
         }
-        return MeasureFormat.getInstance(Locale.getDefault(), MeasureFormat.FormatWidth.NARROW).formatMeasures(*measures)
+        return narrow(measures)
+    }
+
+    /**
+     * One ICU [MeasureFormat] for the current language, made again only when the language changes: making
+     * one loads locale data, too slow for every torrent row on every 2-second poll. ICU formats aren't
+     * thread-safe, so use is serialised.
+     */
+    private var narrowCache: Pair<Locale, MeasureFormat>? = null
+
+    @Synchronized
+    private fun narrow(measures: Array<Measure>): String {
+        val locale = Locale.getDefault()
+        val f = narrowCache?.takeIf { it.first == locale }?.second
+            ?: MeasureFormat.getInstance(locale, MeasureFormat.FormatWidth.NARROW).also { narrowCache = locale to it }
+        return f.formatMeasures(*measures)
     }
 
     /** Radarr/Sonarr "timeleft" ("1.02:03:04" or "02:03:04") → seconds. */

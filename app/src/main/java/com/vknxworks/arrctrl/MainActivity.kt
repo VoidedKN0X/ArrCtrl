@@ -52,10 +52,12 @@ class MainActivity : ComponentActivity() {
             }
             // "Hide in screenshots": FLAG_SECURE (also blanks the Recents preview). Always on, whatever the
             // switch says, while an API key, password or pasted server settings, the lock screen or a PIN screen are on screen.
-            val secure = settings.hideScreenshots || ScreenPrivacy.forced > 0 || lockCovering(c.vault)
+            // Until the saved settings are read, both stay on: the placeholder defaults would lift them for a moment.
+            val loaded by c.settings.loaded.collectAsStateWithLifecycle()
+            val secure = !loaded || settings.hideScreenshots || ScreenPrivacy.forced > 0 || lockCovering(c.vault)
             // "Hide in recent apps": a blank Recents card; screenshots still work. Always with the app lock on,
             // so Recents never shows what's behind the lock.
-            val blankRecents = settings.hideRecents || c.vault.enabled
+            val blankRecents = !loaded || settings.hideRecents || c.vault.enabled
             LaunchedEffect(secure, blankRecents) {
                 // Locking as you leave changes these while the activity may already be closing; the system can
                 // refuse that for a finished activity, which must never crash the app.

@@ -780,7 +780,7 @@
     <string name="lock_too_many">Zu viele Versuche. Erneut in %1$d s</string>
     <string name="lock_forgot">PIN vergessen?</string>
     <string name="lock_forgot_title">PIN vergessen?</string>
-    <string name="lock_forgot_body">Die PIN kann nicht wiederhergestellt werden, weil sie deine gespeicherten API-Schlüssel und Passwörter verschlüsselt. ArrCtrl entfernt jeden Server samt API-Schlüssel oder Passwort und das, was die Benachrichtigungen auf diesem Smartphone gespeichert haben. Auf deinen Servern ändert sich nichts.</string>
+    <string name="lock_forgot_body">Die PIN kann nicht wiederhergestellt werden, weil sie deine gespeicherten API-Schlüssel und Passwörter verschlüsselt. ArrCtrl entfernt jeden Server samt API-Schlüssel oder Passwort und das, was die Benachrichtigungen auf diesem Smartphone gespeichert haben. Auf deinen Servern ändert sich nichts. Wenn dein Smartphone eine Displaysperre hat, bestätigst du zuerst damit.</string>
     <string name="lock_forgot_confirm">Server entfernen und zurücksetzen</string>
     <string name="lock_choose_pin">App-PIN wählen</string>
     <string name="lock_enable_intro">Mindestens %1$d Ziffern, anders als die PIN deines Smartphones. Wenn du sie vergisst, musst du deine Server erneut hinzufügen.</string>
@@ -1087,4 +1087,7 @@
     <string name="torrent_tab_peers">Peers</string>
     <string name="detail_audio">Audio</string>
     <string name="calendar_album">Album</string>
+    <string name="lock_reset_prompt_title">App-Sperre von ArrCtrl zurücksetzen</string>
+    <string name="lock_reset_prompt_subtitle">Bestätige mit der Displaysperre deines Smartphones, dass du es bist</string>
+    <string name="lock_reset_prompt_failed">Displaysperre konnte nicht angezeigt werden</string>
 </resources>

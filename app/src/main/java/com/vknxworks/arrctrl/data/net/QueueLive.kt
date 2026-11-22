@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
+import okhttp3.HttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -78,15 +79,14 @@ class QueueLive(private val http: Http) {
         val hub = base.newBuilder().addPathSegments("signalr/messages").build()
 
         // 1. Negotiate (POST …/negotiate?negotiateVersion=1): the server hands out a connection token.
-        val negotiate = hub.newBuilder().addPathSegment("negotiate")
-            .addQueryParameter("negotiateVersion", "1")
-            .addQueryParameter("access_token", server.apiKey)
-            .build()
+        // The API key goes only in the X-Api-Key header (added by Http's AuthInterceptor to every request,
+        // the WebSocket upgrade included), never in the URL, where reverse-proxy and server logs would keep it.
+        val negotiate = signalRNegotiateUrl(hub)
         val answer = Api.json(client, Request.Builder().url(negotiate).post(ByteArray(0).toRequestBody("text/plain".toMediaType())).build()) as? JsonObject
         val token = answer.str("connectionToken") ?: answer.str("connectionId") ?: return false
 
         // 2. The WebSocket, 3. the handshake, then messages until it closes.
-        val socketUrl = hub.newBuilder().addQueryParameter("id", token).addQueryParameter("access_token", server.apiKey).build()
+        val socketUrl = signalRSocketUrl(hub, token)
         val done = CompletableDeferred<Unit>()
         // Set on OkHttp's threads, read here.
         val ready = AtomicBoolean(false)
@@ -153,3 +153,11 @@ class QueueLive(private val http: Http) {
         const val MAX_RETRY_MS = 60_000L
     }
 }
+
+/** The SignalR negotiate address under [hub]. No API key in it: that goes in the X-Api-Key header. */
+internal fun signalRNegotiateUrl(hub: HttpUrl): HttpUrl =
+    hub.newBuilder().addPathSegment("negotiate").addQueryParameter("negotiateVersion", "1").build()
+
+/** The WebSocket address for connection [token] under [hub]. No API key in it: that goes in the X-Api-Key header. */
+internal fun signalRSocketUrl(hub: HttpUrl, token: String): HttpUrl =
+    hub.newBuilder().addQueryParameter("id", token).build()

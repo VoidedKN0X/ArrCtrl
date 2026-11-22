@@ -780,7 +780,7 @@
     <string name="lock_too_many">Trop d\'essais. Réessayez dans %1$d s</string>
     <string name="lock_forgot">Code PIN oublié ?</string>
     <string name="lock_forgot_title">Vous avez oublié votre code PIN ?</string>
-    <string name="lock_forgot_body">Le code PIN ne peut pas être récupéré, car il chiffre vos clés API et mots de passe enregistrés. ArrCtrl supprimera chaque serveur avec sa clé API ou son mot de passe, ainsi que ce que les notifications ont mémorisé sur ce téléphone. Rien ne change sur vos serveurs.</string>
+    <string name="lock_forgot_body">Le code PIN ne peut pas être récupéré, car il chiffre vos clés API et mots de passe enregistrés. ArrCtrl supprimera chaque serveur avec sa clé API ou son mot de passe, ainsi que ce que les notifications ont mémorisé sur ce téléphone. Rien ne change sur vos serveurs. Si votre téléphone a un verrouillage d\'écran, vous le confirmerez d\'abord avec celui-ci.</string>
     <string name="lock_forgot_confirm">Supprimer les serveurs et réinitialiser</string>
     <string name="lock_choose_pin">Choisissez un code PIN</string>
     <string name="lock_enable_intro">Au moins %1$d chiffres, différent du code PIN de votre téléphone. Si vous l\'oubliez, la seule solution est d\'ajouter à nouveau vos serveurs.</string>
@@ -1087,4 +1087,7 @@
     <string name="torrent_tab_peers">Peers</string>
     <string name="detail_audio">Audio</string>
     <string name="calendar_album">Album</string>
+    <string name="lock_reset_prompt_title">Réinitialiser le verrouillage d\'ArrCtrl</string>
+    <string name="lock_reset_prompt_subtitle">Utilisez le verrouillage d\'écran de votre téléphone pour confirmer votre identité</string>
+    <string name="lock_reset_prompt_failed">Impossible d\'afficher le verrouillage d\'écran</string>
 </resources>

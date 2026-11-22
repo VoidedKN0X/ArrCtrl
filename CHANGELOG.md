@@ -4,6 +4,23 @@ What changed in each ArrCtrl release. Every release on the [Releases page](https
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+Built and checked by CI only: nothing here has been run on a phone yet.
+
+### Fixed
+
+- **"Hide in screenshots" and "Hide in recent apps" hold from the first moment.** Right after opening ArrCtrl, for the instant before your settings were read, the window could be screenshotted and the Recents card could show the app even with these switches on. Both now stay on until the settings are known, then follow your choice as before.
+
+### Changed
+
+- **Download times are formatted a bit faster.** The short-unit formatter for the time left on torrents and queue items (like "2h 5m") is now made once per language instead of for every row on every 2-second refresh. What you see is the same.
+
+### Security
+
+- **Your API key no longer appears in web addresses.** The live queue connection (the "live" badge on the Activity tab) put the Radarr, Sonarr or Lidarr API key in the address of the connection as well as in the request header. Reverse proxies such as Nginx Proxy Manager and the servers' own access logs keep full addresses, so the key ended up in those logs every time you opened the Activity tab and on every reconnect. The key is now only sent in the X-Api-Key header, which these logs don't record. Please check once that the Activity tab still shows "live" with your Radarr and Sonarr; if a server refused it, the queue falls back to refreshing every 5 seconds as before.
+- **"Forgot PIN?" now asks for your phone's screen lock.** Before, anyone holding your unlocked phone could tap "Forgot PIN?" on ArrCtrl's lock screen and remove the servers and the app lock without knowing the PIN. Now the reset first asks for your phone's own PIN, pattern, password or fingerprint. If you cancel or it fails, nothing is reset. If your phone has no screen lock at all, the reset works as before, after the same confirmation. The "Forgot your PIN?" dialog says so, in all four languages.
+
 ## v1.12.1 (2026-11-21)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.

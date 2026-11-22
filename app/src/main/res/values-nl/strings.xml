@@ -777,7 +777,7 @@
     <string name="lock_too_many">Te veel pogingen. Probeer opnieuw over %1$d s</string>
     <string name="lock_forgot">Pincode vergeten?</string>
     <string name="lock_forgot_title">Je pincode vergeten?</string>
-    <string name="lock_forgot_body">De pincode kan niet hersteld worden, want ze versleutelt je bewaarde API-sleutels en wachtwoorden. ArrCtrl verwijdert elke server met zijn API-sleutel of wachtwoord, en wat de meldingen op deze telefoon onthouden hebben. Op je servers verandert er niets.</string>
+    <string name="lock_forgot_body">De pincode kan niet hersteld worden, want ze versleutelt je bewaarde API-sleutels en wachtwoorden. ArrCtrl verwijdert elke server met zijn API-sleutel of wachtwoord, en wat de meldingen op deze telefoon onthouden hebben. Op je servers verandert er niets. Heeft je telefoon een schermvergrendeling, dan bevestig je eerst daarmee.</string>
     <string name="lock_forgot_confirm">Servers verwijderen en resetten</string>
     <string name="lock_choose_pin">Kies een pincode voor de app</string>
     <string name="lock_enable_intro">Minstens %1$d cijfers, anders dan de pincode van je telefoon. Als je ze vergeet, kom je er alleen weer in door je servers opnieuw toe te voegen.</string>
@@ -1085,4 +1085,7 @@
     <string name="albums">Albums</string>
     <string name="calendar_album">Album</string>
     <string name="notify_push_test_message">ArrCtrl-test</string>
+    <string name="lock_reset_prompt_title">App-vergrendeling van ArrCtrl resetten</string>
+    <string name="lock_reset_prompt_subtitle">Bevestig met de schermvergrendeling van je telefoon dat jij het bent</string>
+    <string name="lock_reset_prompt_failed">De schermvergrendeling kon niet getoond worden</string>
 </resources>

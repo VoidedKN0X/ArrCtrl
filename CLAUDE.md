@@ -31,7 +31,7 @@
 
 ## Languages
 
-English (`values/strings.xml`) and Dutch (`values-nl/strings.xml`, Belgian Dutch, informal "je"). Android picks by the phone's language; there is no in-app switch. A new string needs both files.
+English (`values/strings.xml`), Dutch (`values-nl/strings.xml`, Belgian Dutch, informal "je"), French (`values-fr/strings.xml`, polite "vous") and German (`values-de/strings.xml`, informal "du"). Android picks by the phone's language; there is no in-app switch. A new string needs all four files.
 
 ## Dependency verification
 
